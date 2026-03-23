@@ -10,6 +10,7 @@ const http: AxiosInstance = axios.create({
     Accept: 'application/json',
   },
   withCredentials: true,
+  withXSRFToken: true,
 })
 
 http.interceptors.request.use((config) => {
