@@ -1,5 +1,5 @@
 const apiBaseUrl = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace(/\/+$/, '')
-const backendOrigin = apiBaseUrl.replace(/\/api(?:\/.*)?$/, '')
+export const backendOrigin = apiBaseUrl.replace(/\/api(?:\/.*)?$/, '')
 
 export const resolveAssetUrl = (value: string | null | undefined): string => {
   if (!value) return ''
