@@ -64,6 +64,7 @@ const AuthService = {
   },
 
   async verifyEmailCode(payload: VerifyEmailCodePayload) {
+    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
     const { data } = await http.post('/auth/verify-email-code', payload)
     return data
   },
@@ -79,6 +80,7 @@ const AuthService = {
   },
 
   async forgotPassword(payload: ForgotPasswordPayload) {
+    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
     const { data } = await http.post('/auth/forgot-password', payload)
     return data
   },
