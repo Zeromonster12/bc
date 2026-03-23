@@ -1,0 +1,8 @@
+FROM clamav/clamav:latest
+
+ENV CLAMAV_NO_TCP_CHECK=false
+ENV CLAMD_SETTINGS_LogFile=/var/log/clamav/clamd.log
+ENV CLAMD_SETTINGS_TCPSocket=3310
+ENV CLAMD_SETTINGS_TCPAddr=0.0.0.0
+
+EXPOSE 3310
