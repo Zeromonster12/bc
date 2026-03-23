@@ -1,4 +1,5 @@
 import http from '@/services/core/http'
+import { backendOrigin } from '@/services/core/url'
 
 export interface LoginCredentials {
   email: string
@@ -41,6 +42,7 @@ export interface OAuthCallbackPayload {
 
 const AuthService = {
   async login(credentials: LoginCredentials) {
+    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
     const { data } = await http.post('/auth/login', credentials)
     return data
   },
@@ -66,6 +68,7 @@ const AuthService = {
   },
 
   async logout() {
+    await http.get(`${backendOrigin}/sanctum/csrf-cookie`)
     await http.post('/auth/logout')
   },
 
