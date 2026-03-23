@@ -222,6 +222,21 @@ class StudentCvController extends Controller
         }
 
         $fullPath = Storage::disk('local')->path($storagePath);
+
+        $driver = trim((string) config('security.cv_antivirus_driver', 'command'));
+
+        if ($driver === 'clamd_tcp') {
+            return $this->scanWithClamdTcp($fullPath);
+        }
+
+        return $this->scanWithCommand($fullPath);
+    }
+
+    /**
+     * @return array{status: string, message: string}
+     */
+    private function scanWithCommand(string $fullPath): array
+    {
         $command = trim((string) config('security.cv_antivirus_command', 'clamscan --no-summary'));
 
         if ($command === '') {
@@ -275,6 +290,134 @@ class StudentCvController extends Controller
                 'status' => 'scan_error',
                 'message' => $e->getMessage(),
             ];
+        }
+    }
+
+    /**
+     * @return array{status: string, message: string}
+     */
+    private function scanWithClamdTcp(string $fullPath): array
+    {
+        $host = trim((string) config('security.cv_antivirus_clamd_host', 'clamav'));
+        $port = (int) config('security.cv_antivirus_clamd_port', 3310);
+        $timeout = (float) config('security.cv_antivirus_clamd_timeout', 10);
+
+        if ($host === '' || $port < 1 || $port > 65535) {
+            return [
+                'status' => 'scan_error',
+                'message' => 'Invalid clamd host or port configuration.',
+            ];
+        }
+
+        if (! is_file($fullPath) || ! is_readable($fullPath)) {
+            return [
+                'status' => 'scan_error',
+                'message' => 'Stored file is not readable for antivirus scan.',
+            ];
+        }
+
+        $errno = 0;
+        $errstr = '';
+
+        $socket = @stream_socket_client(
+            sprintf('tcp://%s:%d', $host, $port),
+            $errno,
+            $errstr,
+            $timeout
+        );
+
+        if (! is_resource($socket)) {
+            return [
+                'status' => 'scan_error',
+                'message' => sprintf('Failed to connect to clamd at %s:%d (%s).', $host, $port, $errstr !== '' ? $errstr : 'connection failed'),
+            ];
+        }
+
+        try {
+            stream_set_timeout($socket, (int) max(1, ceil($timeout)));
+
+            if (fwrite($socket, "zINSTREAM\0") === false) {
+                return [
+                    'status' => 'scan_error',
+                    'message' => 'Failed to initialize clamd INSTREAM command.',
+                ];
+            }
+
+            $fileHandle = fopen($fullPath, 'rb');
+            if (! is_resource($fileHandle)) {
+                return [
+                    'status' => 'scan_error',
+                    'message' => 'Failed to open file for clamd scan.',
+                ];
+            }
+
+            try {
+                while (! feof($fileHandle)) {
+                    $chunk = fread($fileHandle, 8192);
+                    if ($chunk === false) {
+                        return [
+                            'status' => 'scan_error',
+                            'message' => 'Failed while reading file for antivirus scan.',
+                        ];
+                    }
+
+                    if ($chunk === '') {
+                        continue;
+                    }
+
+                    $packet = pack('N', strlen($chunk)) . $chunk;
+                    if (fwrite($socket, $packet) === false) {
+                        return [
+                            'status' => 'scan_error',
+                            'message' => 'Failed while streaming file to clamd.',
+                        ];
+                    }
+                }
+            } finally {
+                fclose($fileHandle);
+            }
+
+            if (fwrite($socket, pack('N', 0)) === false) {
+                return [
+                    'status' => 'scan_error',
+                    'message' => 'Failed to finalize clamd stream.',
+                ];
+            }
+
+            $response = trim((string) stream_get_contents($socket));
+
+            if ($response === '') {
+                return [
+                    'status' => 'scan_error',
+                    'message' => 'No response from clamd.',
+                ];
+            }
+
+            if (str_contains($response, 'FOUND')) {
+                return [
+                    'status' => 'infected',
+                    'message' => $response,
+                ];
+            }
+
+            if (str_contains($response, 'OK')) {
+                return [
+                    'status' => 'clean',
+                    'message' => 'Antivirus scan passed.',
+                ];
+            }
+
+            return [
+                'status' => 'scan_error',
+                'message' => $response,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'status' => 'scan_error',
+                'message' => $e->getMessage(),
+            ];
+        } finally {
+            fclose($socket);
         }
     }
 }
