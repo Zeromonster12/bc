@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Project extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'company_user_id',
+        'title',
+        'description',
+        'requirements',
+        'tech_stack',
+        'status',
+        'max_students',
+        'deadline',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'tech_stack' => 'array',
+            'deadline' => 'date',
+        ];
+    }
+
+    public function companyUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'company_user_id');
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
+    }
+}

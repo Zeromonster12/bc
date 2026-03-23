@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+:root {
+  --color-primary: #0f766e;
+  --color-primary-dark: #115e59;
+  --color-surface: #f8fafc;
+  --color-surface-strong: #ffffff;
+  --color-ink: #0f172a;
+  --color-ink-muted: #475569;
+}
+
+body {
+  font-family:
+    'Plus Jakarta Sans',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    sans-serif;
+  @apply min-h-screen text-slate-900 antialiased;
+  background:
+    radial-gradient(1200px 600px at -10% -10%, rgba(20, 184, 166, 0.12), transparent 55%),
+    radial-gradient(1000px 600px at 110% 10%, rgba(15, 118, 110, 0.1), transparent 50%),
+    var(--color-surface);
+}
+
+#app {
+  @apply min-h-screen;
+}
+
+.surface-card {
+  @apply rounded-2xl border border-slate-200/70 bg-white/95 shadow-sm;
+}
+
+.surface-glass {
+  @apply rounded-2xl border border-white/50 bg-white/70 backdrop-blur;
+}
