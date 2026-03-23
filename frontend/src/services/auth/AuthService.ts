@@ -58,6 +58,7 @@ const AuthService = {
   },
 
   async register(payload: RegisterData) {
+    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
     const { data } = await http.post('/auth/register', payload)
     return data
   },
