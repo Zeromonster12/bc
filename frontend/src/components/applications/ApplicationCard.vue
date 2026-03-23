@@ -42,53 +42,19 @@
           </a>
         </div>
       </div>
-      <ApplicationStatusBadge :status="application.status" />
+      <ApplicationStatusBadge :status="application.status ?? 'pending'" />
     </div>
-    <p class="text-xs text-gray-600 line-clamp-2">{{ application.cover_letter }}</p>
+    <p class="text-xs text-gray-600 line-clamp-2">{{ application.cover_letter ?? '' }}</p>
 
     <div
-      v-if="application.status === 'accepted' && application.student_project_status"
+      v-if="application.status === 'accepted'"
       class="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2"
     >
-      <p class="text-xs font-semibold text-emerald-800">
-        Student project progress:
-        {{ studentProjectStatusLabel(application.student_project_status) }}
+      <p class="text-xs font-semibold text-emerald-800">Tasks summary</p>
+      <p class="mt-1 text-xs text-emerald-900/80">
+        Total: {{ taskStats.total }} | Todo: {{ taskStats.todo }} | In progress:
+        {{ taskStats.inProgress }} | Complete: {{ taskStats.complete }}
       </p>
-      <p
-        v-if="application.student_project_note"
-        class="mt-1 text-xs text-emerald-900/80 whitespace-pre-line"
-      >
-        {{ application.student_project_note }}
-      </p>
-      <p
-        v-if="application.student_project_status_updated_at"
-        class="mt-1 text-[11px] text-emerald-800/70"
-      >
-        Updated {{ formatDateTime(application.student_project_status_updated_at) }}
-      </p>
-
-      <div
-        v-if="application.progress_updates && application.progress_updates.length > 0"
-        class="mt-3 border-t border-emerald-100 pt-2"
-      >
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-800/80">
-          Timeline
-        </p>
-        <ul class="mt-2 space-y-1.5">
-          <li
-            v-for="update in application.progress_updates.slice(0, 3)"
-            :key="update.id"
-            class="text-xs text-emerald-900/80"
-          >
-            <span class="font-semibold">{{ update.title }}</span>
-            <span v-if="update.student_project_status">
-              ({{ studentProjectStatusLabel(update.student_project_status) }})</span
-            >
-            <span class="text-emerald-800/70"> - {{ formatDateTime(update.created_at) }}</span>
-            <p v-if="update.notes" class="mt-0.5 text-emerald-900/70">{{ update.notes }}</p>
-          </li>
-        </ul>
-      </div>
     </div>
 
     <div class="flex items-center justify-between">
@@ -107,18 +73,14 @@ import { resolveAssetUrl } from '@/services/core/url'
 
 interface ApplicationCardItem {
   id: number
-  status: string
-  cover_letter: string
-  created_at: string
-  student_project_status?: 'not_started' | 'in_progress' | 'blocked' | 'completed' | null
-  student_project_note?: string | null
-  student_project_status_updated_at?: string | null
-  progress_updates?: Array<{
+  status?: string
+  cover_letter?: string
+  created_at?: string
+  tasks?: Array<{
     id: number
-    title: string
-    notes?: string | null
-    student_project_status?: string | null
-    created_at: string
+    title?: string
+    status?: 'todo' | 'in_progress' | 'complete' | null
+    created_at?: string
   }>
   student?: {
     name?: string
@@ -158,16 +120,27 @@ export default defineComponent({
         .toUpperCase()
         .slice(0, 2)
     },
+    taskStats(): { total: number; todo: number; inProgress: number; complete: number } {
+      const tasks = this.application.tasks ?? []
+      return {
+        total: tasks.length,
+        todo: tasks.filter((task) => task.status === 'todo').length,
+        inProgress: tasks.filter((task) => task.status === 'in_progress').length,
+        complete: tasks.filter((task) => task.status === 'complete').length,
+      }
+    },
   },
   methods: {
-    formatDate(date: string): string {
+    formatDate(date?: string): string {
+      if (!date) return 'Unknown'
       return new Date(date).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
       })
     },
-    formatDateTime(value: string): string {
+    formatDateTime(value?: string): string {
+      if (!value) return 'Unknown'
       return new Date(value).toLocaleString('en-US', {
         month: 'short',
         day: 'numeric',
@@ -175,13 +148,6 @@ export default defineComponent({
         hour: '2-digit',
         minute: '2-digit',
       })
-    },
-    studentProjectStatusLabel(status: string): string {
-      if (status === 'not_started') return 'Not started'
-      if (status === 'in_progress') return 'In progress'
-      if (status === 'blocked') return 'Blocked'
-      if (status === 'completed') return 'Completed'
-      return status
     },
   },
 })

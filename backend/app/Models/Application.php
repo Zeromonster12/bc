@@ -44,4 +44,9 @@ class Application extends Model
     {
         return $this->hasMany(ApplicationProgressUpdate::class)->latest('id');
     }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(ApplicationTask::class)->latest('id');
+    }
 }

@@ -85,6 +85,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/applications/company-board',
+      name: 'applications.company-board',
+      component: () => import('@/views/applications/CompanyTaskBoardView.vue'),
+      meta: { requiresAuth: true, roles: ['company'] },
+    },
+    {
       path: '/applications/accepted',
       name: 'applications.accepted',
       component: () => import('@/views/applications/AcceptedProjectsView.vue'),

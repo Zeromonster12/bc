@@ -46,6 +46,43 @@
                 Reject
               </BaseButton>
             </div>
+
+            <div v-if="application.status === 'accepted'" class="mt-3 w-full space-y-2">
+              <p class="text-xs font-semibold text-gray-700">Create task for student</p>
+              <input
+                v-model="taskTitle[application.id]"
+                type="text"
+                maxlength="160"
+                class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Task title"
+              />
+              <div class="grid gap-2 sm:grid-cols-[160px_1fr]">
+                <select
+                  v-model="taskPriority[application.id]"
+                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+                <textarea
+                  v-model="taskRequirements[application.id]"
+                  rows="2"
+                  maxlength="5000"
+                  class="w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Requirements for this task"
+                />
+              </div>
+              <BaseButton
+                variant="primary"
+                size="sm"
+                :loading="creatingTaskId === application.id"
+                @click="emitCreateTask(application.id)"
+              >
+                Create task
+              </BaseButton>
+            </div>
           </template>
         </ApplicationCard>
       </div>
@@ -65,6 +102,8 @@ interface CompanyProject {
 
 interface ApplicationListItem {
   id: number
+  cover_letter?: string
+  created_at?: string
   status?: string
   [key: string]: unknown
 }
@@ -89,7 +128,38 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    creatingTaskId: {
+      type: Number as PropType<number | null>,
+      default: null,
+    },
   },
-  emits: ['update-status'],
+  emits: ['update-status', 'create-task'],
+  data() {
+    return {
+      taskTitle: {} as Record<number, string>,
+      taskPriority: {} as Record<number, 'low' | 'medium' | 'high' | 'urgent'>,
+      taskRequirements: {} as Record<number, string>,
+    }
+  },
+  methods: {
+    emitCreateTask(applicationId: number) {
+      const title = (this.taskTitle[applicationId] ?? '').trim()
+      if (!title) return
+
+      const priority = this.taskPriority[applicationId] ?? 'medium'
+      const requirements = (this.taskRequirements[applicationId] ?? '').trim()
+
+      this.$emit('create-task', {
+        applicationId,
+        title,
+        priority,
+        requirements: requirements || undefined,
+      })
+
+      this.taskTitle[applicationId] = ''
+      this.taskRequirements[applicationId] = ''
+      this.taskPriority[applicationId] = 'medium'
+    },
+  },
 })
 </script>

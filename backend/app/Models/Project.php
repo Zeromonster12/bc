@@ -44,4 +44,19 @@ class Project extends Model
     {
         return $this->hasMany(Conversation::class);
     }
+
+    public function taskFolders(): HasMany
+    {
+        return $this->hasMany(ApplicationTaskFolder::class)->orderBy('position')->orderBy('id');
+    }
+
+    public function taskCategories(): HasMany
+    {
+        return $this->hasMany(ApplicationTaskCategory::class)->orderBy('position')->orderBy('id');
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(ApplicationTask::class)->orderBy('position')->orderBy('id');
+    }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProjectTaskBoardController;
 use App\Http\Controllers\Profile\StudentCvController;
 use App\Http\Controllers\Profile\StudentProfileController;
 use App\Http\Controllers\ProjectController;
@@ -42,9 +43,10 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/applications', [ApplicationController::class, 'index']);
     Route::post('/projects/{project}/apply', [ApplicationController::class, 'store']);
     Route::patch('/applications/{application}', [ApplicationController::class, 'update']);
-    Route::patch('/applications/{application}/student-progress', [ApplicationController::class, 'updateStudentProgress']);
-    Route::get('/applications/{application}/progress-updates', [ApplicationController::class, 'listProgressUpdates']);
-    Route::post('/applications/{application}/progress-updates', [ApplicationController::class, 'storeProgressUpdate']);
+    Route::get('/applications/{application}/tasks', [ApplicationController::class, 'listTasks']);
+    Route::post('/applications/{application}/tasks', [ApplicationController::class, 'storeTask']);
+    Route::patch('/applications/{application}/tasks/{task}', [ApplicationController::class, 'updateTask']);
+    Route::delete('/applications/{application}/tasks/{task}', [ApplicationController::class, 'destroyTask']);
     Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
 
     Route::get('/projects', [ProjectController::class, 'index']);
@@ -52,6 +54,15 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/projects', [ProjectController::class, 'store']);
     Route::put('/projects/{project}', [ProjectController::class, 'update']);
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+
+    Route::get('/projects/{project}/task-board', [ProjectTaskBoardController::class, 'show']);
+    Route::get('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'listFolders']);
+    Route::post('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'storeFolder']);
+    Route::patch('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'updateFolder']);
+    Route::delete('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'destroyFolder']);
+    Route::post('/projects/{project}/task-folders/{folder}/categories', [ProjectTaskBoardController::class, 'storeCategory']);
+    Route::patch('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'updateCategory']);
+    Route::delete('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'destroyCategory']);
 
     Route::get('/profile/student', [StudentProfileController::class, 'show'])
         ->middleware('throttle:30,1');

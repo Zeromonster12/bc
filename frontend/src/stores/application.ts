@@ -7,9 +7,7 @@ interface Application {
   student: Record<string, unknown>
   cover_letter: string
   status: 'pending' | 'accepted' | 'rejected' | 'withdrawn'
-  student_project_status: 'not_started' | 'in_progress' | 'blocked' | 'completed' | null
-  student_project_note: string | null
-  student_project_status_updated_at: string | null
+  tasks: Array<Record<string, unknown>>
   reviewed_at: string | null
   created_at: string
 }
@@ -83,19 +81,6 @@ export const useApplicationStore = defineStore('application', {
         const application = this.applications[index]
         if (application) application.status = 'withdrawn'
       }
-    },
-
-    async updateStudentProjectProgress(
-      id: number,
-      payload: {
-        student_project_status: 'not_started' | 'in_progress' | 'blocked' | 'completed'
-        student_project_note?: string
-      },
-    ) {
-      const result = await ApplicationService.updateStudentProjectProgress(id, payload)
-      const index = this.applications.findIndex((a) => a.id === id)
-      if (index !== -1) this.applications[index] = result.data
-      return result.data as Application
     },
   },
 })

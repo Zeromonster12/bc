@@ -29,7 +29,9 @@
             :applications="filteredApplications"
             :updating-id="updatingId"
             :updating-status="updatingStatus"
+            :creating-task-id="creatingTaskId"
             @update-status="handlePanelUpdateStatus"
+            @create-task="handleCreateTask"
           />
         </div>
 
@@ -67,6 +69,7 @@ import {
   findProjectById,
   toPagination,
 } from '@/services/applications/ApplicationsViewService'
+import ApplicationService from '@/services/applications/ApplicationService'
 import AppLayout from '@/layouts/AppLayout.vue'
 import ApplicationStatusFilters from '@/components/applications/ApplicationStatusFilters.vue'
 import CompanyProjectList from '@/components/applications/CompanyProjectList.vue'
@@ -98,6 +101,7 @@ export default defineComponent({
       withdrawingId: null as number | null,
       updatingId: null as number | null,
       updatingStatus: '',
+      creatingTaskId: null as number | null,
       statusOptions: [
         { value: 'all', label: 'All' },
         { value: 'pending', label: 'Pending' },
@@ -191,6 +195,27 @@ export default defineComponent({
       } finally {
         this.updatingId = null
         this.updatingStatus = ''
+      }
+    },
+    async handleCreateTask(payload: {
+      applicationId: number
+      title: string
+      priority: 'low' | 'medium' | 'high' | 'urgent'
+      requirements?: string
+    }) {
+      this.creatingTaskId = payload.applicationId
+      try {
+        await ApplicationService.createTask(payload.applicationId, {
+          title: payload.title,
+          priority: payload.priority,
+          requirements: payload.requirements,
+        })
+
+        if (this.auth.isCompany) {
+          await this.fetchCompanyApplicationsForSelectedProject(1)
+        }
+      } finally {
+        this.creatingTaskId = null
       }
     },
   },

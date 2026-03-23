@@ -4,7 +4,7 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Accepted Projects</h1>
         <p class="text-sm text-gray-600 mt-1">
-          Track only projects where you were accepted and manage your current work status.
+          Track assigned tasks for projects where your application was accepted.
         </p>
       </div>
 
@@ -62,93 +62,76 @@
             </span>
           </div>
 
-          <div class="grid gap-4 md:grid-cols-[220px_220px_1fr_auto] md:items-end">
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">My progress</label>
-              <select
-                v-model="localStatus[application.id]"
-                class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              >
-                <option value="not_started">Not started</option>
-                <option value="in_progress">In progress</option>
-                <option value="blocked">Blocked</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Change title</label>
-              <input
-                v-model="localTitle[application.id]"
-                type="text"
-                maxlength="160"
-                class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="e.g. API integration finished"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-gray-700 mb-1">Notes</label>
-              <textarea
-                v-model="localNote[application.id]"
-                rows="2"
-                maxlength="5000"
-                class="w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="What changed on this project?"
-              />
-            </div>
-
-            <div class="md:self-end">
-              <BaseButton
-                variant="primary"
-                :loading="savingId === application.id"
-                @click="saveProgress(application.id)"
-              >
-                Submit update
-              </BaseButton>
-            </div>
-          </div>
-
-          <p v-if="application.student_project_status_updated_at" class="text-xs text-gray-500">
-            Last updated: {{ formatDateTime(application.student_project_status_updated_at) }}
-          </p>
-
           <section class="rounded-lg border border-slate-200 bg-slate-50/60 p-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-slate-900">Timeline</h3>
-              <span class="text-xs text-slate-500">Newest first</span>
+              <h3 class="text-sm font-semibold text-slate-900">My assigned tasks</h3>
+              <span class="text-xs text-slate-500">Todo, in progress, complete</span>
             </div>
 
-            <div v-if="timelineLoading[application.id]" class="mt-3 space-y-2">
-              <div v-for="n in 2" :key="n" class="h-12 rounded bg-slate-200/70 animate-pulse" />
-            </div>
-
-            <ul v-else-if="(timelines[application.id] ?? []).length > 0" class="mt-3 space-y-3">
+            <ul v-if="(tasksByApplication[application.id] ?? []).length > 0" class="mt-3 space-y-3">
               <li
-                v-for="entry in timelines[application.id]"
-                :key="entry.id"
-                class="relative rounded-md border border-slate-200 bg-white p-3"
+                v-for="task in tasksByApplication[application.id]"
+                :key="task.id"
+                class="rounded-md border border-slate-200 bg-white p-3"
               >
-                <div class="flex flex-wrap items-center gap-2">
-                  <p class="text-sm font-semibold text-slate-900">{{ entry.title }}</p>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <p class="text-sm font-semibold text-slate-900">{{ task.title }}</p>
                   <span
                     class="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-[11px] font-medium text-indigo-700"
                   >
-                    {{ progressStatusLabel(entry.student_project_status) }}
+                    {{ priorityLabel(task.priority) }}
                   </span>
                 </div>
-                <p v-if="entry.notes" class="mt-1 text-xs text-slate-600 whitespace-pre-line">
-                  {{ entry.notes }}
+
+                <p v-if="task.requirements" class="mt-1 text-xs text-slate-600 whitespace-pre-line">
+                  {{ task.requirements }}
                 </p>
-                <p class="mt-1 text-[11px] text-slate-500">
-                  {{ formatDateTime(entry.created_at) }}
+
+                <div class="mt-3 grid gap-3 md:grid-cols-[220px_1fr_auto] md:items-end">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <select
+                      v-model="taskStatus[task.id]"
+                      class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      <option value="todo">Todo</option>
+                      <option value="in_progress">In progress</option>
+                      <option value="complete">Complete</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">My note</label>
+                    <textarea
+                      v-model="taskNote[task.id]"
+                      rows="2"
+                      maxlength="1000"
+                      class="w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="Optional note for company"
+                    />
+                  </div>
+
+                  <div class="md:self-end">
+                    <BaseButton
+                      variant="primary"
+                      :loading="savingTaskId === task.id"
+                      @click="saveTask(application.id, task.id)"
+                    >
+                      Save
+                    </BaseButton>
+                  </div>
+                </div>
+
+                <p class="mt-2 text-[11px] text-slate-500">
+                  Created {{ formatDateTime(task.created_at) }}
+                  <span v-if="task.completed_at">
+                    | Completed {{ formatDateTime(task.completed_at) }}</span
+                  >
                 </p>
               </li>
             </ul>
 
-            <p v-else class="mt-3 text-xs text-slate-500">
-              No updates yet. Submit your first project change above.
-            </p>
+            <p v-else class="mt-3 text-xs text-slate-500">No tasks assigned yet.</p>
           </section>
         </article>
       </div>
@@ -164,15 +147,24 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
-type StudentProgressStatus = 'not_started' | 'in_progress' | 'blocked' | 'completed'
+type TaskStatus = 'todo' | 'in_progress' | 'complete'
+type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
+
+interface ApplicationTaskItem {
+  id: number
+  title: string
+  requirements: string | null
+  priority: TaskPriority
+  status: TaskStatus
+  student_note: string | null
+  created_at: string
+  completed_at: string | null
+}
 
 interface AcceptedApplicationItem {
   id: number
   status: string
-  student_project_status: StudentProgressStatus | null
-  student_project_note: string | null
-  student_project_status_updated_at: string | null
-  progress_updates?: ProgressUpdateItem[]
+  tasks?: ApplicationTaskItem[]
   project?: {
     title?: string
     status?: string
@@ -181,14 +173,6 @@ interface AcceptedApplicationItem {
       name?: string
     }
   }
-}
-
-interface ProgressUpdateItem {
-  id: number
-  title: string
-  notes: string | null
-  student_project_status: StudentProgressStatus | null
-  created_at: string
 }
 
 export default defineComponent({
@@ -202,19 +186,17 @@ export default defineComponent({
   data() {
     return {
       loading: true,
-      savingId: null as number | null,
+      savingTaskId: null as number | null,
       errorMessage: '',
       successMessage: '',
-      localStatus: {} as Record<number, StudentProgressStatus>,
-      localTitle: {} as Record<number, string>,
-      localNote: {} as Record<number, string>,
-      timelineLoading: {} as Record<number, boolean>,
-      timelines: {} as Record<number, ProgressUpdateItem[]>,
+      tasksByApplication: {} as Record<number, ApplicationTaskItem[]>,
+      taskStatus: {} as Record<number, TaskStatus>,
+      taskNote: {} as Record<number, string>,
     }
   },
   computed: {
     acceptedApplications(): AcceptedApplicationItem[] {
-      return (this.applicationStore.applications as AcceptedApplicationItem[]).filter(
+      return (this.applicationStore.applications as unknown as AcceptedApplicationItem[]).filter(
         (item) => item.status === 'accepted',
       )
     },
@@ -230,15 +212,13 @@ export default defineComponent({
       try {
         await this.applicationStore.fetchApplications({ status: 'accepted', per_page: 100 })
         this.acceptedApplications.forEach((application) => {
-          this.localStatus[application.id] = application.student_project_status ?? 'not_started'
-          this.localTitle[application.id] = ''
-          this.localNote[application.id] = application.student_project_note ?? ''
-          this.timelines[application.id] = application.progress_updates ?? []
+          const tasks = (application.tasks ?? []) as ApplicationTaskItem[]
+          this.tasksByApplication[application.id] = tasks
+          tasks.forEach((task) => {
+            this.taskStatus[task.id] = task.status
+            this.taskNote[task.id] = task.student_note ?? ''
+          })
         })
-
-        await Promise.all(
-          this.acceptedApplications.map((application) => this.loadTimeline(application.id)),
-        )
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage =
@@ -247,69 +227,42 @@ export default defineComponent({
         this.loading = false
       }
     },
-    async loadTimeline(applicationId: number) {
-      this.timelineLoading[applicationId] = true
-      try {
-        const response = await ApplicationService.listProgressUpdates(applicationId)
-        this.timelines[applicationId] = response.data as ProgressUpdateItem[]
-      } catch {
-        this.timelines[applicationId] = this.timelines[applicationId] ?? []
-      } finally {
-        this.timelineLoading[applicationId] = false
-      }
-    },
-    async saveProgress(applicationId: number) {
-      const status = this.localStatus[applicationId] ?? 'not_started'
-      const title = (this.localTitle[applicationId] ?? '').trim()
-      const note = this.localNote[applicationId] ?? ''
+    async saveTask(applicationId: number, taskId: number) {
+      const status = this.taskStatus[taskId] ?? 'todo'
+      const studentNote = (this.taskNote[taskId] ?? '').trim()
 
-      if (!title) {
-        this.errorMessage = 'Please add a short change title before submitting update.'
-        return
-      }
-
-      this.savingId = applicationId
+      this.savingTaskId = taskId
       this.errorMessage = ''
       this.successMessage = ''
 
       try {
-        const response = await ApplicationService.submitProgressUpdate(applicationId, {
-          title,
-          notes: note,
-          student_project_status: status,
+        const response = await ApplicationService.updateTask(applicationId, taskId, {
+          status,
+          student_note: studentNote,
         })
 
-        const updatedApplication = response.application as AcceptedApplicationItem
-        const index = this.applicationStore.applications.findIndex(
-          (app) => app.id === applicationId,
+        const updatedTask = response.data as ApplicationTaskItem
+        const tasks = this.tasksByApplication[applicationId] ?? []
+        this.tasksByApplication[applicationId] = tasks.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task,
         )
-        if (index !== -1) {
-          this.applicationStore.applications[index] = updatedApplication as never
-        }
+        this.taskStatus[taskId] = updatedTask.status
+        this.taskNote[taskId] = updatedTask.student_note ?? ''
 
-        this.localStatus[applicationId] = (updatedApplication.student_project_status ??
-          status) as StudentProgressStatus
-        this.localNote[applicationId] = updatedApplication.student_project_note ?? ''
-        this.localTitle[applicationId] = ''
-
-        await this.loadTimeline(applicationId)
-
-        this.successMessage = 'Project update submitted.'
+        this.successMessage = 'Task updated.'
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
-        this.errorMessage =
-          typedError?.response?.data?.message ?? 'Failed to submit project update.'
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to update task.'
       } finally {
-        this.savingId = null
+        this.savingTaskId = null
       }
     },
-    progressStatusLabel(status?: StudentProgressStatus | null): string {
-      if (!status) return 'Unknown'
-      if (status === 'not_started') return 'Not started'
-      if (status === 'in_progress') return 'In progress'
-      if (status === 'blocked') return 'Blocked'
-      if (status === 'completed') return 'Completed'
-      return status
+    priorityLabel(priority: TaskPriority): string {
+      if (priority === 'low') return 'Low'
+      if (priority === 'medium') return 'Medium'
+      if (priority === 'high') return 'High'
+      if (priority === 'urgent') return 'Urgent'
+      return priority
     },
     formatDate(value?: string | null): string {
       if (!value) return 'Unknown'

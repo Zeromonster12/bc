@@ -106,6 +106,12 @@ export default defineComponent({
           short: 'AC',
           roles: ['student'],
         },
+        {
+          name: 'applications.company-board',
+          label: 'Task Board',
+          short: 'TB',
+          roles: ['company'],
+        },
         { name: 'profile.student', label: 'My Profile', short: 'MP', roles: ['student'] },
         { name: 'profile.company', label: 'Company Profile', short: 'CP', roles: ['company'] },
         { name: 'messages', label: 'Messages', short: 'MS', roles: ['student', 'company'] },
