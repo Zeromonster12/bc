@@ -14,6 +14,8 @@ use Throwable;
 
 class StudentCvController extends Controller
 {
+    private const CV_DISK = 'usercv';
+
     /**
      * @var array<string, string>
      */
@@ -74,7 +76,23 @@ class StudentCvController extends Controller
         $extension = self::MIME_TO_EXTENSION[$detectedMimeType];
         $storagePath = sprintf('private/cv/student/%d/%s.%s', $user->id, (string) Str::uuid(), $extension);
 
-        $stored = Storage::disk('local')->putFileAs(
+        $scanResult = $this->scanUploadedFile($file->getRealPath());
+
+        if ($scanResult['status'] === 'infected') {
+            return response()->json([
+                'message' => 'CV upload rejected: malware detected by antivirus scan.',
+                'scan_detail' => Str::limit($scanResult['message'], 300, ''),
+            ], 422);
+        }
+
+        $isScanRequired = (bool) config('security.cv_antivirus_required', false);
+        if ($scanResult['status'] === 'scan_error' && $isScanRequired) {
+            return response()->json([
+                'message' => 'CV upload blocked: antivirus scan failed and scanning is required.',
+            ], 503);
+        }
+
+        $stored = Storage::disk(self::CV_DISK)->putFileAs(
             dirname($storagePath),
             $file,
             basename($storagePath)
@@ -88,26 +106,6 @@ class StudentCvController extends Controller
 
         $tmpPath = $file->getRealPath();
         $checksum = $tmpPath ? hash_file('sha256', $tmpPath) : null;
-
-        $scanResult = $this->scanStoredFile($storagePath);
-
-        if ($scanResult['status'] === 'infected') {
-            Storage::disk('local')->delete($storagePath);
-
-            return response()->json([
-                'message' => 'CV upload rejected: malware detected by antivirus scan.',
-                'scan_detail' => Str::limit($scanResult['message'], 300, ''),
-            ], 422);
-        }
-
-        $isScanRequired = (bool) config('security.cv_antivirus_required', false);
-        if ($scanResult['status'] === 'scan_error' && $isScanRequired) {
-            Storage::disk('local')->delete($storagePath);
-
-            return response()->json([
-                'message' => 'CV upload blocked: antivirus scan failed and scanning is required.',
-            ], 503);
-        }
 
         $record = StudentCvFile::query()->create([
             'student_user_id' => $user->id,
@@ -145,7 +143,7 @@ class StudentCvController extends Controller
             ], 403);
         }
 
-        if (! Storage::disk('local')->exists($cvFile->storage_path)) {
+        if (! Storage::disk(self::CV_DISK)->exists($cvFile->storage_path)) {
             return response()->json([
                 'message' => 'CV file not found in storage.',
             ], 404);
@@ -157,8 +155,19 @@ class StudentCvController extends Controller
             ], 423);
         }
 
-        return response()->download(
-            Storage::disk('local')->path($cvFile->storage_path),
+        $stream = Storage::disk(self::CV_DISK)->readStream($cvFile->storage_path);
+
+        if (! is_resource($stream)) {
+            return response()->json([
+                'message' => 'CV file could not be streamed from storage.',
+            ], 500);
+        }
+
+        return response()->streamDownload(
+            static function () use ($stream): void {
+                fpassthru($stream);
+                fclose($stream);
+            },
             $cvFile->original_filename,
             [
                 'Content-Type' => $cvFile->mime_type,
@@ -184,7 +193,7 @@ class StudentCvController extends Controller
             ], 403);
         }
 
-        Storage::disk('local')->delete($cvFile->storage_path);
+        Storage::disk(self::CV_DISK)->delete($cvFile->storage_path);
         $cvFile->delete();
 
         return response()->json([
@@ -210,7 +219,7 @@ class StudentCvController extends Controller
     /**
      * @return array{status: string, message: string}
      */
-    private function scanStoredFile(string $storagePath): array
+    private function scanUploadedFile(?string $fullPath): array
     {
         $antivirusEnabled = (bool) config('security.cv_antivirus_enabled', false);
 
@@ -221,7 +230,12 @@ class StudentCvController extends Controller
             ];
         }
 
-        $fullPath = Storage::disk('local')->path($storagePath);
+        if (! is_string($fullPath) || $fullPath === '' || ! is_file($fullPath) || ! is_readable($fullPath)) {
+            return [
+                'status' => 'scan_error',
+                'message' => 'Uploaded file is not readable for antivirus scan.',
+            ];
+        }
 
         $driver = trim((string) config('security.cv_antivirus_driver', 'command'));
 

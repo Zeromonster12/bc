@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\StudentProfile;
+use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class StudentProfileController extends Controller
 {
+    private const AVATAR_DISK = 'userpfp';
+
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -49,10 +52,10 @@ class StudentProfileController extends Controller
         $avatarPath = $profile->avatar_path;
         if (array_key_exists('avatar', $validated) && $validated['avatar']) {
             if ($avatarPath) {
-                Storage::disk('public')->delete($avatarPath);
+                Storage::disk(self::AVATAR_DISK)->delete($avatarPath);
             }
 
-            $avatarPath = $validated['avatar']->store('student-avatars/' . $user->id, 'public');
+            $avatarPath = $validated['avatar']->store('student-avatars/' . $user->id, self::AVATAR_DISK);
         }
 
         $profile->update([
@@ -81,7 +84,10 @@ class StudentProfileController extends Controller
         $data = is_array($profile?->profile_data) ? $profile->profile_data : [];
 
         if ($profile?->avatar_path) {
-            $data['avatar_url'] = '/storage/' . $profile->avatar_path;
+            $disk = Storage::disk(self::AVATAR_DISK);
+            $data['avatar_url'] = $disk instanceof Cloud
+                ? $disk->url($profile->avatar_path)
+                : '/storage/' . $profile->avatar_path;
         }
 
         return $data;

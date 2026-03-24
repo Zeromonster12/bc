@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -106,6 +108,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getAvatarUrlAttribute(): ?string
     {
+        $avatarDisk = 'userpfp';
         $avatarPath = null;
 
         if ($this->relationLoaded('studentProfile')) {
@@ -115,7 +118,11 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         if (is_string($avatarPath) && $avatarPath !== '') {
-            return '/storage/' . $avatarPath;
+            $disk = Storage::disk($avatarDisk);
+
+            return $disk instanceof Cloud
+                ? $disk->url($avatarPath)
+                : '/storage/' . $avatarPath;
         }
 
         return null;
