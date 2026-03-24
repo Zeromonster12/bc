@@ -2,6 +2,8 @@
 
 return [
 
+    'avatar_temporary_url_minutes' => (int) env('PROFILE_AVATAR_TEMP_URL_MINUTES', 60),
+
     /*
     |--------------------------------------------------------------------------
     | Default Filesystem Disk

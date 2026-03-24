@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Filesystem\Cloud;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+use Throwable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -120,9 +121,17 @@ class User extends Authenticatable implements MustVerifyEmail
         if (is_string($avatarPath) && $avatarPath !== '') {
             $disk = Storage::disk($avatarDisk);
 
-            return $disk instanceof Cloud
-                ? $disk->url($avatarPath)
-                : '/storage/' . $avatarPath;
+            if ($disk instanceof FilesystemAdapter) {
+                try {
+                    $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+
+                    return $disk->temporaryUrl($avatarPath, now()->addMinutes($ttlMinutes));
+                } catch (Throwable) {
+                    return $disk->url($avatarPath);
+                }
+            }
+
+            return '/storage/' . $avatarPath;
         }
 
         return null;

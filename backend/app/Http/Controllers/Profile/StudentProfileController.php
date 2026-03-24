@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\StudentProfile;
-use Illuminate\Contracts\Filesystem\Cloud;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class StudentProfileController extends Controller
 {
@@ -109,9 +110,16 @@ class StudentProfileController extends Controller
 
         if ($profile?->avatar_path) {
             $disk = Storage::disk(self::AVATAR_DISK);
-            $data['avatar_url'] = $disk instanceof Cloud
-                ? $disk->url($profile->avatar_path)
-                : '/storage/' . $profile->avatar_path;
+            if ($disk instanceof FilesystemAdapter) {
+                try {
+                    $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+                    $data['avatar_url'] = $disk->temporaryUrl($profile->avatar_path, now()->addMinutes($ttlMinutes));
+                } catch (Throwable) {
+                    $data['avatar_url'] = $disk->url($profile->avatar_path);
+                }
+            } else {
+                $data['avatar_url'] = '/storage/' . $profile->avatar_path;
+            }
         }
 
         return $data;
