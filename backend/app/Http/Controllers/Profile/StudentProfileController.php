@@ -13,6 +13,7 @@ use Throwable;
 class StudentProfileController extends Controller
 {
     private const AVATAR_DISK = 'userpfp';
+    private const AVATAR_SIGNED_URL_DISK = 'userpfp_signed';
 
     public function show(Request $request): JsonResponse
     {
@@ -109,7 +110,7 @@ class StudentProfileController extends Controller
         $data = is_array($profile?->profile_data) ? $profile->profile_data : [];
 
         if ($profile?->avatar_path) {
-            $disk = Storage::disk(self::AVATAR_DISK);
+            $disk = Storage::disk(self::AVATAR_SIGNED_URL_DISK);
             if ($disk instanceof FilesystemAdapter) {
                 try {
                     $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));

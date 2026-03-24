@@ -109,7 +109,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getAvatarUrlAttribute(): ?string
     {
-        $avatarDisk = 'userpfp';
+        $avatarDisk = 'userpfp_signed';
         $avatarPath = null;
 
         if ($this->relationLoaded('studentProfile')) {
