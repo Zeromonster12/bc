@@ -605,7 +605,6 @@
               </li>
             </ul>
           </section>
-
         </fieldset>
       </form>
     </div>

@@ -34,11 +34,7 @@
       >
         <span
           class="inline-flex h-7 w-7 items-center justify-center"
-          :class="
-            isActive(link.name)
-              ? 'text-white'
-              : 'text-slate-500 group-hover:text-[#4e3aba]'
-          "
+          :class="isActive(link.name) ? 'text-white' : 'text-slate-500 group-hover:text-[#4e3aba]'"
         >
           <component :is="link.icon" class="h-4 w-4" />
         </span>
@@ -78,7 +74,12 @@
         <div
           class="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-semibold"
         >
-          <img v-if="avatarUrl" :src="avatarUrl" alt="User avatar" class="h-full w-full object-cover" />
+          <img
+            v-if="avatarUrl"
+            :src="avatarUrl"
+            alt="User avatar"
+            class="h-full w-full object-cover"
+          />
           <span v-else>{{ initials }}</span>
         </div>
         <div
@@ -108,7 +109,10 @@
           <RouterLink
             :to="profileRoute"
             class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
-            @click="profileMenuOpen = false; mobile && $emit('navigate')"
+            @click="
+              profileMenuOpen = false
+              mobile && $emit('navigate')
+            "
           >
             Profile
           </RouterLink>

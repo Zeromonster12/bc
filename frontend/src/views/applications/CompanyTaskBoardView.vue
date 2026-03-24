@@ -8,7 +8,6 @@
           class="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur"
         >
           <div class="border-b border-slate-200 px-4 py-3">
-            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Projects</p>
             <h2 class="mt-1 text-sm font-semibold text-slate-900">Company Workspace</h2>
           </div>
           <div class="flex-1 space-y-1 overflow-auto p-2">
@@ -23,6 +22,7 @@
                   : 'text-slate-700 hover:bg-slate-100',
               ]"
               @click="selectProject(project.id)"
+              ;
             >
               <span class="truncate text-sm font-medium">{{ project.title }}</span>
               <span
@@ -84,7 +84,7 @@
                       type="button"
                       class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                       @click.stop="
-                        openCreateFolderModal('todo');
+                        openCreateFolderModal('todo')
                         closeActionMenu()
                       "
                     >
@@ -96,7 +96,7 @@
                       class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                       :disabled="!selectedFolderId"
                       @click.stop="
-                        openCreateCategoryModal('todo');
+                        openCreateCategoryModal('todo')
                         closeActionMenu()
                       "
                     >
@@ -300,7 +300,7 @@
                           type="button"
                           class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                           @click.stop="
-                            openCreateTaskModal(status, entry.folder.id, null);
+                            openCreateTaskModal(status, entry.folder.id, null)
                             closeActionMenu()
                           "
                         >
@@ -311,7 +311,7 @@
                           type="button"
                           class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                           @click.stop="
-                            openCreateCategoryModal(status, entry.folder.id);
+                            openCreateCategoryModal(status, entry.folder.id)
                             closeActionMenu()
                           "
                         >
@@ -322,7 +322,7 @@
                           type="button"
                           class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                           @click.stop="
-                            startFolderRename(entry.folder.id, entry.folder.name);
+                            startFolderRename(entry.folder.id, entry.folder.name)
                             closeActionMenu()
                           "
                         >
@@ -333,7 +333,7 @@
                           type="button"
                           class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
                           @click.stop="
-                            deleteFolder(entry.folder.id, entry.folder.name);
+                            deleteFolder(entry.folder.id, entry.folder.name)
                             closeActionMenu()
                           "
                         >
@@ -431,7 +431,7 @@
                                 type="button"
                                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                                 @click.stop="
-                                  startTaskRename(task.application_id, task.id, task.title);
+                                  startTaskRename(task.application_id, task.id, task.title)
                                   closeActionMenu()
                                 "
                               >
@@ -442,7 +442,7 @@
                                 type="button"
                                 class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
                                 @click.stop="
-                                  deleteTask(task.application_id, task.id, task.title);
+                                  deleteTask(task.application_id, task.id, task.title)
                                   closeActionMenu()
                                 "
                               >
@@ -533,7 +533,7 @@
                               type="button"
                               class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                               @click.stop="
-                                openCreateTaskModal(status, entry.folder.id, category.id);
+                                openCreateTaskModal(status, entry.folder.id, category.id)
                                 closeActionMenu()
                               "
                             >
@@ -544,7 +544,7 @@
                               type="button"
                               class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                               @click.stop="
-                                startCategoryRename(entry.folder.id, category.id, category.name);
+                                startCategoryRename(entry.folder.id, category.id, category.name)
                                 closeActionMenu()
                               "
                             >
@@ -555,7 +555,7 @@
                               type="button"
                               class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
                               @click.stop="
-                                deleteCategory(entry.folder.id, category.id, category.name);
+                                deleteCategory(entry.folder.id, category.id, category.name)
                                 closeActionMenu()
                               "
                             >
@@ -652,7 +652,7 @@
                                   type="button"
                                   class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
                                   @click.stop="
-                                    startTaskRename(task.application_id, task.id, task.title);
+                                    startTaskRename(task.application_id, task.id, task.title)
                                     closeActionMenu()
                                   "
                                 >
@@ -663,7 +663,7 @@
                                   type="button"
                                   class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
                                   @click.stop="
-                                    deleteTask(task.application_id, task.id, task.title);
+                                    deleteTask(task.application_id, task.id, task.title)
                                     closeActionMenu()
                                   "
                                 >

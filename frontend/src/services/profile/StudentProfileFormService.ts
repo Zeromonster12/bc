@@ -273,11 +273,7 @@ export const addTagToField = (
 export const validateStudentProfileForm = (form: StudentProfileForm): Record<string, string> => {
   const errors: Record<string, string> = {}
 
-  const urlFields = [
-    'portfolio_url',
-    'cv_url',
-    'website_url',
-  ] as const
+  const urlFields = ['portfolio_url', 'cv_url', 'website_url'] as const
   urlFields.forEach((field) => {
     const value = form[field].trim()
     if (!value) return
