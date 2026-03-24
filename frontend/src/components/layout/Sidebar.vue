@@ -110,7 +110,7 @@
             :to="profileRoute"
             class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
             @click="
-              profileMenuOpen = false
+              profileMenuOpen = false;
               mobile && $emit('navigate')
             "
           >
