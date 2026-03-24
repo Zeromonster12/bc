@@ -10,7 +10,7 @@
 
     <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6 sm:px-10">
       <RouterLink to="/" class="text-lg font-extrabold tracking-tight text-teal-800"
-        >ProjectLinker</RouterLink
+        >Project Linker</RouterLink
       >
       <nav class="flex items-center gap-3">
         <RouterLink
