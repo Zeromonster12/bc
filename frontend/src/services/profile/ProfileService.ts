@@ -153,6 +153,14 @@ const ProfileService = {
     const { data } = await http.delete(`/profile/student/cv/${id}`)
     return data
   },
+
+  async downloadStudentCv(id: number): Promise<Blob> {
+    const { data } = await http.get(`/profile/student/cv/${id}/download`, {
+      responseType: 'blob',
+    })
+
+    return data as Blob
+  },
 }
 
 export default ProfileService

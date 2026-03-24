@@ -591,17 +591,19 @@
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <a
-                    :href="cv.download_url"
+                  <button
+                    type="button"
                     class="text-xs font-medium"
                     :class="
                       canDownloadCv(cv.scan_status)
                         ? 'text-teal-700 hover:text-teal-800'
                         : 'pointer-events-none text-slate-400'
                     "
+                    :disabled="!canDownloadCv(cv.scan_status) || downloadingCvId === cv.id"
+                    @click="handleCvDownload(cv)"
                   >
-                    Download
-                  </a>
+                    {{ downloadingCvId === cv.id ? 'Downloading...' : 'Download' }}
+                  </button>
                   <BaseButton
                     type="button"
                     variant="ghost"
@@ -729,6 +731,7 @@ export default defineComponent({
       cvUploadPhase: 'idle' as 'idle' | 'uploading' | 'scanning',
       cvFileToUpload: null as File | null,
       cvFiles: [] as StudentCvFileItem[],
+      downloadingCvId: null as number | null,
       deletingCvId: null as number | null,
     }
   },
@@ -941,6 +944,29 @@ export default defineComponent({
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to delete CV.'
       } finally {
         this.deletingCvId = null
+      }
+    },
+    async handleCvDownload(cv: StudentCvFileItem) {
+      if (!this.canDownloadCv(cv.scan_status)) return
+
+      this.downloadingCvId = cv.id
+      this.errorMessage = ''
+
+      try {
+        const blob = await ProfileService.downloadStudentCv(cv.id)
+        const objectUrl = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = objectUrl
+        link.download = cv.original_filename || 'cv-file'
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(objectUrl)
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to download CV.'
+      } finally {
+        this.downloadingCvId = null
       }
     },
     humanFileSize(sizeBytes: number): string {
