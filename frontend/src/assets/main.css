@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --color-primary: #0f766e;
@@ -10,6 +11,15 @@
   --color-ink-muted: #475569;
 }
 
+.dark {
+  --color-primary: #2dd4bf;
+  --color-primary-dark: #14b8a6;
+  --color-surface: #020617;
+  --color-surface-strong: #0f172a;
+  --color-ink: #e2e8f0;
+  --color-ink-muted: #94a3b8;
+}
+
 body {
   font-family:
     'Plus Jakarta Sans',
@@ -18,10 +28,18 @@ body {
     -apple-system,
     Segoe UI,
     sans-serif;
-  @apply min-h-screen text-slate-900 antialiased;
+  @apply min-h-screen antialiased;
+  color: var(--color-ink);
   background:
     radial-gradient(1200px 600px at -10% -10%, rgba(20, 184, 166, 0.12), transparent 55%),
     radial-gradient(1000px 600px at 110% 10%, rgba(15, 118, 110, 0.1), transparent 50%),
+    var(--color-surface);
+}
+
+.dark body {
+  background:
+    radial-gradient(1200px 600px at -10% -10%, rgba(45, 212, 191, 0.09), transparent 55%),
+    radial-gradient(1000px 600px at 110% 10%, rgba(20, 184, 166, 0.07), transparent 50%),
     var(--color-surface);
 }
 
@@ -30,9 +48,9 @@ body {
 }
 
 .surface-card {
-  @apply rounded-2xl border border-slate-200/70 bg-white/95 shadow-sm;
+  @apply rounded-2xl border border-slate-200/70 bg-white/95 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/95;
 }
 
 .surface-glass {
-  @apply rounded-2xl border border-white/50 bg-white/70 backdrop-blur;
+  @apply rounded-2xl border border-white/50 bg-white/70 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/70;
 }

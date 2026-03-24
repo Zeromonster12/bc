@@ -14,14 +14,16 @@
             'max-w-[85%] rounded-2xl px-4 py-2 text-sm shadow-sm md:max-w-lg',
             Number(message.sender?.id) === currentUserId
               ? 'rounded-br-sm bg-indigo-600 text-white'
-              : 'rounded-bl-sm border border-slate-200 bg-white text-slate-900',
+              : 'rounded-bl-sm border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
           ]"
         >
           <p>{{ message.body }}</p>
           <p
             :class="[
               'mt-1 flex items-center justify-end gap-1 text-[11px]',
-              Number(message.sender?.id) === currentUserId ? 'text-indigo-200' : 'text-slate-400',
+              Number(message.sender?.id) === currentUserId
+                ? 'text-indigo-200'
+                : 'text-slate-400 dark:text-slate-500',
             ]"
           >
             <span>{{ formatTime(message.created_at) }}</span>
@@ -39,19 +41,19 @@
       </div>
     </div>
 
-    <div v-if="typingNames.length" class="px-4 pb-2 text-xs text-slate-500">
+    <div v-if="typingNames.length" class="px-4 pb-2 text-xs text-slate-500 dark:text-slate-400">
       {{ typingText }}
     </div>
 
-    <div class="sticky bottom-0 z-10 border-t border-slate-200 bg-white px-4 py-3">
-      <div class="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
+    <div class="sticky bottom-0 z-10 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
+      <div class="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
         <textarea
           ref="textareaRef"
           v-model="body"
           rows="1"
           :disabled="sending"
           placeholder="Type a message"
-          class="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-2 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-transparent focus:outline-none disabled:opacity-50"
+          class="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-2 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-transparent focus:outline-none disabled:opacity-50 dark:text-slate-100 dark:placeholder:text-slate-500"
           @keydown.enter.exact.prevent="send"
           @input="handleTypingInput"
         />

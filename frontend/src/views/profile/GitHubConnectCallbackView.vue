@@ -1,10 +1,10 @@
 <template>
   <AppLayout>
     <div
-      class="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm"
+      class="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900"
     >
-      <h1 class="text-2xl font-bold text-slate-900">Connecting GitHub</h1>
-      <p class="mt-2 text-sm text-slate-500">
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Connecting GitHub</h1>
+      <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
         Please wait while we complete the account connection.
       </p>
 
@@ -19,12 +19,12 @@
 
       <div
         v-if="loading"
-        class="mx-auto mt-6 h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-teal-600"
+        class="mx-auto mt-6 h-9 w-9 animate-spin rounded-full border-2 border-slate-200 border-t-teal-600 dark:border-slate-700"
       ></div>
 
       <RouterLink
         to="/profile/student"
-        class="mt-6 inline-block text-sm font-medium text-teal-700 hover:text-teal-800"
+        class="mt-6 inline-block text-sm font-medium text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
       >
         Back to student profile
       </RouterLink>

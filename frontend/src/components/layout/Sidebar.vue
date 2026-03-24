@@ -2,14 +2,14 @@
   <nav
     @mouseleave="onSidebarLeave"
     :class="[
-      'h-full flex flex-col overflow-visible bg-white/95 backdrop-blur transition-all duration-200',
+      'h-full flex flex-col overflow-visible bg-white/95 backdrop-blur transition-all duration-200 dark:bg-slate-900/95',
       mobile
-        ? 'w-72 max-w-[86vw] border-r border-slate-200/80'
+        ? 'w-72 max-w-[86vw] border-r border-slate-200/80 dark:border-slate-700/80'
         : collapsed
           ? isHoverExpanded
-            ? 'w-64 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)]'
-            : 'w-16 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)]'
-          : 'w-64 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)]',
+            ? 'w-64 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-slate-700/80 dark:shadow-[0_8px_24px_rgba(2,6,23,0.45)]'
+            : 'w-16 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-slate-700/80 dark:shadow-[0_8px_24px_rgba(2,6,23,0.45)]'
+          : 'w-64 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-slate-700/80 dark:shadow-[0_8px_24px_rgba(2,6,23,0.45)]',
     ]"
   >
     <div class="flex-1 overflow-y-auto overflow-x-visible px-3 py-4 space-y-1">
@@ -26,7 +26,7 @@
             : 'gap-2.5 px-3 py-2',
           isActive(link.name)
             ? 'bg-[#4e3aba] text-white ring-1 ring-[#4e3aba]'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba]',
+            : 'text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
         ]"
         @mouseenter="onLinkEnter(link.name)"
         @mouseleave="onLinkLeave"
@@ -34,7 +34,7 @@
       >
         <span
           class="inline-flex h-7 w-7 items-center justify-center"
-          :class="isActive(link.name) ? 'text-white' : 'text-slate-500 group-hover:text-[#4e3aba]'"
+          :class="isActive(link.name) ? 'text-white' : 'text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]'"
         >
           <component :is="link.icon" class="h-4 w-4" />
         </span>
@@ -51,6 +51,39 @@
           {{ link.label }}
         </span>
       </RouterLink>
+
+      <div class="pt-2">
+        <button
+          type="button"
+          :class="[
+            'group flex items-center rounded-2xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
+            collapsed && !mobile
+              ? isHoverExpanded
+                ? 'h-9 w-full justify-start px-3'
+                : 'mx-auto h-9 w-9 justify-center overflow-hidden p-0'
+              : 'gap-2.5 px-3 py-2',
+          ]"
+          @click="toggleTheme"
+          :aria-label="themeStore.resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        >
+          <span class="inline-flex h-7 w-7 items-center justify-center text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]">
+            <Moon v-if="themeStore.resolvedTheme === 'dark'" class="h-4 w-4" />
+            <Sun v-else class="h-4 w-4" />
+          </span>
+          <span
+            :class="[
+              'truncate whitespace-nowrap transition-all duration-200',
+              collapsed && !mobile
+                ? isHoverExpanded
+                  ? 'ml-2 max-w-42 opacity-100'
+                  : 'max-w-0 opacity-0'
+                : '',
+            ]"
+          >
+            {{ themeStore.resolvedTheme === 'dark' ? 'Dark Mode' : 'Light Mode' }}
+          </span>
+        </button>
+      </div>
     </div>
 
     <div
@@ -62,7 +95,7 @@
       <button
         type="button"
         :class="[
-          'group flex w-full items-center rounded-2xl transition-all duration-200 hover:bg-slate-100',
+          'group flex w-full items-center rounded-2xl transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800',
           collapsed && !mobile
             ? isHoverExpanded
               ? 'h-11 w-full justify-start px-3'
@@ -72,7 +105,7 @@
         @click="profileMenuOpen = !profileMenuOpen"
       >
         <div
-          class="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-semibold"
+          class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300"
         >
           <img
             v-if="avatarUrl"
@@ -92,23 +125,23 @@
               : 'max-w-40 opacity-100',
           ]"
         >
-          <p class="truncate text-sm font-medium text-slate-900">{{ auth.user?.name }}</p>
-          <p class="truncate text-xs text-slate-500">{{ auth.user?.email }}</p>
+          <p class="truncate text-sm font-medium text-slate-900 dark:text-slate-100">{{ auth.user?.name }}</p>
+          <p class="truncate text-xs text-slate-500 dark:text-slate-400">{{ auth.user?.email }}</p>
         </div>
       </button>
 
       <Transition name="dropdown">
         <div
           v-if="profileMenuOpen"
-          class="absolute bottom-full left-3 right-3 mb-2 rounded-lg border border-gray-100 bg-white py-1 shadow-lg z-50"
+          class="absolute bottom-full left-3 right-3 z-50 mb-2 rounded-lg border border-gray-100 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
         >
-          <div class="border-b border-gray-100 px-4 py-2">
-            <p class="text-sm font-medium text-gray-900">{{ auth.user?.name }}</p>
-            <p class="text-xs text-gray-500">{{ auth.user?.email }}</p>
+          <div class="border-b border-gray-100 px-4 py-2 dark:border-slate-700">
+            <p class="text-sm font-medium text-gray-900 dark:text-slate-100">{{ auth.user?.name }}</p>
+            <p class="text-xs text-gray-500 dark:text-slate-400">{{ auth.user?.email }}</p>
           </div>
           <RouterLink
             :to="profileRoute"
-            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
+            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
             @click="
               profileMenuOpen = false;
               mobile && $emit('navigate')
@@ -117,7 +150,7 @@
             Profile
           </RouterLink>
           <button
-            class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 transition hover:bg-red-50"
+            class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
             @click="handleLogout"
           >
             Sign out
@@ -138,11 +171,14 @@ import {
   KanbanSquare,
   LayoutDashboard,
   MessageSquare,
+  Moon,
   Shield,
+  Sun,
   User,
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { resolveAssetUrl } from '@/services/core/url'
+import { useThemeStore } from '@/stores/theme'
 
 interface NavLink {
   name: string
@@ -162,7 +198,9 @@ export default defineComponent({
     KanbanSquare,
     User,
     MessageSquare,
+    Moon,
     Shield,
+    Sun,
   },
   props: {
     mobile: {
@@ -176,7 +214,10 @@ export default defineComponent({
   },
   emits: ['navigate'],
   setup() {
-    return { auth: useAuthStore() }
+    return {
+      auth: useAuthStore(),
+      themeStore: useThemeStore(),
+    }
   },
   data(): {
     links: NavLink[]
@@ -265,6 +306,9 @@ export default defineComponent({
     },
   },
   methods: {
+    toggleTheme(): void {
+      this.themeStore.toggleTheme()
+    },
     isActive(routeName: string): boolean {
       return this.$route.name === routeName
     },

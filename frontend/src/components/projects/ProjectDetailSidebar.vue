@@ -1,31 +1,34 @@
 <template>
   <div class="space-y-4">
-    <div class="bg-white border border-gray-200 rounded-xl p-5 space-y-3 text-sm">
+    <div class="space-y-3 rounded-xl border border-gray-200 bg-white p-5 text-sm dark:border-slate-700/70 dark:bg-slate-900/90">
       <div class="flex justify-between">
-        <span class="text-gray-500">Company</span>
-        <span class="font-medium text-gray-900">{{ project.company?.name }}</span>
+        <span class="text-gray-500 dark:text-slate-400">Company</span>
+        <span class="font-medium text-gray-900 dark:text-slate-100">{{ project.company?.name }}</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-gray-500">Deadline</span>
-        <span class="font-medium text-gray-900">{{ formattedDeadline }}</span>
+        <span class="text-gray-500 dark:text-slate-400">Deadline</span>
+        <span class="font-medium text-gray-900 dark:text-slate-100">{{ formattedDeadline }}</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-gray-500">Max students</span>
-        <span class="font-medium text-gray-900">{{ project.max_students }}</span>
+        <span class="text-gray-500 dark:text-slate-400">Max students</span>
+        <span class="font-medium text-gray-900 dark:text-slate-100">{{ project.max_students }}</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-gray-500">Applications</span>
-        <span class="font-medium text-gray-900">{{ project.applications_count ?? 0 }}</span>
+        <span class="text-gray-500 dark:text-slate-400">Applications</span>
+        <span class="font-medium text-gray-900 dark:text-slate-100">{{ project.applications_count ?? 0 }}</span>
       </div>
     </div>
 
-    <div v-if="project.tech_stack?.length" class="bg-white border border-gray-200 rounded-xl p-5">
-      <h3 class="text-sm font-semibold text-gray-900 mb-3">Tech stack</h3>
+    <div
+      v-if="project.tech_stack?.length"
+      class="rounded-xl border border-gray-200 bg-white p-5 dark:border-slate-700/70 dark:bg-slate-900/90"
+    >
+      <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-slate-100">Tech stack</h3>
       <div class="flex flex-wrap gap-2">
         <span
           v-for="tech in project.tech_stack"
           :key="tech"
-          class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium"
+          class="rounded-lg bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300"
         >
           {{ tech }}
         </span>

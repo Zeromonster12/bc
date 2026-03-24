@@ -1,6 +1,6 @@
 <template>
   <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">{{ label }}</label>
+    <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">{{ label }}</label>
     <div class="flex flex-wrap gap-2 mb-2">
       <span v-for="(tag, index) in tags" :key="`${label}-${index}`" :class="chipClass">
         {{ tag }}
@@ -11,7 +11,7 @@
       <input
         :value="inputValue"
         type="text"
-        class="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         :placeholder="placeholder"
         @input="$emit('update:inputValue', ($event.target as HTMLInputElement).value)"
         @keydown.enter.prevent="$emit('add')"
@@ -19,7 +19,7 @@
       />
       <button
         type="button"
-        class="inline-flex items-center justify-center rounded-lg font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 px-3 py-1.5 text-sm bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500"
+        class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         @click="$emit('add')"
       >
         Add
@@ -65,20 +65,20 @@ export default defineComponent({
     chipClass(): string {
       const tones: Record<string, string> = {
         indigo:
-          'inline-flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-700 text-sm rounded-lg',
+          'inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1 text-sm text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
         emerald:
-          'inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700 text-sm rounded-lg',
+          'inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1 text-sm text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
         amber:
-          'inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 text-sm rounded-lg',
+          'inline-flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1 text-sm text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
       }
       const fallback = tones.indigo ?? ''
       return tones[this.tone] ?? fallback
     },
     removeClass(): string {
       const tones: Record<string, string> = {
-        indigo: 'text-indigo-400 hover:text-indigo-700 leading-none',
-        emerald: 'text-emerald-400 hover:text-emerald-700 leading-none',
-        amber: 'text-amber-400 hover:text-amber-700 leading-none',
+        indigo: 'leading-none text-indigo-400 hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200',
+        emerald: 'leading-none text-emerald-400 hover:text-emerald-700 dark:text-emerald-300 dark:hover:text-emerald-200',
+        amber: 'leading-none text-amber-400 hover:text-amber-700 dark:text-amber-300 dark:hover:text-amber-200',
       }
       const fallback = tones.indigo ?? ''
       return tones[this.tone] ?? fallback

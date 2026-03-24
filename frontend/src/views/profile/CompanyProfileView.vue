@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <div class="max-w-2xl mx-auto space-y-6">
-      <h1 class="text-2xl font-bold text-gray-900">Company Profile</h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Company Profile</h1>
 
       <BaseAlert
         v-if="successMessage"
@@ -19,7 +19,7 @@
       />
 
       <div v-if="loading" class="space-y-4">
-        <div v-for="n in 4" :key="n" class="h-12 bg-gray-100 rounded-xl animate-pulse" />
+        <div v-for="n in 4" :key="n" class="h-12 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
 
       <CompanyProfileForm

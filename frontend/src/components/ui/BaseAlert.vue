@@ -11,7 +11,7 @@
       </div>
       <button
         v-if="dismissible"
-        class="flex-shrink-0 opacity-60 hover:opacity-100 transition"
+          class="shrink-0 opacity-60 transition hover:opacity-100"
         @click="dismiss"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,12 +56,12 @@ export default defineComponent({
   computed: {
     variantClasses(): string {
       const variants: Record<string, string> = {
-        info: 'bg-blue-50 border-blue-200 text-blue-800',
-        success: 'bg-green-50 border-green-200 text-green-800',
-        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-        error: 'bg-red-50 border-red-200 text-red-800',
+        info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-300',
+        success: 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950/30 dark:border-green-900 dark:text-green-300',
+        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950/30 dark:border-yellow-900 dark:text-yellow-300',
+        error: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950/30 dark:border-red-900 dark:text-red-300',
       }
-      const fallback = 'bg-blue-50 border-blue-200 text-blue-800'
+      const fallback = 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-300'
       return variants[this.type] ?? fallback
     },
   },

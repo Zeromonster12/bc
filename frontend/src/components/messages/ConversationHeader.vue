@@ -1,18 +1,18 @@
 <template>
-  <div class="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3">
+  <div class="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
     <button
-      class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden"
+      class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
       @click="$emit('back')"
     >
       &larr;
     </button>
     <div
-      class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700"
+      class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
     >
       {{ avatarInitials }}
     </div>
     <div class="min-w-0">
-      <p class="truncate text-sm font-semibold text-slate-900">
+      <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
         {{ participantNames || 'Conversation' }}
       </p>
     </div>

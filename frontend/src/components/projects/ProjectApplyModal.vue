@@ -3,15 +3,15 @@
     <div class="space-y-4">
       <BaseAlert v-if="errorMessage" type="error" :message="errorMessage" />
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cover letter</label>
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Cover letter</label>
         <textarea
           :value="coverLetter"
           rows="6"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
           placeholder="Tell the company why you're a great fit for this project... (min. 50 characters)"
           @input="$emit('update:coverLetter', ($event.target as HTMLTextAreaElement).value)"
         />
-        <p class="text-xs text-gray-400 mt-1">{{ coverLetter.length }} / 3000</p>
+        <p class="mt-1 text-xs text-gray-400 dark:text-slate-500">{{ coverLetter.length }} / 3000</p>
       </div>
     </div>
     <template #footer>

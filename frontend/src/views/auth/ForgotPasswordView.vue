@@ -1,7 +1,7 @@
 <template>
   <AuthLayout>
-    <h2 class="text-2xl font-bold text-gray-900 mb-2 text-center">Forgot password?</h2>
-    <p class="text-sm text-gray-500 text-center mb-6">
+    <h2 class="mb-2 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">Forgot password?</h2>
+    <p class="mb-6 text-center text-sm text-gray-500 dark:text-slate-400">
       Enter your email and we'll send you a reset link.
     </p>
 
@@ -47,8 +47,11 @@
       </BaseButton>
     </form>
 
-    <p class="mt-6 text-center text-sm text-gray-600">
-      <RouterLink to="/login" class="text-indigo-600 hover:text-indigo-500 font-medium">
+    <p class="mt-6 text-center text-sm text-gray-600 dark:text-slate-300">
+      <RouterLink
+        to="/login"
+        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+      >
         Back to sign in
       </RouterLink>
     </p>
@@ -106,7 +109,8 @@ export default defineComponent({
         })
         this.successMessage = 'A password reset link has been sent to your email address.'
       } catch (e: unknown) {
-        if (e?.response?.status === 422) {
+        const err = e as { response?: { status?: number } }
+        if (err?.response?.status === 422) {
           this.emailError = resolveSingleFieldError(e, 'email')
           this.turnstileError = resolveSingleFieldError(e, 'turnstile_token')
         } else {

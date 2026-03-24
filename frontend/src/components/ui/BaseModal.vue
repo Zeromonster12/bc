@@ -8,11 +8,11 @@
         aria-modal="true"
       >
         <div class="absolute inset-0 bg-black/50" @click="$emit('update:modelValue', false)" />
-        <div :class="['relative bg-white rounded-xl shadow-xl w-full', maxWidthClass]" @click.stop>
-          <div class="flex items-center justify-between px-6 py-4 border-b">
-            <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
+        <div :class="['relative w-full rounded-xl bg-white shadow-xl dark:bg-slate-900 dark:shadow-[0_16px_36px_rgba(2,6,23,0.55)]', maxWidthClass]" @click.stop>
+          <div class="flex items-center justify-between border-b px-6 py-4 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">{{ title }}</h2>
             <button
-              class="text-gray-400 hover:text-gray-600 transition"
+              class="text-gray-400 transition hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300"
               @click="$emit('update:modelValue', false)"
             >
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,7 +28,7 @@
           <div class="px-6 py-4">
             <slot />
           </div>
-          <div v-if="$slots.footer" class="px-6 py-4 border-t flex justify-end gap-3">
+          <div v-if="$slots.footer" class="flex justify-end gap-3 border-t px-6 py-4 dark:border-slate-700">
             <slot name="footer" />
           </div>
         </div>

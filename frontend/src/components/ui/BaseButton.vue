@@ -53,13 +53,13 @@ export default defineComponent({
   computed: {
     variantClasses(): string {
       const variants: Record<string, string> = {
-        primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
+        primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus:ring-indigo-400',
         secondary:
-          'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-indigo-500',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-        ghost: 'text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500',
+          'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus:ring-indigo-400',
+        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-500 dark:hover:bg-red-400 dark:focus:ring-red-400',
+        ghost: 'text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500 dark:text-indigo-300 dark:hover:bg-indigo-500/10 dark:focus:ring-indigo-400',
       }
-      const fallback = 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500'
+      const fallback = 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus:ring-indigo-400'
       return variants[this.variant] ?? fallback
     },
     sizeClasses(): string {

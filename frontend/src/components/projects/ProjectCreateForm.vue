@@ -2,7 +2,7 @@
   <form
     @submit.prevent="$emit('submit')"
     novalidate
-    class="bg-white border border-gray-200 rounded-xl p-6 space-y-5"
+    class="space-y-5 rounded-xl border border-gray-200 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90"
   >
     <BaseInput
       :model-value="form.title"
@@ -13,11 +13,11 @@
     />
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
       <textarea
         :value="form.description"
         rows="4"
-        class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         placeholder="Describe the project..."
         @input="
           $emit('update-field', {
@@ -30,11 +30,11 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Requirements</label>
+      <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Requirements</label>
       <textarea
         :value="form.requirements"
         rows="4"
-        class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         placeholder="List student requirements..."
         @input="
           $emit('update-field', {
@@ -60,10 +60,10 @@
 
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Status</label>
         <select
           :value="form.status"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
           @change="
             $emit('update-field', {
               field: 'status',
@@ -76,13 +76,13 @@
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Max students</label>
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Max students</label>
         <input
           :value="form.max_students"
           type="number"
           min="1"
           max="20"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
           @input="
             $emit('update-field', {
               field: 'max_students',

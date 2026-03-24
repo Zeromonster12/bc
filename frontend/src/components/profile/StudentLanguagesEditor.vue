@@ -21,10 +21,10 @@
         @update:modelValue="$emit('update-name', { index, value: $event })"
       />
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Level</label>
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Level</label>
         <select
           :value="language.level"
-          class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
           @change="
             $emit('update-level', { index, value: ($event.target as HTMLSelectElement).value })
           "

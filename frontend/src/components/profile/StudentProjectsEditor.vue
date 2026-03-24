@@ -12,7 +12,7 @@
     <div
       v-for="(project, index) in projects"
       :key="`project-${index}`"
-      class="border border-slate-200 rounded-xl p-4 space-y-3"
+      class="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700"
     >
       <div class="grid gap-3 sm:grid-cols-2">
         <BaseInput
@@ -35,11 +35,11 @@
         />
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
         <textarea
           :value="project.description"
           rows="3"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
           placeholder="What was your role, what was delivered, what impact did it have"
           @input="
             $emit('update-field', {

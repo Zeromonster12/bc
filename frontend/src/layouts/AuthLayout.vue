@@ -1,8 +1,8 @@
 <template>
   <div class="relative min-h-screen overflow-hidden px-4 py-10 sm:px-6">
     <div class="pointer-events-none absolute inset-0">
-      <div class="absolute -left-24 top-8 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl"></div>
-      <div class="absolute -right-20 bottom-8 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl"></div>
+      <div class="absolute -left-24 top-8 h-72 w-72 rounded-full bg-teal-300/20 blur-3xl dark:bg-teal-500/10"></div>
+      <div class="absolute -right-20 bottom-8 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl dark:bg-cyan-500/10"></div>
     </div>
 
     <div
@@ -10,7 +10,7 @@
     >
       <div class="grid w-full items-stretch gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <section
-          class="hidden rounded-3xl border border-white/50 bg-linear-to-br from-teal-700 to-cyan-700 p-10 text-white shadow-xl lg:block"
+          class="hidden rounded-3xl border border-white/50 bg-linear-to-br from-teal-700 to-cyan-700 p-10 text-white shadow-xl lg:block dark:border-slate-700/50 dark:from-teal-800 dark:to-cyan-900"
         >
           <p class="text-xs font-semibold uppercase tracking-[0.24em] text-teal-100">BC Platform</p>
           <h1 class="mt-6 text-4xl font-semibold leading-tight">
@@ -24,8 +24,8 @@
 
         <div class="surface-glass w-full p-5 shadow-xl sm:p-8">
           <div class="mb-8 text-center lg:text-left">
-            <h1 class="text-3xl font-extrabold tracking-tight text-teal-700">BC Platform</h1>
-            <p class="mt-1 text-sm text-slate-500">Student and company collaboration workspace</p>
+            <h1 class="text-3xl font-extrabold tracking-tight text-teal-700 dark:text-teal-300">BC Platform</h1>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Student and company collaboration workspace</p>
           </div>
           <slot />
         </div>

@@ -1,30 +1,30 @@
 <template>
   <AppLayout>
-    <div class="-m-6 h-[calc(100vh-4rem)] bg-slate-100 md:p-5">
-      <div class="h-full overflow-hidden border border-slate-200 bg-white shadow-sm md:rounded-2xl">
+    <div class="-m-6 h-[calc(100vh-4rem)] bg-slate-100 dark:bg-slate-950 md:p-5">
+      <div class="h-full overflow-hidden border border-slate-200 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900 md:rounded-2xl">
         <div class="flex h-full overflow-hidden">
           <div
             :class="[
-              'w-full md:w-90 shrink-0 border-r border-slate-200 flex flex-col bg-white',
+              'w-full md:w-90 shrink-0 border-r border-slate-200 flex flex-col bg-white dark:border-slate-700 dark:bg-slate-900',
               currentConversation ? 'hidden md:flex' : 'flex',
             ]"
           >
-            <div class="border-b border-slate-200 bg-white px-4 py-3">
+            <div class="border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
               <div class="flex items-center justify-between">
-                <h2 class="font-semibold text-slate-900">Messages</h2>
+                <h2 class="font-semibold text-slate-900 dark:text-slate-100">Messages</h2>
                 <button
                   @click="showNewConversation = !showNewConversation"
-                  class="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  class="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   New chat
                 </button>
               </div>
-              <p class="mt-0.5 text-xs text-slate-500">{{ messageStore.totalUnread }} unread</p>
+              <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{{ messageStore.totalUnread }} unread</p>
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search chats"
-                class="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none"
+                class="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:bg-slate-900"
               />
             </div>
 
@@ -54,16 +54,16 @@
 
           <div
             :class="[
-              'flex-1 flex flex-col bg-slate-50',
+              'flex-1 flex flex-col bg-slate-50 dark:bg-slate-950',
               !currentConversation ? 'hidden md:flex' : 'flex',
             ]"
           >
             <div
               v-if="!currentConversation"
-              class="flex-1 flex items-center justify-center text-slate-400"
+              class="flex-1 flex items-center justify-center text-slate-400 dark:text-slate-500"
             >
               <div class="px-6 text-center">
-                <p class="text-2xl font-semibold text-slate-700">Your chats</p>
+                <p class="text-2xl font-semibold text-slate-700 dark:text-slate-200">Your chats</p>
                 <p class="mt-2 text-sm">Select a conversation from the left and start messaging.</p>
               </div>
             </div>

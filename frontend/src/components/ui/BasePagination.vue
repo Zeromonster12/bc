@@ -1,12 +1,12 @@
 <template>
   <div v-if="lastPage > 1" class="flex items-center justify-between">
-    <p class="text-sm text-gray-600">
+    <p class="text-sm text-gray-600 dark:text-slate-300">
       Page {{ currentPage }} of {{ lastPage }} &mdash; {{ total }} total
     </p>
     <div class="flex items-center gap-1">
       <button
         :disabled="currentPage <= 1"
-        class="p-1.5 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition"
+        class="rounded border p-1.5 text-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
         @click="$emit('change', currentPage - 1)"
       >
         &larr; Prev
@@ -17,8 +17,8 @@
         :class="[
           'px-3 py-1.5 rounded border text-sm transition',
           page === currentPage
-            ? 'bg-indigo-600 text-white border-indigo-600'
-            : 'hover:bg-gray-50',
+            ? 'border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500'
+            : 'dark:border-slate-600 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800',
         ]"
         @click="$emit('change', page)"
       >
@@ -26,7 +26,7 @@
       </button>
       <button
         :disabled="currentPage >= lastPage"
-        class="p-1.5 rounded border text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition"
+        class="rounded border p-1.5 text-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
         @click="$emit('change', currentPage + 1)"
       >
         Next &rarr;

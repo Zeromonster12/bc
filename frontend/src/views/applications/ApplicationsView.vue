@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <div class="space-y-6">
-      <h1 class="text-2xl font-bold text-gray-900">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">
         <span v-if="auth.isStudent">My Applications</span>
         <span v-else>Project Applicants</span>
       </h1>
@@ -13,7 +13,7 @@
       />
 
       <div v-if="applicationStore.loading" class="space-y-3">
-        <div v-for="n in 4" :key="n" class="h-28 bg-gray-100 rounded-xl animate-pulse" />
+        <div v-for="n in 4" :key="n" class="h-28 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
 
       <template v-else>

@@ -1,7 +1,7 @@
 <template>
   <button
     type="button"
-    class="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+    class="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
     @click="$emit('click')"
   >
     <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">

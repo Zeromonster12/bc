@@ -2,7 +2,7 @@
   <AppLayout>
     <div class="space-y-6">
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">Projects</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Projects</h1>
         <RouterLink v-if="auth.isCompany" to="/projects/create">
           <BaseButton variant="primary" size="sm">+ New project</BaseButton>
         </RouterLink>
@@ -11,11 +11,11 @@
       <ProjectFilters @change="handleFilterChange" />
 
       <div v-if="projectStore.loading" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="n in 6" :key="n" class="h-48 bg-gray-100 rounded-xl animate-pulse" />
+        <div v-for="n in 6" :key="n" class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
 
       <template v-else>
-        <div v-if="projectStore.projects.length === 0" class="text-center py-16 text-gray-500">
+        <div v-if="projectStore.projects.length === 0" class="py-16 text-center text-gray-500 dark:text-slate-400">
           <p class="text-4xl mb-3">📂</p>
           <p class="font-medium">No projects found</p>
           <p class="text-sm mt-1">Try adjusting your filters.</p>

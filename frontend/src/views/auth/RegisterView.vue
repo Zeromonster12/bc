@@ -1,6 +1,6 @@
 <template>
   <AuthLayout>
-    <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Create an account</h2>
+    <h2 class="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">Create an account</h2>
 
     <BaseAlert
       v-if="errorMessage"
@@ -66,9 +66,11 @@
       </BaseButton>
     </form>
 
-    <p class="mt-6 text-center text-sm text-gray-600">
+    <p class="mt-6 text-center text-sm text-gray-600 dark:text-slate-300">
       Already have an account?
-      <RouterLink to="/login" class="text-indigo-600 hover:text-indigo-500 font-medium"
+      <RouterLink
+        to="/login"
+        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
         >Sign in</RouterLink
       >
     </p>
@@ -147,7 +149,8 @@ export default defineComponent({
           query: { email: result.email ?? this.form.email },
         })
       } catch (e: unknown) {
-        if (e?.response?.status === 422) {
+        const err = e as { response?: { status?: number } }
+        if (err?.response?.status === 422) {
           this.errors = resolveValidationErrors(e)
         } else {
           this.errorMessage = resolveErrorMessage(e, 'Registration failed. Please try again.')

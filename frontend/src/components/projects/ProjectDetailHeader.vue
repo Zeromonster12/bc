@@ -2,10 +2,10 @@
   <div class="flex items-start justify-between gap-4">
     <div>
       <div class="flex items-center gap-3 mb-2">
-        <ProjectStatusBadge :status="project.status" />
-        <span class="text-sm text-gray-400">{{ project.company?.name }}</span>
+        <ProjectStatusBadge :status="project.status ?? 'draft'" />
+        <span class="text-sm text-gray-400 dark:text-slate-500">{{ project.company?.name }}</span>
       </div>
-      <h1 class="text-2xl font-bold text-gray-900">{{ project.title }}</h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ project.title }}</h1>
     </div>
 
     <div class="flex gap-2 shrink-0">

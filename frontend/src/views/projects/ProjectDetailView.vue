@@ -2,8 +2,8 @@
   <AppLayout>
     <!-- Loading skeleton -->
     <div v-if="loading" class="space-y-4">
-      <div class="h-8 w-64 bg-gray-100 rounded animate-pulse" />
-      <div class="h-48 bg-gray-100 rounded-xl animate-pulse" />
+      <div class="h-8 w-64 rounded bg-gray-100 animate-pulse dark:bg-slate-800" />
+      <div class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
     </div>
 
     <!-- Error -->
@@ -26,31 +26,31 @@
         <div class="grid lg:grid-cols-3 gap-6">
           <!-- Main content -->
           <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+            <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
               <div>
-                <h2 class="text-base font-semibold text-gray-900 mb-2">Description</h2>
-                <p class="text-sm text-gray-600 whitespace-pre-line">{{ project.description }}</p>
+                <h2 class="mb-2 text-base font-semibold text-gray-900 dark:text-slate-100">Description</h2>
+                <p class="whitespace-pre-line text-sm text-gray-600 dark:text-slate-300">{{ project.description }}</p>
               </div>
               <div>
-                <h2 class="text-base font-semibold text-gray-900 mb-2">Requirements</h2>
-                <p class="text-sm text-gray-600 whitespace-pre-line">{{ project.requirements }}</p>
+                <h2 class="mb-2 text-base font-semibold text-gray-900 dark:text-slate-100">Requirements</h2>
+                <p class="whitespace-pre-line text-sm text-gray-600 dark:text-slate-300">{{ project.requirements }}</p>
               </div>
             </div>
 
             <!-- Applications for company -->
             <div v-if="auth.isCompany && project.company?.user_id === auth.user?.id">
-              <h2 class="text-lg font-semibold text-gray-900 mb-3">
+              <h2 class="mb-3 text-lg font-semibold text-gray-900 dark:text-slate-100">
                 Applications
-                <span class="ml-2 px-2 py-0.5 text-xs bg-indigo-100 text-indigo-700 rounded-full">
+                <span class="ml-2 rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
                   {{ applicationStore.applications.length }}
                 </span>
               </h2>
               <div v-if="applicationStore.loading" class="space-y-3">
-                <div v-for="n in 3" :key="n" class="h-20 bg-gray-100 rounded-xl animate-pulse" />
+                <div v-for="n in 3" :key="n" class="h-20 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
               </div>
               <div
                 v-else-if="applicationStore.applications.length === 0"
-                class="text-sm text-gray-500 py-6 text-center"
+                class="py-6 text-center text-sm text-gray-500 dark:text-slate-400"
               >
                 No applications yet.
               </div>
@@ -85,7 +85,7 @@
 
           <ProjectDetailSidebar
             :project="project"
-            :formatted-deadline="formatDate(project.deadline)"
+            :formatted-deadline="formatDate(project.deadline ?? '')"
           />
         </div>
       </div>
@@ -205,6 +205,7 @@ export default defineComponent({
     },
     async confirmDelete() {
       if (!confirm('Are you sure you want to delete this project?')) return
+      if (!this.project) return
       this.deleting = true
       try {
         await this.projectStore.deleteProject(this.project.id)
@@ -214,6 +215,7 @@ export default defineComponent({
       }
     },
     async submitApplication() {
+      if (!this.project) return
       if (this.coverLetter.trim().length < 50) {
         this.applyError = 'Cover letter must be at least 50 characters.'
         return

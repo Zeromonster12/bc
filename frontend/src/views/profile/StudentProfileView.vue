@@ -23,7 +23,7 @@
       />
 
       <div v-if="loading" class="space-y-4">
-        <div v-for="n in 8" :key="n" class="h-16 bg-gray-100 rounded-xl animate-pulse" />
+        <div v-for="n in 8" :key="n" class="h-16 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
 
       <form v-else @submit.prevent="handleSubmit" novalidate class="space-y-6">
@@ -52,12 +52,12 @@
             <h2 class="text-lg font-semibold text-slate-900">Identity and Contact</h2>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Profile photo</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Profile photo</label>
               <input
                 type="file"
                 accept="image/*"
                 @change="handleAvatar"
-                class="text-sm text-gray-500"
+                class="text-sm text-gray-500 dark:text-slate-400"
               />
               <p v-if="errors.avatar" class="mt-1 text-xs text-red-600">{{ errors.avatar }}</p>
             </div>
@@ -84,19 +84,19 @@
               />
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date of birth</label>
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Date of birth</label>
                 <input
                   v-model="form.date_of_birth"
                   type="date"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Gender</label>
                 <select
                   v-model="form.gender"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Select</option>
                   <option value="female">Female</option>
@@ -148,13 +148,13 @@
               />
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Year of study</label>
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Year of study</label>
                 <input
                   v-model.number="form.year_of_study"
                   type="number"
                   min="1"
                   max="8"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 />
                 <p v-if="errors.year_of_study" class="mt-1 text-xs text-red-600">
                   {{ errors.year_of_study }}
@@ -162,7 +162,7 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >Expected graduation year</label
                 >
                 <input
@@ -170,16 +170,16 @@
                   type="number"
                   min="2000"
                   max="2100"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">GPA</label>
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">GPA</label>
                 <input
                   v-model="form.gpa"
                   type="text"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                   placeholder="e.g. 1.7"
                 />
               </div>
@@ -190,23 +190,23 @@
             <h2 class="text-lg font-semibold text-slate-900">About You</h2>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Short bio</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Short bio</label>
               <textarea
                 v-model="form.bio"
                 rows="3"
-                class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                 placeholder="Summarize your profile in 2-3 sentences"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
+              <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300"
                 >Detailed introduction</label
               >
               <textarea
                 v-model="form.about_me"
                 rows="5"
-                class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                 placeholder="Describe your motivation, strengths, and what kind of work you enjoy"
               />
             </div>
@@ -217,10 +217,10 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Availability</label>
                 <select
                   v-model="form.availability"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Select</option>
                   <option value="immediately">Immediately</option>
@@ -231,12 +231,12 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"
+                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300"
                   >Preferred work type</label
                 >
                 <select
                   v-model="form.preferred_work_type"
-                  class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                 >
                   <option value="">Select</option>
                   <option value="internship">Internship</option>
@@ -313,7 +313,7 @@
               />
             </div>
 
-            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/60">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p class="text-sm font-semibold text-slate-900">GitHub account connection</p>
@@ -326,7 +326,7 @@
                         :href="githubConnection.profile_url"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="font-medium text-teal-700 hover:text-teal-800"
+                        class="font-medium text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                       >
                         {{
                           githubConnection.username
@@ -370,112 +370,112 @@
 
               <div
                 v-if="githubConnected && githubConnection"
-                class="mt-4 rounded-lg border border-slate-200 bg-white p-3"
+                class="mt-4 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900"
               >
                 <div class="flex items-center gap-3">
                   <img
                     v-if="githubConnection.avatar_url"
                     :src="githubConnection.avatar_url"
                     alt="GitHub avatar"
-                    class="h-10 w-10 rounded-full border border-slate-200 object-cover"
+                    class="h-10 w-10 rounded-full border border-slate-200 object-cover dark:border-slate-600"
                   />
                   <div>
-                    <p class="text-sm font-medium text-slate-900">
+                    <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
                       {{
                         githubConnection.username
                           ? `@${githubConnection.username}`
                           : 'Connected GitHub account'
                       }}
                     </p>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
                       Connected on {{ formatDateTime(githubConnection.connected_at) }}
                     </p>
                   </div>
                 </div>
-                <div class="mt-3 grid gap-2 text-xs text-slate-600 sm:grid-cols-2">
+                <div class="mt-3 grid gap-2 text-xs text-slate-600 dark:text-slate-300 sm:grid-cols-2">
                   <div>
-                    <span class="font-medium text-slate-700">Profile URL:</span>
+                    <span class="font-medium text-slate-700 dark:text-slate-200">Profile URL:</span>
                     <a
                       v-if="githubConnection.profile_url"
                       :href="githubConnection.profile_url"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="ml-1 text-teal-700 hover:text-teal-800"
+                      class="ml-1 text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                     >
                       {{ githubConnection.profile_url }}
                     </a>
                     <span v-else class="ml-1">Unavailable</span>
                   </div>
                   <div>
-                    <span class="font-medium text-slate-700">Username:</span>
+                    <span class="font-medium text-slate-700 dark:text-slate-200">Username:</span>
                     <span class="ml-1">{{ githubConnection.username || 'Unavailable' }}</span>
                   </div>
                 </div>
 
                 <div class="mt-4 grid gap-4 lg:grid-cols-2">
                   <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Recent repositories
                     </p>
-                    <p v-if="githubInsightsLoading" class="mt-2 text-xs text-slate-500">
+                    <p v-if="githubInsightsLoading" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
                       Loading repositories...
                     </p>
                     <ul v-else-if="githubRepositories.length > 0" class="mt-2 space-y-2">
                       <li
                         v-for="repo in githubRepositories"
                         :key="repo.url"
-                        class="rounded-md border border-slate-200 px-2 py-1.5"
+                        class="rounded-md border border-slate-200 px-2 py-1.5 dark:border-slate-700"
                       >
                         <a
                           :href="repo.url"
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="text-xs font-medium text-teal-700 hover:text-teal-800"
+                          class="text-xs font-medium text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                         >
                           {{ repo.name }}
                         </a>
-                        <p class="mt-0.5 text-[11px] text-slate-500">
+                        <p class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
                           {{ repo.language || 'Unknown language' }} · ★ {{ repo.stars }}
                         </p>
                       </li>
                     </ul>
-                    <p v-else class="mt-2 text-xs text-slate-500">No public repositories found.</p>
+                    <p v-else class="mt-2 text-xs text-slate-500 dark:text-slate-400">No public repositories found.</p>
                   </div>
 
                   <div>
-                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Recent commits
                     </p>
-                    <p v-if="githubInsightsLoading" class="mt-2 text-xs text-slate-500">
+                    <p v-if="githubInsightsLoading" class="mt-2 text-xs text-slate-500 dark:text-slate-400">
                       Loading commits...
                     </p>
                     <ul v-else-if="githubRecentCommits.length > 0" class="mt-2 space-y-2">
                       <li
                         v-for="commit in githubRecentCommits"
                         :key="`${commit.sha}-${commit.pushed_at}`"
-                        class="rounded-md border border-slate-200 px-2 py-1.5"
+                        class="rounded-md border border-slate-200 px-2 py-1.5 dark:border-slate-700"
                       >
-                        <p class="text-xs font-medium text-slate-700">{{ commit.message }}</p>
-                        <p class="mt-0.5 text-[11px] text-slate-500">
+                        <p class="text-xs font-medium text-slate-700 dark:text-slate-200">{{ commit.message }}</p>
+                        <p class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
                           {{ commit.repo }} · {{ shortSha(commit.sha) }} ·
                           {{ formatDateTime(commit.pushed_at) }}
                         </p>
                       </li>
                     </ul>
-                    <p v-else class="mt-2 text-xs text-slate-500">
+                    <p v-else class="mt-2 text-xs text-slate-500 dark:text-slate-400">
                       No recent public commit activity found.
                     </p>
                   </div>
                 </div>
 
                 <div class="mt-4">
-                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     Contribution heatmap
                   </p>
-                  <p class="mt-1 text-[11px] text-slate-500">
+                  <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                     Public contributions over the last year.
                   </p>
-                  <div class="mt-2 overflow-x-auto rounded-md border border-slate-200 bg-white p-2">
+                  <div class="mt-2 overflow-x-auto rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
                     <img
                       v-if="githubConnection.username"
                       :src="githubHeatmapUrl(githubConnection.username)"
@@ -483,7 +483,7 @@
                       class="min-w-180"
                       loading="lazy"
                     />
-                    <p v-else class="text-xs text-slate-500">
+                    <p v-else class="text-xs text-slate-500 dark:text-slate-400">
                       Heatmap unavailable because GitHub username is missing.
                     </p>
                   </div>
@@ -516,7 +516,7 @@
 
           <section class="surface-card p-6 sm:p-7 space-y-5">
             <h2 class="text-lg font-semibold text-slate-900">CV Upload (Secure Storage)</h2>
-            <p class="text-sm text-slate-600">
+            <p class="text-sm text-slate-600 dark:text-slate-300">
               Upload your CV as PDF, DOC, or DOCX. Files are stored in private storage and are not
               publicly accessible.
             </p>
@@ -526,7 +526,7 @@
                 type="file"
                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 @change="handleCvFileSelected"
-                class="text-sm text-slate-600"
+                class="text-sm text-slate-600 dark:text-slate-300"
               />
               <BaseButton
                 type="button"
@@ -539,13 +539,13 @@
               </BaseButton>
             </div>
 
-            <p class="text-xs text-slate-500">Max size: 5 MB. Allowed formats: PDF, DOC, DOCX.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Max size: 5 MB. Allowed formats: PDF, DOC, DOCX.</p>
 
             <div v-if="cvUploading" class="space-y-1">
-              <p class="text-xs font-medium text-slate-700">
+              <p class="text-xs font-medium text-slate-700 dark:text-slate-200">
                 {{ cvUploadStatusText() }} {{ cvUploadProgress }}%
               </p>
-              <div class="h-2 w-full overflow-hidden rounded bg-slate-200">
+              <div class="h-2 w-full overflow-hidden rounded bg-slate-200 dark:bg-slate-700">
                 <div
                   class="h-full bg-teal-600 transition-all duration-300"
                   :style="{ width: `${cvUploadProgress}%` }"
@@ -554,10 +554,14 @@
             </div>
 
             <div v-if="cvLoading" class="space-y-2">
-              <div v-for="n in 2" :key="n" class="h-10 rounded-lg bg-gray-100 animate-pulse"></div>
+              <div
+                v-for="n in 2"
+                :key="n"
+                class="h-10 rounded-lg bg-gray-100 animate-pulse dark:bg-slate-800"
+              ></div>
             </div>
 
-            <div v-else-if="cvFiles.length === 0" class="text-sm text-slate-500">
+            <div v-else-if="cvFiles.length === 0" class="text-sm text-slate-500 dark:text-slate-400">
               No CV uploaded yet.
             </div>
 
@@ -565,11 +569,11 @@
               <li
                 v-for="cv in cvFiles"
                 :key="cv.id"
-                class="flex flex-col gap-2 rounded-lg border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
+                class="flex flex-col gap-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
-                  <p class="text-sm font-medium text-slate-800">{{ cv.original_filename }}</p>
-                  <p class="text-xs text-slate-500">
+                  <p class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ cv.original_filename }}</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
                     {{ humanFileSize(cv.size_bytes) }} · Uploaded
                     {{ formatDateTime(cv.uploaded_at) }}
                   </p>
@@ -584,8 +588,8 @@
                     class="text-xs font-medium"
                     :class="
                       canDownloadCv(cv.scan_status)
-                        ? 'text-teal-700 hover:text-teal-800'
-                        : 'pointer-events-none text-slate-400'
+                        ? 'text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200'
+                        : 'pointer-events-none text-slate-400 dark:text-slate-500'
                     "
                     :disabled="!canDownloadCv(cv.scan_status) || downloadingCvId === cv.id"
                     @click="handleCvDownload(cv)"

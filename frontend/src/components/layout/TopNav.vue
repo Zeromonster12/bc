@@ -1,12 +1,12 @@
 <template>
   <header
-    class="w-full border-b border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur sm:px-6 sm:py-5 lg:px-8"
+    class="w-full border-b border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/90 sm:px-6 sm:py-5 lg:px-8"
   >
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <button
           type="button"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 lg:hidden"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300 lg:hidden"
           @click="$emit('toggle-sidebar')"
           aria-label="Open menu"
         >
@@ -20,7 +20,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
-        <h2 class="text-lg font-semibold text-slate-900">ProjectLinker</h2>
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">ProjectLinker</h2>
       </div>
       <UserDropdown />
     </div>

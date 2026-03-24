@@ -5,10 +5,10 @@
         class="grid h-full min-h-0 items-stretch gap-2 xl:grid-cols-[260px_minmax(0,1fr)]"
       >
         <aside
-          class="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur"
+          class="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-[0_8px_24px_rgba(2,6,23,0.45)]"
         >
-          <div class="border-b border-slate-200 px-4 py-3">
-            <h2 class="mt-1 text-sm font-semibold text-slate-900">Company Projects</h2>
+          <div class="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+            <h2 class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">Company Projects</h2>
           </div>
           <div class="flex-1 space-y-1 overflow-auto p-2">
             <button
@@ -18,8 +18,8 @@
               :class="[
                 'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition',
                 selectedProjectId === project.id
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-700 hover:bg-slate-100',
+                  ? 'bg-slate-900 text-white shadow-sm dark:bg-[#4e3aba]'
+                  : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
               ]"
               @click="selectProject(project.id)"
               ;
@@ -30,7 +30,7 @@
                   'ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-semibold',
                   selectedProjectId === project.id
                     ? 'bg-white/20 text-white'
-                    : 'bg-slate-200 text-slate-600',
+                    : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
                 ]"
               >
                 {{
@@ -53,43 +53,43 @@
           />
 
           <div v-if="loading" class="space-y-3">
-            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-3xl bg-slate-100" />
+            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800" />
           </div>
 
           <div
             v-else-if="!selectedProjectId"
-            class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600"
+            class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300"
           >
             Select a project from left sidebar.
           </div>
 
           <div
             v-else
-            class="min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]"
+            class="min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-[0_10px_26px_rgba(2,6,23,0.5)]"
           >
-            <div class="h-full overflow-y-auto overflow-x-hidden rounded-3xl bg-white p-3 sm:p-4 lg:p-5">
+            <div class="h-full overflow-y-auto overflow-x-hidden rounded-3xl bg-white p-3 sm:p-4 lg:p-5 dark:bg-slate-900">
             <section
               v-for="(status, index) in boardStatuses"
               :key="status"
               :class="[
                 'overflow-visible transition',
-                index < boardStatuses.length - 1 ? 'border-b border-slate-200/60' : '',
-                isDropZoneActive(status, null, null, 'status') ? 'bg-[#4e3aba]/5' : '',
+                index < boardStatuses.length - 1 ? 'border-b border-slate-200/60 dark:border-slate-700/60' : '',
+                isDropZoneActive(status, null, null, 'status') ? 'bg-[#4e3aba]/5 dark:bg-[#4e3aba]/15' : '',
               ]"
               @dragover.prevent="setActiveDropZone(status, null, null, 'status')"
               @dragleave="clearActiveDropZone"
               @drop.prevent="onStatusDrop(status)"
             >
-              <div class="flex items-center gap-2 px-3 pt-2.5 pb-2">
+              <div class="flex items-center gap-2 px-3 pb-2 pt-2.5">
                 <component :is="statusIcon(status)" :class="statusIconClass(status)" />
-                <h2 class="text-sm font-semibold text-slate-900">{{ statusLabel(status) }}</h2>
-                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ statusLabel(status) }}</h2>
+                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                   {{ statusCount(status) }}
                 </span>
               </div>
 
               <div
-                class="grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3 bg-slate-50/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500"
+                class="grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3 bg-slate-50/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:bg-slate-800/70 dark:text-slate-400"
               >
                 <span>Name</span>
                 <span>Assignee</span>
@@ -963,10 +963,10 @@
 
       <div
         v-if="openCreateFolder"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
       >
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
-          <h3 class="text-sm font-semibold text-slate-900">Create folder</h3>
+        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create folder</h3>
           <select
             v-model="createFolderStatus"
             class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
@@ -1000,10 +1000,10 @@
 
       <div
         v-if="openCreateCategory"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
       >
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
-          <h3 class="text-sm font-semibold text-slate-900">Create subfolder</h3>
+        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create subfolder</h3>
 
           <select
             v-model="createCategoryStatus"
@@ -1062,10 +1062,10 @@
 
       <div
         v-if="openCreateTask"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
       >
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
-          <h3 class="text-sm font-semibold text-slate-900">Create task</h3>
+        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create task</h3>
 
           <select
             v-model="createTaskStatus"
@@ -1511,8 +1511,8 @@ export default defineComponent({
     },
     statusIconClass(status: ApplicationTaskStatus): string {
       if (status === 'todo') return 'h-4 w-4 text-[#4e3aba]'
-      if (status === 'in_progress') return 'h-4 w-4 text-amber-600'
-      return 'h-4 w-4 text-emerald-600'
+      if (status === 'in_progress') return 'h-4 w-4 text-amber-600 dark:text-amber-400'
+      return 'h-4 w-4 text-emerald-600 dark:text-emerald-400'
     },
     priorityLabel(priority: string): string {
       if (priority === 'low') return 'Low'
@@ -1523,24 +1523,24 @@ export default defineComponent({
     },
     priorityPillClass(priority: string): string {
       if (priority === 'urgent') {
-        return 'inline-flex items-center rounded-full bg-rose-100 px-2 py-1 text-[11px] font-semibold text-rose-700'
+        return 'inline-flex items-center rounded-full bg-rose-100 px-2 py-1 text-[11px] font-semibold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300'
       }
       if (priority === 'high') {
-        return 'inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-[11px] font-semibold text-orange-700'
+        return 'inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-[11px] font-semibold text-orange-700 dark:bg-orange-950/40 dark:text-orange-300'
       }
       if (priority === 'medium') {
-        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700'
+        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
       }
-      return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600'
+      return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300'
     },
     statusPillClass(status: ApplicationTaskStatus): string {
       if (status === 'todo') {
-        return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700'
+        return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-300'
       }
       if (status === 'in_progress') {
-        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700'
+        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
       }
-      return 'inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700'
+      return 'inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
     },
     onFolderDragStart(status: ApplicationTaskStatus, folderId: number, event: DragEvent) {
       this.closeActionMenu()

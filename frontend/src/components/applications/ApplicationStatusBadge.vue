@@ -13,13 +13,16 @@
 import { defineComponent } from 'vue'
 
 const CONFIG: Record<string, { label: string; classes: string }> = {
-  pending: { label: 'Pending', classes: 'bg-yellow-100 text-yellow-700' },
-  accepted: { label: 'Accepted', classes: 'bg-green-100 text-green-700' },
-  rejected: { label: 'Rejected', classes: 'bg-red-100 text-red-600' },
-  withdrawn: { label: 'Withdrawn', classes: 'bg-gray-100 text-gray-600' },
+  pending: { label: 'Pending', classes: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300' },
+  accepted: { label: 'Accepted', classes: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' },
+  rejected: { label: 'Rejected', classes: 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-300' },
+  withdrawn: { label: 'Withdrawn', classes: 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-300' },
 }
 
-const FALLBACK_CONFIG = { label: 'Pending', classes: 'bg-yellow-100 text-yellow-700' }
+const FALLBACK_CONFIG = {
+  label: 'Pending',
+  classes: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300',
+}
 
 export default defineComponent({
   name: 'ApplicationStatusBadge',

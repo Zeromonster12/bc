@@ -13,13 +13,17 @@
 
         <section>
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Recent open projects</h2>
-            <RouterLink to="/projects" class="text-sm text-indigo-600 hover:underline"
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent open projects</h2>
+            <RouterLink to="/projects" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400"
               >View all →</RouterLink
             >
           </div>
           <div v-if="projectStore.loading" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="n in 3" :key="n" class="h-40 bg-gray-100 rounded-xl animate-pulse" />
+            <div
+              v-for="n in 3"
+              :key="n"
+              class="h-40 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800"
+            />
           </div>
           <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <ProjectCard
@@ -43,13 +47,19 @@
 
         <section>
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Your projects</h2>
-            <RouterLink to="/projects/create" class="text-sm text-indigo-600 hover:underline"
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Your projects</h2>
+            <RouterLink
+              to="/projects/create"
+              class="text-sm text-indigo-600 hover:underline dark:text-indigo-400"
               >+ New project</RouterLink
             >
           </div>
           <div v-if="projectStore.loading" class="space-y-3">
-            <div v-for="n in 3" :key="n" class="h-20 bg-gray-100 rounded-xl animate-pulse" />
+            <div
+              v-for="n in 3"
+              :key="n"
+              class="h-20 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800"
+            />
           </div>
           <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <ProjectCard
@@ -70,9 +80,9 @@
           <StatCard label="Total Projects" :value="stats.totalProjects" tone="slate" />
           <StatCard label="Open Projects" :value="stats.openProjects" tone="cyan" />
         </div>
-        <div class="surface-card p-6 text-sm text-slate-600">
+        <div class="surface-card p-6 text-sm text-slate-600 dark:text-slate-300">
           Go to
-          <RouterLink to="/admin" class="text-indigo-600 hover:underline font-medium"
+          <RouterLink to="/admin" class="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
             >Admin Panel</RouterLink
           >
           to manage users and projects.

@@ -5,12 +5,12 @@
         :value="search"
         type="text"
         placeholder="Search by name or email..."
-        class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         @input="$emit('update:search', ($event.target as HTMLInputElement).value)"
       />
       <select
         :value="roleFilter"
-        class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
         @change="$emit('update:roleFilter', ($event.target as HTMLSelectElement).value)"
       >
         <option value="">All roles</option>
@@ -21,12 +21,15 @@
     </div>
 
     <div v-if="loading" class="space-y-2">
-      <div v-for="n in 5" :key="n" class="h-12 bg-gray-100 rounded-xl animate-pulse" />
+      <div v-for="n in 5" :key="n" class="h-12 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
     </div>
 
-    <div v-else class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div
+      v-else
+      class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-slate-700/70 dark:bg-slate-900/90"
+    >
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+        <thead class="bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-500 dark:bg-slate-800 dark:text-slate-400">
           <tr>
             <th class="px-4 py-3 text-left">Name</th>
             <th class="px-4 py-3 text-left">Email</th>
@@ -35,21 +38,21 @@
             <th class="px-4 py-3 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-gray-100 dark:divide-slate-700/60">
           <tr v-if="users.length === 0">
-            <td colspan="5" class="px-4 py-10 text-center text-gray-400">No users found.</td>
+            <td colspan="5" class="px-4 py-10 text-center text-gray-400 dark:text-slate-500">No users found.</td>
           </tr>
-          <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-            <td class="px-4 py-3 font-medium text-gray-900">{{ user.name }}</td>
-            <td class="px-4 py-3 text-gray-600">{{ user.email }}</td>
+          <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-slate-800/70">
+            <td class="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">{{ user.name }}</td>
+            <td class="px-4 py-3 text-gray-600 dark:text-slate-300">{{ user.email }}</td>
             <td class="px-4 py-3">
-              <span class="capitalize px-2 py-0.5 bg-gray-100 rounded text-xs">{{
+              <span class="rounded bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-slate-700 dark:text-slate-200">{{
                 user.role
               }}</span>
             </td>
             <td class="px-4 py-3">
               <span
-                :class="user.email_verified_at ? 'text-green-600' : 'text-gray-400'"
+                :class="user.email_verified_at ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-slate-500'"
                 class="text-xs"
               >
                 {{ user.email_verified_at ? 'Yes' : 'No' }}
@@ -65,7 +68,7 @@
                       role: ($event.target as HTMLSelectElement).value,
                     })
                   "
-                  class="text-xs border border-gray-200 rounded px-2 py-1"
+                  class="rounded border border-gray-200 bg-white px-2 py-1 text-xs text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                 >
                   <option value="student">student</option>
                   <option value="company">company</option>
@@ -73,7 +76,7 @@
                 </select>
                 <button
                   @click="$emit('delete-user', user.id)"
-                  class="text-xs text-red-600 hover:text-red-800"
+                  class="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                 >
                   Delete
                 </button>

@@ -1,7 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
-      <h1 class="text-xl font-semibold text-slate-900 mb-2">Email verification</h1>
+  <div class="min-h-screen flex items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
+    <div
+      class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+    >
+      <h1 class="mb-2 text-xl font-semibold text-slate-900 dark:text-slate-100">Email verification</h1>
       <p :class="statusClass" class="text-sm mb-6">{{ resolvedMessage }}</p>
 
       <div class="flex gap-3">
@@ -38,7 +40,9 @@ export default defineComponent({
       return String(this.$route.query.message ?? '')
     },
     statusClass(): string {
-      return this.status === 'success' ? 'text-emerald-700' : 'text-rose-700'
+      return this.status === 'success'
+        ? 'text-emerald-700 dark:text-emerald-300'
+        : 'text-rose-700 dark:text-rose-300'
     },
     resolvedMessage(): string {
       return resolveEmailVerificationResultMessage(this.status, this.message)

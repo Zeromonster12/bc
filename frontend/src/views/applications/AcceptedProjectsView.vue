@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="space-y-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Accepted Projects</h1>
-        <p class="text-sm text-gray-600 mt-1">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Accepted Projects</h1>
+        <p class="mt-1 text-sm text-gray-600 dark:text-slate-300">
           Track assigned tasks for projects where your application was accepted.
         </p>
       </div>
@@ -24,31 +24,31 @@
       />
 
       <div v-if="loading" class="space-y-3">
-        <div v-for="n in 4" :key="n" class="h-36 bg-gray-100 rounded-xl animate-pulse" />
+        <div v-for="n in 4" :key="n" class="h-36 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
 
       <div
         v-else-if="acceptedApplications.length === 0"
-        class="rounded-xl border border-gray-200 bg-white p-8 text-center"
+        class="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-slate-700/70 dark:bg-slate-900/90"
       >
-        <p class="text-sm text-gray-600">You do not have any accepted projects yet.</p>
+        <p class="text-sm text-gray-600 dark:text-slate-300">You do not have any accepted projects yet.</p>
       </div>
 
       <div v-else class="space-y-4">
         <article
           v-for="application in acceptedApplications"
           :key="application.id"
-          class="rounded-xl border border-gray-200 bg-white p-5 space-y-4"
+          class="space-y-4 rounded-xl border border-gray-200 bg-white p-5 dark:border-slate-700/70 dark:bg-slate-900/90"
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 {{ application.project?.title ?? 'Project' }}
               </h2>
-              <p class="text-sm text-gray-600">
+              <p class="text-sm text-gray-600 dark:text-slate-300">
                 Company: {{ application.project?.company?.name ?? 'Unknown' }}
               </p>
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">
                 Project status: {{ projectStatusLabel(application.project?.status) }}
                 <span v-if="application.project?.deadline">
                   | Deadline: {{ formatDate(application.project?.deadline) }}</span
@@ -56,7 +56,7 @@
               </p>
             </div>
             <span
-              class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700"
+              class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
             >
               Accepted
             </span>
@@ -64,35 +64,38 @@
 
           <section class="rounded-lg border border-slate-200 bg-slate-50/60 p-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-slate-900">My assigned tasks</h3>
-              <span class="text-xs text-slate-500">Todo, in progress, complete</span>
+              <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">My assigned tasks</h3>
+              <span class="text-xs text-slate-500 dark:text-slate-400">Todo, in progress, complete</span>
             </div>
 
             <ul v-if="(tasksByApplication[application.id] ?? []).length > 0" class="mt-3 space-y-3">
               <li
                 v-for="task in tasksByApplication[application.id]"
                 :key="task.id"
-                class="rounded-md border border-slate-200 bg-white p-3"
+                class="rounded-md border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900"
               >
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                  <p class="text-sm font-semibold text-slate-900">{{ task.title }}</p>
+                  <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ task.title }}</p>
                   <span
-                    class="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-[11px] font-medium text-indigo-700"
+                    class="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-[11px] font-medium text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300"
                   >
                     {{ priorityLabel(task.priority) }}
                   </span>
                 </div>
 
-                <p v-if="task.requirements" class="mt-1 text-xs text-slate-600 whitespace-pre-line">
+                <p
+                  v-if="task.requirements"
+                  class="mt-1 whitespace-pre-line text-xs text-slate-600 dark:text-slate-300"
+                >
                   {{ task.requirements }}
                 </p>
 
                 <div class="mt-3 grid gap-3 md:grid-cols-[220px_1fr_auto] md:items-end">
                   <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">Status</label>
                     <select
                       v-model="taskStatus[task.id]"
-                      class="block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
                     >
                       <option value="todo">Todo</option>
                       <option value="in_progress">In progress</option>
@@ -101,12 +104,12 @@
                   </div>
 
                   <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">My note</label>
+                    <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-slate-300">My note</label>
                     <textarea
                       v-model="taskNote[task.id]"
                       rows="2"
                       maxlength="1000"
-                      class="w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
                       placeholder="Optional note for company"
                     />
                   </div>
@@ -122,7 +125,7 @@
                   </div>
                 </div>
 
-                <p class="mt-2 text-[11px] text-slate-500">
+                <p class="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
                   Created {{ formatDateTime(task.created_at) }}
                   <span v-if="task.completed_at">
                     | Completed {{ formatDateTime(task.completed_at) }}</span
@@ -131,7 +134,7 @@
               </li>
             </ul>
 
-            <p v-else class="mt-3 text-xs text-slate-500">No tasks assigned yet.</p>
+            <p v-else class="mt-3 text-xs text-slate-500 dark:text-slate-400">No tasks assigned yet.</p>
           </section>
         </article>
       </div>

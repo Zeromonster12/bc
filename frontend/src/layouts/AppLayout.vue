@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-transparent overflow-hidden">
+  <div class="min-h-screen overflow-hidden bg-transparent">
     <button
       type="button"
-      class="fixed left-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur lg:hidden"
+      class="fixed left-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur lg:hidden dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-300"
       @click="sidebarOpen = !sidebarOpen"
       aria-label="Open menu"
     >
@@ -26,7 +26,7 @@
       >
         <div
           v-if="sidebarOpen"
-          class="fixed inset-0 z-40 bg-slate-900/40 lg:hidden"
+          class="fixed inset-0 z-40 bg-slate-900/40 lg:hidden dark:bg-slate-950/60"
           @click="sidebarOpen = false"
         />
       </Transition>

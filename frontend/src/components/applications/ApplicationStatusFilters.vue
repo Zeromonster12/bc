@@ -8,8 +8,8 @@
       :class="[
         'px-4 py-1.5 text-sm rounded-full border transition-colors',
         activeStatus === option.value
-          ? 'bg-indigo-600 text-white border-indigo-600'
-          : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
+          ? 'bg-indigo-600 text-white border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500'
+          : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700 dark:hover:border-slate-500',
       ]"
     >
       {{ option.label }}

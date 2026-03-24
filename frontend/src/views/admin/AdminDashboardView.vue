@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <div class="space-y-6">
-      <h1 class="text-2xl font-bold text-gray-900">Admin Panel</h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Admin Panel</h1>
 
       <AdminTabNav :tabs="tabs" :active-tab="activeTab" @change="activeTab = $event" />
 

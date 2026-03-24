@@ -1,11 +1,11 @@
 <template>
   <div class="relative" ref="container">
     <button
-      class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
+      class="flex items-center gap-2 text-sm font-medium text-gray-700 transition hover:text-gray-900 dark:text-slate-300 dark:hover:text-slate-100"
       @click="open = !open"
     >
       <div
-        class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm overflow-hidden"
+        class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300"
       >
         <img
           v-if="avatarUrl"
@@ -16,7 +16,7 @@
         <span v-else>{{ initials }}</span>
       </div>
       <span class="hidden md:block">{{ auth.user?.name }}</span>
-      <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg class="h-4 w-4 text-gray-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
       </svg>
     </button>
@@ -24,21 +24,21 @@
     <Transition name="dropdown">
       <div
         v-if="open"
-        class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50 py-1"
+        class="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-gray-100 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
       >
-        <div class="px-4 py-2 border-b border-gray-100">
-          <p class="text-sm font-medium text-gray-900">{{ auth.user?.name }}</p>
-          <p class="text-xs text-gray-500">{{ auth.user?.email }}</p>
+        <div class="border-b border-gray-100 px-4 py-2 dark:border-slate-700">
+          <p class="text-sm font-medium text-gray-900 dark:text-slate-100">{{ auth.user?.name }}</p>
+          <p class="text-xs text-gray-500 dark:text-slate-400">{{ auth.user?.email }}</p>
         </div>
         <RouterLink
           :to="profileRoute"
-          class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+          class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 dark:text-slate-200 dark:hover:bg-slate-800"
           @click="open = false"
         >
           Profile
         </RouterLink>
         <button
-          class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
+          class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
           @click="handleLogout"
         >
           Sign out
