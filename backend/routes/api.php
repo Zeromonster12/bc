@@ -66,6 +66,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('/profile/student', [StudentProfileController::class, 'show'])
         ->middleware('throttle:30,1');
+    Route::get('/profile/student/avatar', [StudentProfileController::class, 'avatar'])
+        ->middleware('throttle:60,1')
+        ->name('profile.student.avatar.show');
+    Route::get('/users/{user}/avatar', [StudentProfileController::class, 'userAvatar'])
+        ->middleware('throttle:60,1')
+        ->name('users.avatar.show');
     Route::post('/profile/student', [StudentProfileController::class, 'update'])
         ->middleware('throttle:15,1');
     Route::put('/profile/student', [StudentProfileController::class, 'update'])

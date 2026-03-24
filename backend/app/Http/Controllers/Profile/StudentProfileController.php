@@ -4,16 +4,15 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\StudentProfile;
+use App\Models\User;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class StudentProfileController extends Controller
 {
     private const AVATAR_DISK = 'userpfp';
-    private const AVATAR_SIGNED_URL_DISK = 'userpfp_signed';
 
     public function show(Request $request): JsonResponse
     {
@@ -92,6 +91,56 @@ class StudentProfileController extends Controller
         return response()->json($this->transformProfile($profile->fresh()));
     }
 
+    public function avatar(Request $request)
+    {
+        $user = $request->user();
+
+        if (! $user || $user->role !== 'student') {
+            return response()->json([
+                'message' => 'Only students can access profile photo.',
+            ], 403);
+        }
+
+        $avatarPath = StudentProfile::query()
+            ->where('user_id', $user->id)
+            ->value('avatar_path');
+
+        if (! is_string($avatarPath) || $avatarPath === '') {
+            return response()->json([
+                'message' => 'Profile photo not found.',
+            ], 404);
+        }
+
+        return $this->streamAvatar($avatarPath);
+    }
+
+    public function userAvatar(Request $request, User $user)
+    {
+        if (! $request->user()) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        if ($user->role !== 'student') {
+            return response()->json([
+                'message' => 'Profile photo not found.',
+            ], 404);
+        }
+
+        $avatarPath = StudentProfile::query()
+            ->where('user_id', $user->id)
+            ->value('avatar_path');
+
+        if (! is_string($avatarPath) || $avatarPath === '') {
+            return response()->json([
+                'message' => 'Profile photo not found.',
+            ], 404);
+        }
+
+        return $this->streamAvatar($avatarPath);
+    }
+
     /**
      * @param array<string, mixed> $data
      * @return array<string, mixed>
@@ -110,19 +159,40 @@ class StudentProfileController extends Controller
         $data = is_array($profile?->profile_data) ? $profile->profile_data : [];
 
         if ($profile?->avatar_path) {
-            $disk = Storage::disk(self::AVATAR_SIGNED_URL_DISK);
-            if ($disk instanceof FilesystemAdapter) {
-                try {
-                    $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
-                    $data['avatar_url'] = $disk->temporaryUrl($profile->avatar_path, now()->addMinutes($ttlMinutes));
-                } catch (Throwable) {
-                    $data['avatar_url'] = $disk->url($profile->avatar_path);
-                }
-            } else {
-                $data['avatar_url'] = '/storage/' . $profile->avatar_path;
-            }
+            $data['avatar_url'] = route('profile.student.avatar.show');
         }
 
         return $data;
+    }
+
+    private function streamAvatar(string $avatarPath)
+    {
+        if (! Storage::disk(self::AVATAR_DISK)->exists($avatarPath)) {
+            return response()->json([
+                'message' => 'Profile photo not found in storage.',
+            ], 404);
+        }
+
+        $stream = Storage::disk(self::AVATAR_DISK)->readStream($avatarPath);
+
+        if (! is_resource($stream)) {
+            return response()->json([
+                'message' => 'Profile photo could not be streamed from storage.',
+            ], 500);
+        }
+
+        $disk = Storage::disk(self::AVATAR_DISK);
+        $mimeType = $disk instanceof FilesystemAdapter
+            ? ($disk->mimeType($avatarPath) ?: 'application/octet-stream')
+            : 'application/octet-stream';
+
+        return response()->stream(function () use ($stream): void {
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 }

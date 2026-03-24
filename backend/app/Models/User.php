@@ -7,12 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
-use Throwable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -109,7 +106,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getAvatarUrlAttribute(): ?string
     {
-        $avatarDisk = 'userpfp_signed';
         $avatarPath = null;
 
         if ($this->relationLoaded('studentProfile')) {
@@ -119,19 +115,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         if (is_string($avatarPath) && $avatarPath !== '') {
-            $disk = Storage::disk($avatarDisk);
-
-            if ($disk instanceof FilesystemAdapter) {
-                try {
-                    $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
-
-                    return $disk->temporaryUrl($avatarPath, now()->addMinutes($ttlMinutes));
-                } catch (Throwable) {
-                    return $disk->url($avatarPath);
-                }
-            }
-
-            return '/storage/' . $avatarPath;
+            return route('users.avatar.show', ['user' => $this->id]);
         }
 
         return null;
