@@ -11,7 +11,6 @@ export interface StudentCertification {
   name: string
   issuer: string
   year: string
-  url: string
 }
 
 export interface StudentProject {
@@ -155,10 +154,9 @@ const parseCertifications = (input: unknown): StudentCertification[] => {
         name: String(value?.name ?? '').trim(),
         issuer: String(value?.issuer ?? '').trim(),
         year: String(value?.year ?? '').trim(),
-        url: String(value?.url ?? '').trim(),
       }
     })
-    .filter((item) => item.name || item.issuer || item.year || item.url)
+    .filter((item) => item.name || item.issuer || item.year)
 }
 
 const parseProjects = (input: unknown): StudentProject[] => {
@@ -248,8 +246,6 @@ export const calculateStudentProfileCompletion = (form: StudentProfileForm): num
     form.about_me,
     form.availability,
     form.preferred_work_type,
-    form.github_url,
-    form.linkedin_url,
     form.skills.length > 0,
     form.languages.length > 0,
     form.projects.length > 0,
@@ -280,8 +276,6 @@ export const validateStudentProfileForm = (form: StudentProfileForm): Record<str
   const urlFields = [
     'portfolio_url',
     'cv_url',
-    'github_url',
-    'linkedin_url',
     'website_url',
   ] as const
   urlFields.forEach((field) => {
@@ -327,9 +321,8 @@ export const sanitizeStudentProfileForm = (form: StudentProfileForm): StudentPro
         name: item.name.trim(),
         issuer: item.issuer.trim(),
         year: item.year.trim(),
-        url: item.url.trim(),
       }))
-      .filter((item) => item.name || item.issuer || item.year || item.url),
+      .filter((item) => item.name || item.issuer || item.year),
     projects: form.projects
       .map((item) => ({
         title: item.title.trim(),

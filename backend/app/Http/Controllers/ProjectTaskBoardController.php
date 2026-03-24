@@ -92,6 +92,7 @@ class ProjectTaskBoardController extends Controller
                 'name' => $folder->name,
                 'color' => $folder->color,
                 'position' => $folder->position,
+                'status' => $folder->status,
                 'parent_folder_id' => $folder->parent_folder_id,
                 'categories' => $folder->categories->map(fn(ApplicationTaskCategory $category) => [
                     'id' => $category->id,
@@ -131,6 +132,7 @@ class ProjectTaskBoardController extends Controller
                 (new Exists('application_task_folders', 'id'))
                     ->where(fn($query) => $query->where('project_id', $project->id)),
             ],
+            'status' => ['nullable', Rule::in(self::BOARD_STATUSES)],
         ]);
 
         $folder = ApplicationTaskFolder::query()->create([
@@ -140,6 +142,7 @@ class ProjectTaskBoardController extends Controller
             'color' => $validated['color'] ?? null,
             'position' => $validated['position'] ?? 0,
             'parent_folder_id' => $validated['parent_folder_id'] ?? null,
+            'status' => $validated['status'] ?? 'todo',
         ]);
 
         return response()->json([
@@ -148,6 +151,7 @@ class ProjectTaskBoardController extends Controller
                 'name' => $folder->name,
                 'color' => $folder->color,
                 'position' => $folder->position,
+                'status' => $folder->status,
                 'parent_folder_id' => $folder->parent_folder_id,
             ],
         ], 201);
@@ -186,6 +190,7 @@ class ProjectTaskBoardController extends Controller
                 (new Exists('application_task_folders', 'id'))
                     ->where(fn($query) => $query->where('project_id', $project->id)),
             ],
+            'status' => ['sometimes', 'nullable', Rule::in(self::BOARD_STATUSES)],
         ]);
 
         if (
@@ -214,6 +219,7 @@ class ProjectTaskBoardController extends Controller
                 'name' => $folder->name,
                 'color' => $folder->color,
                 'position' => $folder->position,
+                'status' => $folder->status,
                 'parent_folder_id' => $folder->parent_folder_id,
             ],
         ]);
@@ -380,8 +386,11 @@ class ProjectTaskBoardController extends Controller
     private function buildSection($status, $folders, $categories, $tasks): array
     {
         $statusTasks = $tasks->where('status', $status)->values();
+        $statusFolders = $folders
+            ->filter(fn(ApplicationTaskFolder $folder) => $folder->status === null || $folder->status === $status)
+            ->values();
 
-        return $folders->map(function (ApplicationTaskFolder $folder) use ($categories, $statusTasks): array {
+        return $statusFolders->map(function (ApplicationTaskFolder $folder) use ($categories, $statusTasks): array {
             $folderCategories = $categories->where('task_folder_id', $folder->id)->values();
             $uncategorizedTasks = $statusTasks
                 ->where('task_folder_id', $folder->id)

@@ -1,342 +1,694 @@
-<template>
+﻿<template>
   <AppLayout>
-    <div class="space-y-5">
+    <div class="h-full space-y-5 lg:-my-4 xl:-ml-6" @click="closeActionMenu">
       <div
-        class="rounded-2xl border border-slate-200 bg-linear-to-b from-white via-slate-50 to-slate-100/80 p-4 shadow-sm"
+        class="grid h-full items-stretch gap-3 xl:min-h-[calc(100vh-2rem)] xl:grid-cols-[280px_minmax(0,1fr)]"
       >
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Company Workspace
-            </p>
-            <h1 class="mt-1 text-2xl font-semibold text-slate-900">Project Task Board</h1>
-            <p class="mt-1 text-sm text-slate-600">
-              Simple tree view like file explorer: folder, category, task.
-            </p>
-          </div>
-
-          <div class="grid w-full gap-2 sm:grid-cols-[minmax(240px,1fr)_auto_auto] lg:w-auto">
-            <div class="relative">
-              <LayoutGrid
-                class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-              />
-              <select
-                v-model="selectedProjectId"
-                class="block w-full rounded-xl border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                @change="onProjectChange"
-              >
-                <option :value="null">Select project</option>
-                <option v-for="project in companyProjects" :key="project.id" :value="project.id">
-                  {{ project.title }}
-                </option>
-              </select>
-            </div>
-
-            <BaseButton
-              variant="secondary"
-              :disabled="!selectedProjectId"
-              class="rounded-xl!"
-              @click="openCreateFolder = true"
-            >
-              <FolderPlus class="h-4 w-4" />
-              New folder
-            </BaseButton>
-
-            <BaseButton
-              variant="secondary"
-              :disabled="!selectedProjectId || !selectedFolderId"
-              class="rounded-xl!"
-              @click="openCreateCategory = true"
-            >
-              <Plus class="h-4 w-4" />
-              New subfolder
-            </BaseButton>
-          </div>
-        </div>
-
-        <div v-if="selectedProjectId" class="mt-4 grid grid-cols-3 gap-2 sm:max-w-lg">
-          <div class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-center">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-rose-600">To Do</p>
-            <p class="text-lg font-semibold text-rose-900">{{ statusCount('todo') }}</p>
-          </div>
-          <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-amber-600">
-              In Progress
-            </p>
-            <p class="text-lg font-semibold text-amber-900">{{ statusCount('in_progress') }}</p>
-          </div>
-          <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
-              Completed
-            </p>
-            <p class="text-lg font-semibold text-emerald-900">{{ statusCount('complete') }}</p>
-          </div>
-        </div>
-      </div>
-
-      <BaseAlert
-        v-if="errorMessage"
-        type="error"
-        :message="errorMessage"
-        dismissible
-        @dismiss="errorMessage = ''"
-      />
-      <BaseAlert
-        v-if="successMessage"
-        type="success"
-        :message="successMessage"
-        dismissible
-        @dismiss="successMessage = ''"
-      />
-
-      <div v-if="loading" class="space-y-3">
-        <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-2xl bg-slate-100" />
-      </div>
-
-      <div
-        v-else-if="!selectedProjectId"
-        class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600"
-      >
-        Select a project to open the board.
-      </div>
-
-      <div v-else class="space-y-3">
-        <section
-          v-for="status in boardStatuses"
-          :key="status"
-          class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        <aside
+          class="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur"
         >
-          <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-            <div class="flex items-center gap-2">
-              <component :is="statusIcon(status)" :class="statusIconClass(status)" />
-              <h2 class="text-sm font-semibold text-slate-900">{{ statusLabel(status) }}</h2>
-            </div>
-            <div class="flex items-center gap-2">
-              <span
-                class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600"
-              >
-                {{ statusCount(status) }}
-              </span>
-              <button
-                class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                @click="openCreateFolder = true"
-              >
-                <FolderPlus class="h-3 w-3" />
-                New folder
-              </button>
-            </div>
+          <div class="border-b border-slate-200 px-4 py-3">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Projects</p>
+            <h2 class="mt-1 text-sm font-semibold text-slate-900">Company Workspace</h2>
           </div>
-
-          <div
-            class="mx-2 mt-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-500"
-            @dragover.prevent
-            @drop.prevent="onStatusDrop(status)"
-          >
-            Drop task here to move it to {{ statusLabel(status).toLowerCase() }}.
-          </div>
-
-          <div
-            v-if="flattenedFoldersForStatus(status).length === 0"
-            class="px-4 py-4 text-sm text-slate-500"
-          >
-            No tasks in this section.
-          </div>
-
-          <div v-else class="px-2 py-2">
-            <div
-              v-for="entry in flattenedFoldersForStatus(status)"
-              :key="`folder-${status}-${entry.folder.id}`"
-              class="rounded-xl border border-transparent hover:border-slate-200"
-              @dragover.prevent
-              @drop.prevent="onFolderDrop(status, entry.folder.id)"
+          <div class="flex-1 space-y-1 overflow-auto p-2">
+            <button
+              v-for="project in companyProjects"
+              :key="project.id"
+              type="button"
+              :class="[
+                'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition',
+                selectedProjectId === project.id
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-slate-100',
+              ]"
+              @click="selectProject(project.id)"
             >
-              <button
-                class="group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition hover:bg-slate-50"
-                :draggable="true"
-                :style="{ paddingLeft: `${entry.depth * 18 + 10}px` }"
-                @dragstart="onFolderDragStart(status, entry.folder.id, $event)"
-                @click="toggleFolder(status, entry.folder.id)"
+              <span class="truncate text-sm font-medium">{{ project.title }}</span>
+              <span
+                :class="[
+                  'ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-semibold',
+                  selectedProjectId === project.id
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-200 text-slate-600',
+                ]"
               >
-                <span class="flex items-center gap-2">
-                  <ChevronRight
-                    v-if="!isFolderOpen(status, entry.folder.id)"
-                    class="h-4 w-4 text-slate-500"
-                  />
-                  <ChevronDown v-else class="h-4 w-4 text-slate-500" />
-                  <Folder
-                    v-if="!isFolderOpen(status, entry.folder.id)"
-                    class="h-4 w-4 text-amber-500"
-                  />
-                  <FolderOpen v-else class="h-4 w-4 text-amber-500" />
-                  <span class="text-sm font-medium text-slate-800">{{ entry.folder.name }}</span>
-                </span>
-                <span class="flex items-center gap-2">
-                  <span class="text-xs text-slate-500">{{ folderTaskCount(entry.folder) }}</span>
-                  <button
-                    type="button"
-                    class="rounded border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 hover:bg-white"
-                    @click.stop="renameFolder(entry.folder.id, entry.folder.name)"
+                {{
+                  selectedProjectId === project.id
+                    ? statusCount('todo') + statusCount('in_progress') + statusCount('complete')
+                    : '•'
+                }}
+              </span>
+            </button>
+          </div>
+        </aside>
+
+        <div class="space-y-5">
+          <div
+            class="rounded-2xl border border-slate-200 bg-linear-to-b from-white via-slate-50 to-slate-100/80 p-4 shadow-sm"
+          >
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  Project Task Board
+                </p>
+                <h1 class="mt-1 text-2xl font-semibold text-slate-900">
+                  {{
+                    companyProjects.find((project) => project.id === selectedProjectId)?.title ||
+                    'Select project'
+                  }}
+                </h1>
+                <p class="mt-1 text-sm text-slate-600">
+                  Folder, subfolder and task tree with drag and drop.
+                </p>
+              </div>
+
+              <div class="grid w-full gap-2 sm:grid-cols-[auto_auto] lg:w-auto">
+                <div class="relative">
+                  <BaseButton
+                    variant="secondary"
+                    :disabled="!selectedProjectId"
+                    class="rounded-xl!"
+                    @click.stop="toggleActionMenu('quick-add')"
                   >
-                    Rename
-                  </button>
-                  <button
-                    type="button"
-                    class="rounded border border-rose-200 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600 hover:bg-rose-50"
-                    @click.stop="deleteFolder(entry.folder.id, entry.folder.name)"
+                    <Plus class="h-4 w-4" />
+                    Quick add
+                  </BaseButton>
+
+                  <div
+                    v-if="isActionMenuOpen('quick-add')"
+                    class="absolute right-0 top-11 z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                    @click.stop
                   >
-                    Delete
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      @click.stop="
+                        openCreateFolderModal('todo');
+                        closeActionMenu()
+                      "
+                    >
+                      <FolderPlus class="h-3.5 w-3.5" />
+                      New folder
+                    </button>
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      :disabled="!selectedFolderId"
+                      @click.stop="
+                        openCreateCategoryModal('todo');
+                        closeActionMenu()
+                      "
+                    >
+                      <Folder class="h-3.5 w-3.5" />
+                      New subfolder
+                    </button>
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      @click.stop="openQuickCreateTask()"
+                    >
+                      <Plus class="h-3.5 w-3.5" />
+                      New task
+                    </button>
+                  </div>
+                </div>
+
+                <div class="relative">
+                  <label
+                    class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  >
+                    <SlidersHorizontal class="h-4 w-4" />
+                  </label>
+                  <select
+                    v-model="priorityFilter"
+                    class="block w-full rounded-xl border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                  >
+                    <option value="all">All priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="selectedProjectId" class="mt-4 grid grid-cols-3 gap-2 sm:max-w-lg">
+              <div class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-center">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-rose-600">To Do</p>
+                <p class="text-lg font-semibold text-rose-900">{{ statusCount('todo') }}</p>
+              </div>
+              <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-amber-600">
+                  In Progress
+                </p>
+                <p class="text-lg font-semibold text-amber-900">{{ statusCount('in_progress') }}</p>
+              </div>
+              <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
+                  Completed
+                </p>
+                <p class="text-lg font-semibold text-emerald-900">{{ statusCount('complete') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <BaseAlert
+            v-if="errorMessage"
+            type="error"
+            :message="errorMessage"
+            dismissible
+            @dismiss="errorMessage = ''"
+          />
+
+          <div v-if="loading" class="space-y-3">
+            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-2xl bg-slate-100" />
+          </div>
+
+          <div
+            v-else-if="!selectedProjectId"
+            class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600"
+          >
+            Select a project from left sidebar.
+          </div>
+
+          <div v-else class="space-y-3">
+            <section
+              v-for="status in boardStatuses"
+              :key="status"
+              :class="[
+                'overflow-visible rounded-2xl border bg-white shadow-sm transition hover:shadow-md',
+                isDropZoneActive(status, null, null, 'status')
+                  ? 'border-sky-400 ring-2 ring-sky-200'
+                  : 'border-slate-200',
+              ]"
+              @dragover.prevent="setActiveDropZone(status, null, null, 'status')"
+              @dragleave="clearActiveDropZone"
+              @drop.prevent="onStatusDrop(status)"
+            >
+              <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <component :is="statusIcon(status)" :class="statusIconClass(status)" />
+                  <h2 class="text-sm font-semibold text-slate-900">{{ statusLabel(status) }}</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600"
+                  >
+                    {{ statusCount(status) }}
+                  </span>
+                  <button
+                    class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
+                    @click="openCreateFolderModal(status)"
+                  >
+                    <FolderPlus class="h-3 w-3" />
+                    New folder
                   </button>
-                </span>
-              </button>
+                </div>
+              </div>
 
               <div
-                v-if="isFolderOpen(status, entry.folder.id)"
-                class="border-l border-slate-200 pl-3"
-                :style="{ marginLeft: `${entry.depth * 18 + 30}px` }"
+                v-if="flattenedFoldersForStatus(status).length === 0"
+                class="px-4 py-4 text-sm text-slate-500"
               >
+                No tasks in this section.
+              </div>
+
+              <div v-else class="px-2 py-2">
                 <div
-                  class="mb-2 space-y-1 rounded-lg border border-dashed border-slate-200 bg-slate-50 p-2"
-                  @dragover.prevent
-                  @drop.prevent="onTaskDrop(status, entry.folder.id, null)"
+                  v-for="entry in flattenedFoldersForStatus(status)"
+                  :key="`folder-${status}-${entry.folder.id}`"
+                  class="rounded-xl border border-transparent transition hover:border-slate-200"
+                  @dragover.prevent="setActiveDropZone(status, entry.folder.id, null, 'folder')"
+                  @dragleave="clearActiveDropZone"
+                  @drop.prevent="onFolderDrop(status, entry.folder.id)"
                 >
-                  <p class="px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Tasks in folder
-                  </p>
-                  <div
-                    v-for="task in entry.folder.uncategorized_tasks"
-                    :key="`task-folder-${task.id}`"
-                    class="cursor-grab rounded-lg border border-slate-200 bg-white px-3 py-2 active:cursor-grabbing"
+                  <button
+                    :class="[
+                      'group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition hover:bg-slate-50',
+                      isDropZoneActive(status, entry.folder.id, null, 'folder')
+                        ? 'bg-sky-50 ring-2 ring-sky-200'
+                        : '',
+                    ]"
                     :draggable="true"
-                    @dragstart="onTaskDragStart(task, status, entry.folder.id, null, $event)"
+                    :style="{ paddingLeft: `${entry.depth * 18 + 10}px` }"
+                    @dragstart="onFolderDragStart(status, entry.folder.id, $event)"
+                    @dragend="clearActiveDropZone"
+                    @click="toggleFolder(status, entry.folder.id)"
                   >
-                    <div class="flex items-start justify-between gap-3">
-                      <div class="min-w-0">
-                        <p class="truncate text-sm font-medium text-slate-900">{{ task.title }}</p>
-                        <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                          <UserRound class="h-3.5 w-3.5" />
-                          {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
-                        </p>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <span :class="priorityPillClass(task.priority)">
-                          {{ priorityLabel(task.priority) }}
-                        </span>
+                    <span class="flex items-center gap-2">
+                      <ChevronRight
+                        v-if="!isFolderOpen(status, entry.folder.id)"
+                        class="h-4 w-4 text-slate-500"
+                      />
+                      <ChevronDown v-else class="h-4 w-4 text-slate-500" />
+                      <Folder
+                        v-if="!isFolderOpen(status, entry.folder.id)"
+                        class="h-4 w-4 text-amber-500"
+                      />
+                      <FolderOpen v-else class="h-4 w-4 text-amber-500" />
+                      <span
+                        v-if="editingFolderId !== entry.folder.id"
+                        class="text-sm font-semibold text-slate-800"
+                      >
+                        {{ entry.folder.name }}
+                      </span>
+                      <div v-else class="flex items-center gap-1" @click.stop>
+                        <input
+                          v-model="folderRenameDraft"
+                          type="text"
+                          maxlength="120"
+                          class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                          @keydown.enter.prevent="saveFolderRename(entry.folder.id)"
+                          @keydown.esc.prevent="cancelFolderRename"
+                        />
                         <button
                           type="button"
-                          class="rounded border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 hover:bg-white"
-                          @click.stop="renameTask(task.application_id, task.id, task.title)"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                          @click.stop="saveFolderRename(entry.folder.id)"
                         >
+                          <Check class="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          @click.stop="cancelFolderRename"
+                        >
+                          <X class="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </span>
+                    <span class="relative flex items-center gap-2">
+                      <span class="text-xs text-slate-500">{{
+                        folderTaskCount(entry.folder)
+                      }}</span>
+                      <button
+                        type="button"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+                        @click.stop="toggleActionMenu(`folder:${status}:${entry.folder.id}`)"
+                      >
+                        <MoreHorizontal class="h-4 w-4" />
+                      </button>
+
+                      <div
+                        v-if="isActionMenuOpen(`folder:${status}:${entry.folder.id}`)"
+                        class="absolute right-0 top-8 z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                        @click.stop
+                      >
+                        <button
+                          type="button"
+                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                          @click.stop="
+                            openCreateTaskModal(status, entry.folder.id, null);
+                            closeActionMenu()
+                          "
+                        >
+                          <Plus class="h-3.5 w-3.5" />
+                          New task
+                        </button>
+                        <button
+                          type="button"
+                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                          @click.stop="
+                            openCreateCategoryModal(status, entry.folder.id);
+                            closeActionMenu()
+                          "
+                        >
+                          <FolderPlus class="h-3.5 w-3.5" />
+                          New subfolder
+                        </button>
+                        <button
+                          type="button"
+                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                          @click.stop="
+                            startFolderRename(entry.folder.id, entry.folder.name);
+                            closeActionMenu()
+                          "
+                        >
+                          <Pencil class="h-3.5 w-3.5" />
                           Rename
                         </button>
                         <button
                           type="button"
-                          class="rounded border border-rose-200 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600 hover:bg-rose-50"
-                          @click.stop="deleteTask(task.application_id, task.id, task.title)"
+                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
+                          @click.stop="
+                            deleteFolder(entry.folder.id, entry.folder.name);
+                            closeActionMenu()
+                          "
                         >
+                          <Trash2 class="h-3.5 w-3.5" />
                           Delete
                         </button>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  v-for="category in entry.folder.categories"
-                  :key="`cat-${status}-${category.id}`"
-                  class="py-1"
-                  @dragover.prevent
-                  @drop.prevent="onTaskDrop(status, entry.folder.id, category.id)"
-                >
-                  <button
-                    class="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-50"
-                    @click="toggleCategory(status, category.id)"
-                  >
-                    <span class="flex items-center gap-2">
-                      <ChevronRight
-                        v-if="!isCategoryOpen(status, category.id)"
-                        class="h-3.5 w-3.5 text-slate-500"
-                      />
-                      <ChevronDown v-else class="h-3.5 w-3.5 text-slate-500" />
-                      <Folder class="h-3.5 w-3.5 text-sky-500" />
-                      <span class="text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        {{ category.name }}
-                      </span>
-                    </span>
-                    <span class="flex items-center gap-2">
-                      <span class="text-xs text-slate-500">{{ category.tasks.length }}</span>
-                      <button
-                        type="button"
-                        class="rounded border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 hover:bg-white"
-                        @click.stop="renameCategory(entry.folder.id, category.id, category.name)"
-                      >
-                        Rename
-                      </button>
-                      <button
-                        type="button"
-                        class="rounded border border-rose-200 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600 hover:bg-rose-50"
-                        @click.stop="deleteCategory(entry.folder.id, category.id, category.name)"
-                      >
-                        Delete
-                      </button>
                     </span>
                   </button>
 
                   <div
-                    v-if="isCategoryOpen(status, category.id)"
-                    class="ml-5 mt-1 space-y-1 border-l border-slate-200 pl-3"
-                    @dragover.prevent
-                    @drop.prevent="onTaskDrop(status, entry.folder.id, category.id)"
+                    v-if="isFolderOpen(status, entry.folder.id)"
+                    class="border-l border-slate-200 pl-3"
+                    :style="{ marginLeft: `${entry.depth * 18 + 30}px` }"
                   >
                     <div
-                      v-for="task in category.tasks"
-                      :key="`task-${task.id}`"
-                      class="cursor-grab rounded-lg border border-slate-200 bg-white px-3 py-2 active:cursor-grabbing"
-                      :draggable="true"
-                      @dragstart="
-                        onTaskDragStart(task, status, entry.folder.id, category.id, $event)
-                      "
+                      class="mb-2 space-y-1 rounded-lg transition"
+                      @dragover.prevent="setActiveDropZone(status, entry.folder.id, null, 'folder')"
+                      @dragleave="clearActiveDropZone"
+                      @drop.prevent="onTaskDrop(status, entry.folder.id, null)"
                     >
-                      <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                          <p class="truncate text-sm font-medium text-slate-900">
-                            {{ task.title }}
-                          </p>
-                          <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                            <UserRound class="h-3.5 w-3.5" />
-                            {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
-                          </p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span :class="priorityPillClass(task.priority)">
-                            {{ priorityLabel(task.priority) }}
-                          </span>
-                          <button
-                            type="button"
-                            class="rounded border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 hover:bg-white"
-                            @click.stop="renameTask(task.application_id, task.id, task.title)"
-                          >
-                            Rename
-                          </button>
-                          <button
-                            type="button"
-                            class="rounded border border-rose-200 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600 hover:bg-rose-50"
-                            @click.stop="deleteTask(task.application_id, task.id, task.title)"
-                          >
-                            Delete
-                          </button>
+                      <div
+                        v-for="task in filteredTasks(entry.folder.uncategorized_tasks)"
+                        :key="`task-folder-${task.id}`"
+                        :class="[
+                          'cursor-grab rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-sm transition active:cursor-grabbing hover:border-slate-300 hover:shadow-md',
+                          isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
+                        ]"
+                        :draggable="true"
+                        @dragstart="onTaskDragStart(task, status, entry.folder.id, null, $event)"
+                        @dragend="clearActiveDropZone"
+                      >
+                        <div class="flex items-start justify-between gap-3">
+                          <div class="min-w-0">
+                            <p
+                              v-if="editingTaskId !== task.id"
+                              class="truncate text-sm font-medium text-slate-900"
+                            >
+                              {{ task.title }}
+                            </p>
+                            <div v-else class="flex items-center gap-1" @click.stop>
+                              <input
+                                v-model="taskRenameDraft"
+                                type="text"
+                                maxlength="160"
+                                class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                @keydown.enter.prevent="
+                                  saveTaskRename(task.application_id, task.id)
+                                "
+                                @keydown.esc.prevent="cancelTaskRename"
+                              />
+                              <button
+                                type="button"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                                @click.stop="saveTaskRename(task.application_id, task.id)"
+                              >
+                                <Check class="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                @click.stop="cancelTaskRename"
+                              >
+                                <X class="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                            <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                              <UserRound class="h-3.5 w-3.5" />
+                              {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
+                            </p>
+                          </div>
+                          <div class="relative flex items-center gap-2">
+                            <span
+                              class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600"
+                            >
+                              App #{{ task.application_id }}
+                            </span>
+                            <span :class="priorityPillClass(task.priority)">
+                              {{ priorityLabel(task.priority) }}
+                            </span>
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+                              @click.stop="toggleActionMenu(`task:${status}:${task.id}`)"
+                            >
+                              <MoreHorizontal class="h-4 w-4" />
+                            </button>
+
+                            <div
+                              v-if="isActionMenuOpen(`task:${status}:${task.id}`)"
+                              class="absolute bottom-8 right-0 z-30 min-w-36 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                              @click.stop
+                            >
+                              <button
+                                type="button"
+                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                @click.stop="
+                                  startTaskRename(task.application_id, task.id, task.title);
+                                  closeActionMenu()
+                                "
+                              >
+                                <Pencil class="h-3.5 w-3.5" />
+                                Rename
+                              </button>
+                              <button
+                                type="button"
+                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
+                                @click.stop="
+                                  deleteTask(task.application_id, task.id, task.title);
+                                  closeActionMenu()
+                                "
+                              >
+                                <Trash2 class="h-3.5 w-3.5" />
+                                Delete
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <p v-if="category.tasks.length === 0" class="px-2 py-1 text-xs text-slate-400">
-                      Empty category
-                    </p>
+                    <div
+                      v-for="category in entry.folder.categories"
+                      :key="`cat-${status}-${category.id}`"
+                      class="py-1 rounded-lg transition"
+                      @dragover.prevent="
+                        setActiveDropZone(status, entry.folder.id, category.id, 'category')
+                      "
+                      @dragleave="clearActiveDropZone"
+                      @drop.prevent="onTaskDrop(status, entry.folder.id, category.id)"
+                    >
+                      <button
+                        :class="[
+                          'flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-50',
+                          isDropZoneActive(status, entry.folder.id, category.id, 'category')
+                            ? 'bg-sky-50 ring-2 ring-sky-200'
+                            : '',
+                        ]"
+                        @click="toggleCategory(status, category.id)"
+                      >
+                        <span class="flex items-center gap-2">
+                          <ChevronRight
+                            v-if="!isCategoryOpen(status, category.id)"
+                            class="h-3.5 w-3.5 text-slate-500"
+                          />
+                          <ChevronDown v-else class="h-3.5 w-3.5 text-slate-500" />
+                          <Folder class="h-3.5 w-3.5 text-sky-500" />
+                          <span
+                            v-if="editingCategoryId !== category.id"
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-600"
+                          >
+                            {{ category.name }}
+                          </span>
+                          <div v-else class="flex items-center gap-1" @click.stop>
+                            <input
+                              v-model="categoryRenameDraft"
+                              type="text"
+                              maxlength="120"
+                              class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                              @keydown.enter.prevent="
+                                saveCategoryRename(entry.folder.id, category.id)
+                              "
+                              @keydown.esc.prevent="cancelCategoryRename"
+                            />
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                              @click.stop="saveCategoryRename(entry.folder.id, category.id)"
+                            >
+                              <Check class="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                              @click.stop="cancelCategoryRename"
+                            >
+                              <X class="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </span>
+                        <span class="relative flex items-center gap-2">
+                          <span class="text-xs text-slate-500">{{ category.tasks.length }}</span>
+                          <button
+                            type="button"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+                            @click.stop="toggleActionMenu(`category:${status}:${category.id}`)"
+                          >
+                            <MoreHorizontal class="h-4 w-4" />
+                          </button>
+
+                          <div
+                            v-if="isActionMenuOpen(`category:${status}:${category.id}`)"
+                            class="absolute right-0 top-8 z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                            @click.stop
+                          >
+                            <button
+                              type="button"
+                              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                              @click.stop="
+                                openCreateTaskModal(status, entry.folder.id, category.id);
+                                closeActionMenu()
+                              "
+                            >
+                              <Plus class="h-3.5 w-3.5" />
+                              New task
+                            </button>
+                            <button
+                              type="button"
+                              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                              @click.stop="
+                                startCategoryRename(entry.folder.id, category.id, category.name);
+                                closeActionMenu()
+                              "
+                            >
+                              <Pencil class="h-3.5 w-3.5" />
+                              Rename
+                            </button>
+                            <button
+                              type="button"
+                              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
+                              @click.stop="
+                                deleteCategory(entry.folder.id, category.id, category.name);
+                                closeActionMenu()
+                              "
+                            >
+                              <Trash2 class="h-3.5 w-3.5" />
+                              Delete
+                            </button>
+                          </div>
+                        </span>
+                      </button>
+
+                      <div
+                        v-if="isCategoryOpen(status, category.id)"
+                        class="ml-5 mt-1 space-y-1 border-l border-slate-200 pl-3"
+                        @dragover.prevent
+                        @drop.prevent="onTaskDrop(status, entry.folder.id, category.id)"
+                      >
+                        <div
+                          v-for="task in filteredTasks(category.tasks)"
+                          :key="`task-${task.id}`"
+                          :class="[
+                            'cursor-grab rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-sm transition active:cursor-grabbing hover:border-slate-300 hover:shadow-md',
+                            isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
+                          ]"
+                          :draggable="true"
+                          @dragstart="
+                            onTaskDragStart(task, status, entry.folder.id, category.id, $event)
+                          "
+                          @dragend="clearActiveDropZone"
+                        >
+                          <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                              <p
+                                v-if="editingTaskId !== task.id"
+                                class="truncate text-sm font-medium text-slate-900"
+                              >
+                                {{ task.title }}
+                              </p>
+                              <div v-else class="flex items-center gap-1" @click.stop>
+                                <input
+                                  v-model="taskRenameDraft"
+                                  type="text"
+                                  maxlength="160"
+                                  class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                  @keydown.enter.prevent="
+                                    saveTaskRename(task.application_id, task.id)
+                                  "
+                                  @keydown.esc.prevent="cancelTaskRename"
+                                />
+                                <button
+                                  type="button"
+                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                                  @click.stop="saveTaskRename(task.application_id, task.id)"
+                                >
+                                  <Check class="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                  @click.stop="cancelTaskRename"
+                                >
+                                  <X class="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                              <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                                <UserRound class="h-3.5 w-3.5" />
+                                {{
+                                  task.assignee.name || task.assignee.email || 'Unknown assignee'
+                                }}
+                              </p>
+                            </div>
+                            <div class="relative flex items-center gap-2">
+                              <span
+                                class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600"
+                              >
+                                App #{{ task.application_id }}
+                              </span>
+                              <span :class="priorityPillClass(task.priority)">
+                                {{ priorityLabel(task.priority) }}
+                              </span>
+                              <button
+                                type="button"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
+                                @click.stop="toggleActionMenu(`task:${status}:${task.id}`)"
+                              >
+                                <MoreHorizontal class="h-4 w-4" />
+                              </button>
+
+                              <div
+                                v-if="isActionMenuOpen(`task:${status}:${task.id}`)"
+                                class="absolute bottom-8 right-0 z-30 min-w-36 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                                @click.stop
+                              >
+                                <button
+                                  type="button"
+                                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                  @click.stop="
+                                    startTaskRename(task.application_id, task.id, task.title);
+                                    closeActionMenu()
+                                  "
+                                >
+                                  <Pencil class="h-3.5 w-3.5" />
+                                  Rename
+                                </button>
+                                <button
+                                  type="button"
+                                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
+                                  @click.stop="
+                                    deleteTask(task.application_id, task.id, task.title);
+                                    closeActionMenu()
+                                  "
+                                >
+                                  <Trash2 class="h-3.5 w-3.5" />
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <p
+                          v-if="filteredTasks(category.tasks).length === 0"
+                          class="px-2 py-1 text-xs text-slate-400"
+                        >
+                          Empty category
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
           </div>
-        </section>
+        </div>
       </div>
 
       <div
@@ -345,6 +697,14 @@
       >
         <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
           <h3 class="text-sm font-semibold text-slate-900">Create folder</h3>
+          <select
+            v-model="createFolderStatus"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+          >
+            <option value="todo">TO DO</option>
+            <option value="in_progress">IN PROGRESS</option>
+            <option value="complete">COMPLETED</option>
+          </select>
           <input
             v-model="newFolderName"
             type="text"
@@ -376,11 +736,24 @@
           <h3 class="text-sm font-semibold text-slate-900">Create subfolder</h3>
 
           <select
+            v-model="createCategoryStatus"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+          >
+            <option value="todo">TO DO</option>
+            <option value="in_progress">IN PROGRESS</option>
+            <option value="complete">COMPLETED</option>
+          </select>
+
+          <select
             v-model="selectedFolderId"
             class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
           >
             <option :value="null">Select folder</option>
-            <option v-for="folder in folderOptions" :key="folder.id" :value="folder.id">
+            <option
+              v-for="folder in availableFoldersForCreateCategory"
+              :key="folder.id"
+              :value="folder.id"
+            >
               {{ folder.name }}
             </option>
           </select>
@@ -408,6 +781,66 @@
           </div>
         </div>
       </div>
+
+      <div
+        v-if="openCreateTask"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4"
+      >
+        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
+          <h3 class="text-sm font-semibold text-slate-900">Create task</h3>
+
+          <select
+            v-model="createTaskStatus"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+          >
+            <option value="todo">TO DO</option>
+            <option value="in_progress">IN PROGRESS</option>
+            <option value="complete">COMPLETED</option>
+          </select>
+
+          <select
+            v-model="selectedTaskApplicationId"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+          >
+            <option :value="null">Select student application</option>
+            <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
+              {{ app.student_name }}
+            </option>
+          </select>
+
+          <input
+            v-model="newTaskTitle"
+            type="text"
+            maxlength="160"
+            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            placeholder="Task title"
+          />
+
+          <select
+            v-model="newTaskPriority"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+
+          <div class="mt-4 flex justify-end gap-2">
+            <BaseButton variant="secondary" class="rounded-xl!" @click="openCreateTask = false">
+              Cancel
+            </BaseButton>
+            <BaseButton
+              variant="primary"
+              class="rounded-xl!"
+              :loading="submitting"
+              @click="createTask"
+            >
+              Create
+            </BaseButton>
+          </div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
@@ -415,6 +848,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import {
+  Check,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
@@ -423,9 +857,13 @@ import {
   Folder,
   FolderOpen,
   FolderPlus,
-  LayoutGrid,
+  MoreHorizontal,
+  Pencil,
   Plus,
+  SlidersHorizontal,
+  Trash2,
   UserRound,
+  X,
 } from 'lucide-vue-next'
 import AppLayout from '@/layouts/AppLayout.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
@@ -448,6 +886,7 @@ interface SimpleCategory {
 interface FolderOption {
   id: number
   name: string
+  status?: ApplicationTaskStatus | null
   parent_folder_id?: number | null
   categories: SimpleCategory[]
 }
@@ -471,15 +910,33 @@ interface FolderDragPayload {
   fromStatus: ApplicationTaskStatus
 }
 
+type DropZoneType = 'status' | 'folder' | 'category'
+
+interface ActiveDropZone {
+  status: ApplicationTaskStatus
+  folderId: number | null
+  categoryId: number | null
+  type: DropZoneType
+}
+
+interface AcceptedApplicationOption {
+  id: number
+  student_name: string
+}
+
 export default defineComponent({
   name: 'CompanyTaskBoardView',
   components: {
     AppLayout,
     BaseAlert,
     BaseButton,
-    LayoutGrid,
+    Check,
+    MoreHorizontal,
+    Pencil,
     FolderPlus,
     Plus,
+    SlidersHorizontal,
+    Trash2,
     Folder,
     FolderOpen,
     ChevronRight,
@@ -488,6 +945,7 @@ export default defineComponent({
     Circle,
     CircleDot,
     CheckCircle2,
+    X,
   },
   setup() {
     return {
@@ -511,18 +969,44 @@ export default defineComponent({
       openCategories: {} as Record<string, boolean>,
       openCreateFolder: false,
       openCreateCategory: false,
+      openCreateTask: false,
       newFolderName: '',
       newCategoryName: '',
+      newTaskTitle: '',
+      newTaskPriority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
       selectedFolderId: null as number | null,
+      createFolderStatus: 'todo' as ApplicationTaskStatus,
+      createCategoryStatus: 'todo' as ApplicationTaskStatus,
+      createTaskStatus: 'todo' as ApplicationTaskStatus,
+      createTaskFolderId: null as number | null,
+      createTaskCategoryId: null as number | null,
+      selectedTaskApplicationId: null as number | null,
+      acceptedApplications: [] as AcceptedApplicationOption[],
       folderOptions: [] as FolderOption[],
       draggedTask: null as TaskDragPayload | null,
       draggedFolder: null as FolderDragPayload | null,
+      activeDropZone: null as ActiveDropZone | null,
+      openActionMenuKey: null as string | null,
+      priorityFilter: 'all' as 'all' | 'low' | 'medium' | 'high' | 'urgent',
+      editingFolderId: null as number | null,
+      folderRenameDraft: '',
+      editingCategoryId: null as number | null,
+      editingCategoryFolderId: null as number | null,
+      categoryRenameDraft: '',
+      editingTaskId: null as number | null,
+      editingTaskApplicationId: null as number | null,
+      taskRenameDraft: '',
       boardStatuses: ['todo', 'in_progress', 'complete'] as ApplicationTaskStatus[],
     }
   },
   computed: {
     companyProjects() {
       return this.projectStore.projects
+    },
+    availableFoldersForCreateCategory(): FolderOption[] {
+      const currentStatus = this.createCategoryStatus
+      const availableIds = new Set(this.sections[currentStatus].map((folder) => folder.id))
+      return this.folderOptions.filter((folder) => availableIds.has(folder.id))
     },
   },
   async mounted() {
@@ -545,10 +1029,20 @@ export default defineComponent({
     }
   },
   methods: {
+    async selectProject(projectId: number) {
+      if (this.selectedProjectId === projectId) {
+        return
+      }
+
+      this.selectedProjectId = projectId
+      await this.onProjectChange()
+    },
     async onProjectChange() {
       if (!this.selectedProjectId) {
         this.sections = { todo: [], in_progress: [], complete: [] }
         this.folderOptions = []
+        this.acceptedApplications = []
+        this.selectedTaskApplicationId = null
         return
       }
       await this.loadBoard(this.selectedProjectId)
@@ -561,11 +1055,34 @@ export default defineComponent({
         this.sections = board.data.sections
         this.hydrateOpenStates()
         await this.loadFolders(projectId)
+        await this.loadAcceptedApplications(projectId)
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to load task board.'
       } finally {
         this.loading = false
+      }
+    },
+    async loadAcceptedApplications(projectId: number) {
+      const response = await ApplicationService.getAll({
+        project_id: projectId,
+        status: 'accepted',
+        per_page: 100,
+      })
+
+      const rawItems = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response?.data?.data)
+          ? response.data.data
+          : []
+
+      this.acceptedApplications = rawItems.map((item: any) => ({
+        id: Number(item?.id ?? 0),
+        student_name: String(item?.student?.name ?? `Application #${item?.id ?? ''}`).trim(),
+      }))
+
+      if (!this.selectedTaskApplicationId && this.acceptedApplications.length > 0) {
+        this.selectedTaskApplicationId = this.acceptedApplications[0]!.id
       }
     },
     async loadFolders(projectId: number) {
@@ -580,6 +1097,7 @@ export default defineComponent({
       ).map((folder) => ({
         id: folder.id,
         name: folder.name,
+        status: (folder as { status?: ApplicationTaskStatus | null }).status ?? null,
         parent_folder_id: folder.parent_folder_id ?? null,
         categories: (folder.categories ?? []).map((category) => ({
           id: category.id,
@@ -620,9 +1138,12 @@ export default defineComponent({
       return this.openCategories[`${status}:${categoryId}`] ?? false
     },
     folderTaskCount(folder: ProjectTaskBoardFolder): number {
-      const directTasks = folder.uncategorized_tasks?.length ?? 0
+      const directTasks = this.filteredTasks(folder.uncategorized_tasks).length
       return (
-        directTasks + folder.categories.reduce((sum, category) => sum + category.tasks.length, 0)
+        directTasks +
+        folder.categories.reduce((sum, category) => {
+          return sum + this.filteredTasks(category.tasks).length
+        }, 0)
       )
     },
     flattenedFoldersForStatus(status: ApplicationTaskStatus): FlatFolderEntry[] {
@@ -710,6 +1231,8 @@ export default defineComponent({
       return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600'
     },
     onFolderDragStart(status: ApplicationTaskStatus, folderId: number, event: DragEvent) {
+      this.closeActionMenu()
+      this.activeDropZone = null
       this.draggedFolder = { folderId, fromStatus: status }
       if (event.dataTransfer) {
         event.dataTransfer.effectAllowed = 'move'
@@ -717,6 +1240,7 @@ export default defineComponent({
       }
     },
     async onFolderDrop(status: ApplicationTaskStatus, targetFolderId: number) {
+      this.clearActiveDropZone()
       if (!this.selectedProjectId) return
 
       if (this.draggedTask) {
@@ -748,12 +1272,12 @@ export default defineComponent({
           {
             parent_folder_id: targetFolderId,
             position: targetPosition,
+            status,
           },
         )
 
-        this.updateFolderParentLocally(sourceFolderId, targetFolderId, targetPosition)
+        await this.loadBoard(this.selectedProjectId)
         this.openFolders[`${status}:${targetFolderId}`] = true
-        this.successMessage = 'Folder moved as subfolder.'
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to move folder.'
@@ -768,6 +1292,8 @@ export default defineComponent({
       categoryId: number | null,
       event: DragEvent,
     ) {
+      this.closeActionMenu()
+      this.activeDropZone = null
       this.draggedTask = {
         taskId: task.id,
         applicationId: task.application_id,
@@ -782,11 +1308,13 @@ export default defineComponent({
       }
     },
     async onTaskDrop(status: ApplicationTaskStatus, folderId: number, categoryId: number | null) {
+      this.clearActiveDropZone()
       if (!this.draggedTask) return
       await this.moveTaskToTarget(this.draggedTask, status, folderId, categoryId)
       this.draggedTask = null
     },
     async onStatusDrop(status: ApplicationTaskStatus) {
+      this.clearActiveDropZone()
       if (this.draggedFolder) {
         if (!this.selectedProjectId) {
           this.draggedFolder = null
@@ -803,10 +1331,10 @@ export default defineComponent({
           await ApplicationService.updateTaskFolder(this.selectedProjectId, sourceFolderId, {
             parent_folder_id: null,
             position: targetPosition,
+            status,
           })
 
-          this.updateFolderParentLocally(sourceFolderId, null, targetPosition)
-          this.successMessage = 'Folder moved to root.'
+          await this.loadBoard(this.selectedProjectId)
         } catch (error: unknown) {
           const typedError = error as { response?: { data?: { message?: string } } }
           this.errorMessage = typedError?.response?.data?.message ?? 'Failed to move folder.'
@@ -828,6 +1356,204 @@ export default defineComponent({
 
       await this.moveTaskToTarget(this.draggedTask, status, target.folderId, target.categoryId)
       this.draggedTask = null
+    },
+    setActiveDropZone(
+      status: ApplicationTaskStatus,
+      folderId: number | null,
+      categoryId: number | null,
+      type: DropZoneType,
+    ) {
+      this.activeDropZone = { status, folderId, categoryId, type }
+    },
+    toggleActionMenu(key: string) {
+      this.openActionMenuKey = this.openActionMenuKey === key ? null : key
+    },
+    isActionMenuOpen(key: string): boolean {
+      return this.openActionMenuKey === key
+    },
+    closeActionMenu() {
+      this.openActionMenuKey = null
+    },
+    isDropZoneActive(
+      status: ApplicationTaskStatus,
+      folderId: number | null,
+      categoryId: number | null,
+      type: DropZoneType,
+    ): boolean {
+      if (!this.activeDropZone) {
+        return false
+      }
+
+      return (
+        this.activeDropZone.status === status &&
+        this.activeDropZone.folderId === folderId &&
+        this.activeDropZone.categoryId === categoryId &&
+        this.activeDropZone.type === type
+      )
+    },
+    clearActiveDropZone() {
+      this.activeDropZone = null
+    },
+    filteredTasks(tasks: ProjectTaskBoardTask[] | undefined): ProjectTaskBoardTask[] {
+      const source = tasks ?? []
+      if (this.priorityFilter === 'all') {
+        return source
+      }
+
+      return source.filter((task) => task.priority === this.priorityFilter)
+    },
+    isDraggingTask(taskId: number): boolean {
+      return this.draggedTask?.taskId === taskId
+    },
+    openQuickCreateTask() {
+      const target = this.defaultDropTarget('todo')
+      if (!target) {
+        this.errorMessage = 'Create a folder first to add task.'
+        this.closeActionMenu()
+        return
+      }
+
+      this.openCreateTaskModal('todo', target.folderId, target.categoryId)
+      this.closeActionMenu()
+    },
+    startFolderRename(folderId: number, currentName: string) {
+      this.editingFolderId = folderId
+      this.folderRenameDraft = currentName
+    },
+    cancelFolderRename() {
+      this.editingFolderId = null
+      this.folderRenameDraft = ''
+    },
+    async saveFolderRename(folderId: number) {
+      if (!this.selectedProjectId) return
+
+      const nextName = this.folderRenameDraft.trim()
+      if (!nextName) {
+        this.errorMessage = 'Folder name is required.'
+        return
+      }
+
+      this.submitting = true
+      this.errorMessage = ''
+      try {
+        await ApplicationService.updateTaskFolder(this.selectedProjectId, folderId, {
+          name: nextName,
+        })
+
+        this.boardStatuses.forEach((status) => {
+          this.sections[status].forEach((folder) => {
+            if (folder.id === folderId) {
+              folder.name = nextName
+            }
+          })
+        })
+        this.folderOptions = this.folderOptions.map((folder) => {
+          return folder.id === folderId ? { ...folder, name: nextName } : folder
+        })
+
+        this.cancelFolderRename()
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to rename folder.'
+      } finally {
+        this.submitting = false
+      }
+    },
+    startCategoryRename(folderId: number, categoryId: number, currentName: string) {
+      this.editingCategoryFolderId = folderId
+      this.editingCategoryId = categoryId
+      this.categoryRenameDraft = currentName
+    },
+    cancelCategoryRename() {
+      this.editingCategoryFolderId = null
+      this.editingCategoryId = null
+      this.categoryRenameDraft = ''
+    },
+    async saveCategoryRename(folderId: number, categoryId: number) {
+      if (!this.selectedProjectId) return
+
+      const nextName = this.categoryRenameDraft.trim()
+      if (!nextName) {
+        this.errorMessage = 'Subfolder name is required.'
+        return
+      }
+
+      this.submitting = true
+      this.errorMessage = ''
+      try {
+        await ApplicationService.updateTaskCategory(this.selectedProjectId, folderId, categoryId, {
+          name: nextName,
+        })
+        this.boardStatuses.forEach((status) => {
+          this.sections[status].forEach((folder) => {
+            if (folder.id !== folderId) return
+            folder.categories = folder.categories.map((category) => {
+              return category.id === categoryId ? { ...category, name: nextName } : category
+            })
+          })
+        })
+
+        this.folderOptions = this.folderOptions.map((folder) => {
+          if (folder.id !== folderId) return folder
+
+          return {
+            ...folder,
+            categories: folder.categories.map((category) => {
+              return category.id === categoryId ? { ...category, name: nextName } : category
+            }),
+          }
+        })
+
+        this.cancelCategoryRename()
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to rename subfolder.'
+      } finally {
+        this.submitting = false
+      }
+    },
+    startTaskRename(applicationId: number, taskId: number, currentTitle: string) {
+      this.editingTaskApplicationId = applicationId
+      this.editingTaskId = taskId
+      this.taskRenameDraft = currentTitle
+    },
+    cancelTaskRename() {
+      this.editingTaskApplicationId = null
+      this.editingTaskId = null
+      this.taskRenameDraft = ''
+    },
+    async saveTaskRename(applicationId: number, taskId: number) {
+      const nextTitle = this.taskRenameDraft.trim()
+      if (!nextTitle) {
+        this.errorMessage = 'Task title is required.'
+        return
+      }
+
+      this.submitting = true
+      this.errorMessage = ''
+      try {
+        await ApplicationService.updateTask(applicationId, taskId, { title: nextTitle })
+        this.boardStatuses.forEach((status) => {
+          this.sections[status].forEach((folder) => {
+            folder.uncategorized_tasks = (folder.uncategorized_tasks ?? []).map((task) => {
+              return task.id === taskId ? { ...task, title: nextTitle } : task
+            })
+
+            folder.categories.forEach((category) => {
+              category.tasks = category.tasks.map((task) => {
+                return task.id === taskId ? { ...task, title: nextTitle } : task
+              })
+            })
+          })
+        })
+
+        this.cancelTaskRename()
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to rename task.'
+      } finally {
+        this.submitting = false
+      }
     },
     nextFolderPosition(status: ApplicationTaskStatus, parentFolderId: number | null): number {
       const siblings = this.sections[status].filter((folder) => {
@@ -865,30 +1591,52 @@ export default defineComponent({
 
       return false
     },
-    updateFolderParentLocally(
-      sourceFolderId: number,
-      parentFolderId: number | null,
-      position: number,
+    openCreateFolderModal(status: ApplicationTaskStatus) {
+      this.closeActionMenu()
+      this.createFolderStatus = status
+      this.openCreateFolder = true
+      this.errorMessage = ''
+    },
+    openCreateCategoryModal(status: ApplicationTaskStatus, folderId?: number) {
+      this.closeActionMenu()
+      this.createCategoryStatus = status
+      const availableFolders = this.availableFoldersForCreateCategory
+      const fallbackFolderId = availableFolders[0]?.id ?? null
+      this.selectedFolderId = folderId ?? fallbackFolderId
+      this.openCreateCategory = true
+      this.errorMessage = ''
+    },
+    findFirstTaskInLocation(
+      status: ApplicationTaskStatus,
+      folderId: number,
+      categoryId: number | null,
+    ): ProjectTaskBoardTask | null {
+      const folder = this.sections[status].find((item) => item.id === folderId)
+      if (!folder) return null
+
+      if (categoryId === null) {
+        return folder.uncategorized_tasks?.[0] ?? null
+      }
+
+      const category = folder.categories.find((item) => item.id === categoryId)
+      return category?.tasks?.[0] ?? null
+    },
+    openCreateTaskModal(
+      status: ApplicationTaskStatus,
+      folderId: number,
+      categoryId: number | null,
     ) {
-      this.boardStatuses.forEach((boardStatus) => {
-        this.sections[boardStatus].forEach((folder) => {
-          if (folder.id === sourceFolderId) {
-            folder.parent_folder_id = parentFolderId
-            folder.position = position
-          }
-        })
-      })
-
-      this.folderOptions = this.folderOptions.map((folder) => {
-        if (folder.id !== sourceFolderId) {
-          return folder
-        }
-
-        return {
-          ...folder,
-          parent_folder_id: parentFolderId,
-        }
-      })
+      this.closeActionMenu()
+      this.createTaskStatus = status
+      this.createTaskFolderId = folderId
+      this.createTaskCategoryId = categoryId
+      this.newTaskTitle = ''
+      this.newTaskPriority = 'medium'
+      const firstTask = this.findFirstTaskInLocation(status, folderId, categoryId)
+      this.selectedTaskApplicationId =
+        firstTask?.application_id ?? this.acceptedApplications[0]?.id ?? null
+      this.openCreateTask = true
+      this.errorMessage = ''
     },
     defaultDropTarget(
       status: ApplicationTaskStatus,
@@ -987,8 +1735,6 @@ export default defineComponent({
 
         this.removeTaskFromSections(payload.taskId)
         this.insertTaskIntoSection(status, folderId, categoryId, updatedTask)
-
-        this.successMessage = 'Task moved successfully.'
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to move task.'
@@ -1029,38 +1775,6 @@ export default defineComponent({
 
       targetCategory.tasks = [...targetCategory.tasks, task].sort((a, b) => a.position - b.position)
     },
-    async renameFolder(folderId: number, currentName: string) {
-      if (!this.selectedProjectId) return
-
-      const nextName = window.prompt('Rename folder', currentName)?.trim()
-      if (!nextName || nextName === currentName) {
-        return
-      }
-
-      this.submitting = true
-      this.errorMessage = ''
-      try {
-        await ApplicationService.updateTaskFolder(this.selectedProjectId, folderId, {
-          name: nextName,
-        })
-        this.boardStatuses.forEach((status) => {
-          this.sections[status].forEach((folder) => {
-            if (folder.id === folderId) {
-              folder.name = nextName
-            }
-          })
-        })
-        this.folderOptions = this.folderOptions.map((folder) => {
-          return folder.id === folderId ? { ...folder, name: nextName } : folder
-        })
-        this.successMessage = 'Folder renamed.'
-      } catch (error: unknown) {
-        const typedError = error as { response?: { data?: { message?: string } } }
-        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to rename folder.'
-      } finally {
-        this.submitting = false
-      }
-    },
     async deleteFolder(folderId: number, _folderName: string) {
       if (!this.selectedProjectId) return
 
@@ -1093,53 +1807,9 @@ export default defineComponent({
         if (this.selectedFolderId === folderId) {
           this.selectedFolderId = this.folderOptions[0]?.id ?? null
         }
-
-        this.successMessage = 'Folder deleted.'
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to delete folder.'
-      } finally {
-        this.submitting = false
-      }
-    },
-    async renameCategory(folderId: number, categoryId: number, currentName: string) {
-      if (!this.selectedProjectId) return
-
-      const nextName = window.prompt('Rename subfolder', currentName)?.trim()
-      if (!nextName || nextName === currentName) {
-        return
-      }
-
-      this.submitting = true
-      this.errorMessage = ''
-      try {
-        await ApplicationService.updateTaskCategory(this.selectedProjectId, folderId, categoryId, {
-          name: nextName,
-        })
-        this.boardStatuses.forEach((status) => {
-          this.sections[status].forEach((folder) => {
-            if (folder.id !== folderId) return
-            folder.categories = folder.categories.map((category) => {
-              return category.id === categoryId ? { ...category, name: nextName } : category
-            })
-          })
-        })
-
-        this.folderOptions = this.folderOptions.map((folder) => {
-          if (folder.id !== folderId) return folder
-
-          return {
-            ...folder,
-            categories: folder.categories.map((category) => {
-              return category.id === categoryId ? { ...category, name: nextName } : category
-            }),
-          }
-        })
-
-        this.successMessage = 'Subfolder renamed.'
-      } catch (error: unknown) {
-        const typedError = error as { response?: { data?: { message?: string } } }
-        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to rename subfolder.'
       } finally {
         this.submitting = false
       }
@@ -1166,42 +1836,9 @@ export default defineComponent({
             categories: folder.categories.filter((category) => category.id !== categoryId),
           }
         })
-
-        this.successMessage = 'Subfolder deleted.'
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to delete subfolder.'
-      } finally {
-        this.submitting = false
-      }
-    },
-    async renameTask(applicationId: number, taskId: number, currentTitle: string) {
-      const nextTitle = window.prompt('Rename task', currentTitle)?.trim()
-      if (!nextTitle || nextTitle === currentTitle) {
-        return
-      }
-
-      this.submitting = true
-      this.errorMessage = ''
-      try {
-        await ApplicationService.updateTask(applicationId, taskId, { title: nextTitle })
-        this.boardStatuses.forEach((status) => {
-          this.sections[status].forEach((folder) => {
-            folder.uncategorized_tasks = (folder.uncategorized_tasks ?? []).map((task) => {
-              return task.id === taskId ? { ...task, title: nextTitle } : task
-            })
-
-            folder.categories.forEach((category) => {
-              category.tasks = category.tasks.map((task) => {
-                return task.id === taskId ? { ...task, title: nextTitle } : task
-              })
-            })
-          })
-        })
-        this.successMessage = 'Task renamed.'
-      } catch (error: unknown) {
-        const typedError = error as { response?: { data?: { message?: string } } }
-        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to rename task.'
       } finally {
         this.submitting = false
       }
@@ -1212,7 +1849,6 @@ export default defineComponent({
       try {
         await ApplicationService.deleteTask(applicationId, taskId)
         this.removeTaskFromSections(taskId)
-        this.successMessage = 'Task deleted.'
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to delete task.'
@@ -1231,7 +1867,10 @@ export default defineComponent({
       this.submitting = true
       this.errorMessage = ''
       try {
-        const response = await ApplicationService.createTaskFolder(this.selectedProjectId, { name })
+        const response = await ApplicationService.createTaskFolder(this.selectedProjectId, {
+          name,
+          status: this.createFolderStatus,
+        })
         const created = response?.data as {
           id: number
           name: string
@@ -1248,17 +1887,16 @@ export default defineComponent({
           categories: [],
         }
 
-        this.boardStatuses.forEach((status) => {
-          this.sections[status] = [
-            ...this.sections[status],
-            { ...nextFolder, categories: [], uncategorized_tasks: [] },
-          ]
-        })
+        this.sections[this.createFolderStatus] = [
+          ...this.sections[this.createFolderStatus],
+          { ...nextFolder, categories: [], uncategorized_tasks: [] },
+        ]
         this.folderOptions = [
           ...this.folderOptions,
           {
             id: nextFolder.id,
             name: nextFolder.name,
+            status: this.createFolderStatus,
             parent_folder_id: nextFolder.parent_folder_id,
             categories: [],
           },
@@ -1266,7 +1904,7 @@ export default defineComponent({
         if (!this.selectedFolderId) {
           this.selectedFolderId = nextFolder.id
         }
-        this.successMessage = 'Folder created.'
+        this.openFolders[`${this.createFolderStatus}:${nextFolder.id}`] = true
         this.newFolderName = ''
         this.openCreateFolder = false
       } catch (error: unknown) {
@@ -1278,6 +1916,13 @@ export default defineComponent({
     },
     async createCategory() {
       if (!this.selectedProjectId || !this.selectedFolderId) return
+      const availableFolderIds = new Set(
+        this.availableFoldersForCreateCategory.map((folder) => folder.id),
+      )
+      if (!availableFolderIds.has(this.selectedFolderId)) {
+        this.errorMessage = 'Select a folder from the selected status section.'
+        return
+      }
       const name = this.newCategoryName.trim()
       if (!name) {
         this.errorMessage = 'Category name is required.'
@@ -1301,19 +1946,18 @@ export default defineComponent({
           position?: number
         }
 
-        this.boardStatuses.forEach((status) => {
-          this.sections[status].forEach((folder) => {
-            if (folder.id !== created.task_folder_id) return
-            folder.categories = [
-              ...folder.categories,
-              {
-                id: created.id,
-                name: created.name,
-                position: created.position ?? 0,
-                tasks: [],
-              },
-            ]
-          })
+        this.sections[this.createCategoryStatus].forEach((folder) => {
+          if (folder.id !== created.task_folder_id) return
+          folder.categories = [
+            ...folder.categories,
+            {
+              id: created.id,
+              name: created.name,
+              position: created.position ?? 0,
+              tasks: [],
+            },
+          ]
+          this.openCategories[`${this.createCategoryStatus}:${created.id}`] = true
         })
 
         this.folderOptions = this.folderOptions.map((folder) => {
@@ -1324,12 +1968,99 @@ export default defineComponent({
           }
         })
 
-        this.successMessage = 'Category created.'
         this.newCategoryName = ''
         this.openCreateCategory = false
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to create category.'
+      } finally {
+        this.submitting = false
+      }
+    },
+    async createTask() {
+      if (!this.selectedProjectId) return
+      if (!this.selectedTaskApplicationId) {
+        this.errorMessage = 'Select student application.'
+        return
+      }
+
+      const title = this.newTaskTitle.trim()
+      if (!title) {
+        this.errorMessage = 'Task title is required.'
+        return
+      }
+
+      if (!this.createTaskFolderId) {
+        this.errorMessage = 'Target folder is required.'
+        return
+      }
+
+      this.submitting = true
+      this.errorMessage = ''
+      try {
+        const createdResponse = await ApplicationService.createTask(
+          this.selectedTaskApplicationId,
+          {
+            title,
+            priority: this.newTaskPriority,
+            task_folder_id: this.createTaskFolderId,
+            task_category_id: this.createTaskCategoryId ?? undefined,
+            position: this.nextTaskPosition(
+              this.createTaskStatus,
+              this.createTaskFolderId,
+              this.createTaskCategoryId,
+            ),
+          },
+        )
+
+        const createdTask = createdResponse?.data as ProjectTaskBoardTask
+
+        let finalTask = {
+          ...createdTask,
+          title,
+          priority: this.newTaskPriority,
+          task_folder_id: this.createTaskFolderId,
+          task_category_id: this.createTaskCategoryId,
+        } as ProjectTaskBoardTask
+
+        if (this.createTaskStatus !== 'todo') {
+          const targetPosition = this.nextTaskPosition(
+            this.createTaskStatus,
+            this.createTaskFolderId,
+            this.createTaskCategoryId,
+          )
+          const updatedResponse = await ApplicationService.updateTask(
+            this.selectedTaskApplicationId,
+            createdTask.id,
+            {
+              status: this.createTaskStatus,
+              task_folder_id: this.createTaskFolderId,
+              task_category_id: this.createTaskCategoryId,
+              position: targetPosition,
+            },
+          )
+
+          finalTask = {
+            ...finalTask,
+            ...(updatedResponse?.data ?? {}),
+            status: this.createTaskStatus,
+            position: targetPosition,
+          }
+        }
+
+        this.removeTaskFromSections(createdTask.id)
+        this.insertTaskIntoSection(
+          this.createTaskStatus,
+          this.createTaskFolderId,
+          this.createTaskCategoryId,
+          finalTask,
+        )
+
+        this.newTaskTitle = ''
+        this.openCreateTask = false
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to create task.'
       } finally {
         this.submitting = false
       }

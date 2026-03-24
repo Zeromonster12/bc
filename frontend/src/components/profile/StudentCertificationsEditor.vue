@@ -35,12 +35,6 @@
           type="number"
           @update:modelValue="$emit('update-field', { index, field: 'year', value: $event })"
         />
-        <BaseInput
-          :model-value="certification.url"
-          label="Credential URL"
-          type="url"
-          @update:modelValue="$emit('update-field', { index, field: 'url', value: $event })"
-        />
       </div>
       <div class="flex justify-end">
         <BaseButton type="button" variant="ghost" size="sm" @click="$emit('remove', index)"
@@ -60,7 +54,6 @@ interface StudentCertification {
   name: string
   issuer: string
   year: string
-  url: string
 }
 
 export default defineComponent({

@@ -121,7 +121,12 @@ const ApplicationService = {
 
   async createTaskFolder(
     projectId: number,
-    payload: { name: string; color?: string; position?: number },
+    payload: {
+      name: string
+      color?: string
+      position?: number
+      status?: ApplicationTaskStatus
+    },
   ) {
     const { data } = await http.post(`/projects/${projectId}/task-folders`, payload)
     return data
@@ -147,6 +152,7 @@ const ApplicationService = {
       color?: string | null
       position?: number
       parent_folder_id?: number | null
+      status?: ApplicationTaskStatus | null
     },
   ) {
     const { data } = await http.patch(`/projects/${projectId}/task-folders/${folderId}`, payload)

@@ -306,18 +306,6 @@
               />
               <BaseInput v-model="form.cv_url" label="CV URL" type="url" :error="errors.cv_url" />
               <BaseInput
-                v-model="form.github_url"
-                label="GitHub URL"
-                type="url"
-                :error="errors.github_url"
-              />
-              <BaseInput
-                v-model="form.linkedin_url"
-                label="LinkedIn URL"
-                type="url"
-                :error="errors.linkedin_url"
-              />
-              <BaseInput
                 v-model="form.website_url"
                 label="Personal website"
                 type="url"
@@ -618,31 +606,6 @@
             </ul>
           </section>
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">Emergency Contact and Privacy</h2>
-            <div class="grid gap-4 sm:grid-cols-2">
-              <BaseInput
-                v-model="form.emergency_contact_name"
-                label="Emergency contact name"
-                :error="errors.emergency_contact_name"
-              />
-              <BaseInput
-                v-model="form.emergency_contact_phone"
-                label="Emergency contact phone"
-                :error="errors.emergency_contact_phone"
-              />
-            </div>
-
-            <label class="inline-flex items-start gap-2 text-sm text-slate-700">
-              <input
-                v-model="form.consent_public_profile"
-                type="checkbox"
-                class="mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              I agree that my profile information can be shown to verified companies on this
-              platform.
-            </label>
-          </section>
         </fieldset>
       </form>
     </div>
@@ -1034,7 +997,7 @@ export default defineComponent({
       language.level = payload.value as LanguageLevel
     },
     addCertification() {
-      this.form.certifications.push({ name: '', issuer: '', year: '', url: '' })
+      this.form.certifications.push({ name: '', issuer: '', year: '' })
     },
     removeCertification(index: number) {
       this.form.certifications.splice(index, 1)

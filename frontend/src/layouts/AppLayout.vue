@@ -1,8 +1,26 @@
 <template>
-  <div class="flex min-h-screen bg-transparent overflow-hidden">
-    <aside class="hidden lg:block">
-      <Sidebar />
-    </aside>
+  <div class="min-h-screen bg-transparent overflow-hidden">
+    <button
+      type="button"
+      class="fixed left-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur lg:hidden"
+      @click="sidebarOpen = !sidebarOpen"
+      aria-label="Open menu"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
+
+    <div class="flex min-h-screen">
+      <aside class="hidden lg:block p-4">
+        <Sidebar :collapsed="true" />
+      </aside>
 
     <Transition
       enter-active-class="transition-opacity duration-200"
@@ -32,11 +50,11 @@
       </aside>
     </Transition>
 
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <TopNav @toggle-sidebar="sidebarOpen = !sidebarOpen" />
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-        <slot />
-      </main>
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <slot />
+        </main>
+      </div>
     </div>
   </div>
 </template>
@@ -44,11 +62,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Sidebar from '@/components/layout/Sidebar.vue'
-import TopNav from '@/components/layout/TopNav.vue'
 
 export default defineComponent({
   name: 'AppLayout',
-  components: { Sidebar, TopNav },
+  components: { Sidebar },
   data() {
     return {
       sidebarOpen: false,

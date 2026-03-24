@@ -18,6 +18,7 @@ class ApplicationTaskFolder extends Model
         'name',
         'color',
         'position',
+        'status',
     ];
 
     public function project(): BelongsTo
