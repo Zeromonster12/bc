@@ -1,14 +1,14 @@
-﻿<template>
+<template>
   <AppLayout>
-    <div class="h-full space-y-5 lg:-my-4 xl:-ml-6" @click="closeActionMenu">
+    <div class="h-full overflow-hidden space-y-3 lg:my-0 xl:ml-0" @click="closeActionMenu">
       <div
-        class="grid h-full items-stretch gap-3 xl:min-h-[calc(100vh-2rem)] xl:grid-cols-[280px_minmax(0,1fr)]"
+        class="grid h-full min-h-0 items-stretch gap-2 xl:grid-cols-[260px_minmax(0,1fr)]"
       >
         <aside
           class="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur"
         >
           <div class="border-b border-slate-200 px-4 py-3">
-            <h2 class="mt-1 text-sm font-semibold text-slate-900">Company Workspace</h2>
+            <h2 class="mt-1 text-sm font-semibold text-slate-900">Company Projects</h2>
           </div>
           <div class="flex-1 space-y-1 overflow-auto p-2">
             <button
@@ -24,7 +24,7 @@
               @click="selectProject(project.id)"
               ;
             >
-              <span class="truncate text-sm font-medium">{{ project.title }}</span>
+              <span class="truncate text-xs font-medium">{{ project.title }}</span>
               <span
                 :class="[
                   'ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-semibold',
@@ -36,124 +36,14 @@
                 {{
                   selectedProjectId === project.id
                     ? statusCount('todo') + statusCount('in_progress') + statusCount('complete')
-                    : '•'
+                    : '.'
                 }}
               </span>
             </button>
           </div>
         </aside>
 
-        <div class="space-y-5">
-          <div
-            class="rounded-2xl border border-slate-200 bg-linear-to-b from-white via-slate-50 to-slate-100/80 p-4 shadow-sm"
-          >
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  Project Task Board
-                </p>
-                <h1 class="mt-1 text-2xl font-semibold text-slate-900">
-                  {{
-                    companyProjects.find((project) => project.id === selectedProjectId)?.title ||
-                    'Select project'
-                  }}
-                </h1>
-                <p class="mt-1 text-sm text-slate-600">
-                  Folder, subfolder and task tree with drag and drop.
-                </p>
-              </div>
-
-              <div class="grid w-full gap-2 sm:grid-cols-[auto_auto] lg:w-auto">
-                <div class="relative">
-                  <BaseButton
-                    variant="secondary"
-                    :disabled="!selectedProjectId"
-                    class="rounded-xl!"
-                    @click.stop="toggleActionMenu('quick-add')"
-                  >
-                    <Plus class="h-4 w-4" />
-                    Quick add
-                  </BaseButton>
-
-                  <div
-                    v-if="isActionMenuOpen('quick-add')"
-                    class="absolute right-0 top-11 z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
-                    @click.stop
-                  >
-                    <button
-                      type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                      @click.stop="
-                        openCreateFolderModal('todo');
-                        closeActionMenu()
-                      "
-                    >
-                      <FolderPlus class="h-3.5 w-3.5" />
-                      New folder
-                    </button>
-                    <button
-                      type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                      :disabled="!selectedFolderId"
-                      @click.stop="
-                        openCreateCategoryModal('todo');
-                        closeActionMenu()
-                      "
-                    >
-                      <Folder class="h-3.5 w-3.5" />
-                      New subfolder
-                    </button>
-                    <button
-                      type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                      @click.stop="openQuickCreateTask()"
-                    >
-                      <Plus class="h-3.5 w-3.5" />
-                      New task
-                    </button>
-                  </div>
-                </div>
-
-                <div class="relative">
-                  <label
-                    class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  >
-                    <SlidersHorizontal class="h-4 w-4" />
-                  </label>
-                  <select
-                    v-model="priorityFilter"
-                    class="block w-full rounded-xl border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                  >
-                    <option value="all">All priorities</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="urgent">Urgent</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="selectedProjectId" class="mt-4 grid grid-cols-3 gap-2 sm:max-w-lg">
-              <div class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-center">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-rose-600">To Do</p>
-                <p class="text-lg font-semibold text-rose-900">{{ statusCount('todo') }}</p>
-              </div>
-              <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-amber-600">
-                  In Progress
-                </p>
-                <p class="text-lg font-semibold text-amber-900">{{ statusCount('in_progress') }}</p>
-              </div>
-              <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
-                  Completed
-                </p>
-                <p class="text-lg font-semibold text-emerald-900">{{ statusCount('complete') }}</p>
-              </div>
-            </div>
-          </div>
-
+        <div class="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
           <BaseAlert
             v-if="errorMessage"
             type="error"
@@ -163,79 +53,205 @@
           />
 
           <div v-if="loading" class="space-y-3">
-            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-2xl bg-slate-100" />
+            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-3xl bg-slate-100" />
           </div>
 
           <div
             v-else-if="!selectedProjectId"
-            class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600"
+            class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600"
           >
             Select a project from left sidebar.
           </div>
 
-          <div v-else class="space-y-3">
+          <div
+            v-else
+            class="min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]"
+          >
+            <div class="h-full overflow-y-auto overflow-x-hidden rounded-3xl bg-white p-3 sm:p-4 lg:p-5">
             <section
-              v-for="status in boardStatuses"
+              v-for="(status, index) in boardStatuses"
               :key="status"
               :class="[
-                'overflow-visible rounded-2xl border bg-white shadow-sm transition hover:shadow-md',
-                isDropZoneActive(status, null, null, 'status')
-                  ? 'border-sky-400 ring-2 ring-sky-200'
-                  : 'border-slate-200',
+                'overflow-visible transition',
+                index < boardStatuses.length - 1 ? 'border-b border-slate-200/60' : '',
+                isDropZoneActive(status, null, null, 'status') ? 'bg-[#4e3aba]/5' : '',
               ]"
               @dragover.prevent="setActiveDropZone(status, null, null, 'status')"
               @dragleave="clearActiveDropZone"
               @drop.prevent="onStatusDrop(status)"
             >
-              <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                <div class="flex items-center gap-2">
-                  <component :is="statusIcon(status)" :class="statusIconClass(status)" />
-                  <h2 class="text-sm font-semibold text-slate-900">{{ statusLabel(status) }}</h2>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span
-                    class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600"
-                  >
-                    {{ statusCount(status) }}
-                  </span>
-                  <button
-                    class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-50"
-                    @click="openCreateFolderModal(status)"
-                  >
-                    <FolderPlus class="h-3 w-3" />
-                    New folder
-                  </button>
-                </div>
+              <div class="flex items-center gap-2 px-3 pt-2.5 pb-2">
+                <component :is="statusIcon(status)" :class="statusIconClass(status)" />
+                <h2 class="text-sm font-semibold text-slate-900">{{ statusLabel(status) }}</h2>
+                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                  {{ statusCount(status) }}
+                </span>
+              </div>
+
+              <div
+                class="grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3 bg-slate-50/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500"
+              >
+                <span>Name</span>
+                <span>Assignee</span>
+                <span>Priority</span>
+                <span>Status</span>
+                <span class="text-right">Actions</span>
               </div>
 
               <div
                 v-if="flattenedFoldersForStatus(status).length === 0"
-                class="px-4 py-4 text-sm text-slate-500"
+                class="px-4 py-4"
               >
-                No tasks in this section.
+                <div class="mt-3 relative inline-block">
+                  <button
+                    type="button"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                    @click.stop="toggleActionMenu(`status-empty-add:${status}`)"
+                  >
+                    <Plus class="h-3.5 w-3.5" />
+                  </button>
+
+                  <div
+                    v-if="isActionMenuOpen(`status-empty-add:${status}`)"
+                    class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                    @click.stop
+                  >
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      @click.stop="
+                        startInlineFolderCreate(status, null);
+                        closeActionMenu()
+                      "
+                    >
+                      <FolderPlus class="h-3.5 w-3.5" />
+                      New folder
+                    </button>
+                    <button
+                      type="button"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      @click.stop="openStatusQuickCreateTask(status)"
+                    >
+                      <Plus class="h-3.5 w-3.5" />
+                      New task
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === null"
+                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2"
+                >
+                  <div class="flex items-center gap-2">
+                    <input
+                      v-model="inlineFolderDraft.name"
+                      type="text"
+                      maxlength="120"
+                      class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      placeholder="Folder name"
+                      @keydown.enter.prevent="confirmInlineFolderCreate"
+                      @keydown.esc.prevent="cancelInlineFolderCreate"
+                    />
+                    <button
+                      type="button"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                      @click="confirmInlineFolderCreate"
+                    >
+                      <Check class="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                      @click="cancelInlineFolderCreate"
+                    >
+                      <X class="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === null"
+                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2"
+                >
+                  <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
+                    <input
+                      v-model="inlineTaskDraft.title"
+                      type="text"
+                      maxlength="160"
+                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      placeholder="Task title"
+                      @keydown.enter.prevent="confirmInlineTaskCreate"
+                      @keydown.esc.prevent="cancelInlineTaskCreate"
+                    />
+                    <select
+                      v-model="inlineTaskDraft.applicationId"
+                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                    >
+                      <option :value="null">Student</option>
+                      <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
+                        {{ app.student_name }}
+                      </option>
+                    </select>
+                    <select
+                      v-model="inlineTaskDraft.priority"
+                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                    <div class="flex justify-end gap-1">
+                      <button
+                        type="button"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                        @click="confirmInlineTaskCreate"
+                      >
+                        <Check class="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                        @click="cancelInlineTaskCreate"
+                      >
+                        <X class="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div v-else class="px-2 py-2">
+              <div v-else class="px-2 py-1.5">
                 <div
                   v-for="entry in flattenedFoldersForStatus(status)"
                   :key="`folder-${status}-${entry.folder.id}`"
-                  class="rounded-xl border border-transparent transition hover:border-slate-200"
-                  @dragover.prevent="setActiveDropZone(status, entry.folder.id, null, 'folder')"
+                  class="rounded-lg border border-transparent transition hover:border-slate-200/80"
+                  @dragover.prevent="setActiveDropZone(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')"
                   @dragleave="clearActiveDropZone"
-                  @drop.prevent="onFolderDrop(status, entry.folder.id)"
+                  @drop.prevent.stop="onFolderDrop(status, entry.folder.id)"
                 >
-                  <button
+                  <div
+                    v-if="!entry.folder.is_virtual"
                     :class="[
-                      'group flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left transition hover:bg-slate-50',
-                      isDropZoneActive(status, entry.folder.id, null, 'folder')
-                        ? 'bg-sky-50 ring-2 ring-sky-200'
+                      'group flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-100/80',
+                      entry.depth === 0
+                        ? 'bg-white'
+                        : entry.depth === 1
+                          ? 'bg-slate-50/70'
+                          : 'bg-slate-100/70',
+                      isDropZoneActive(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')
+                        ? 'bg-[#4e3aba]/10 ring-2 ring-[#4e3aba]/25'
                         : '',
                     ]"
-                    :draggable="true"
+                    :draggable="!entry.folder.is_virtual"
                     :style="{ paddingLeft: `${entry.depth * 18 + 10}px` }"
-                    @dragstart="onFolderDragStart(status, entry.folder.id, $event)"
+                    role="button"
+                    tabindex="0"
+                    @dragstart="!entry.folder.is_virtual && onFolderDragStart(status, entry.folder.id, $event)"
                     @dragend="clearActiveDropZone"
                     @click="toggleFolder(status, entry.folder.id)"
+                    @keydown.enter.prevent="toggleFolder(status, entry.folder.id)"
+                    @keydown.space.prevent="toggleFolder(status, entry.folder.id)"
                   >
                     <span class="flex items-center gap-2">
                       <ChevronRight
@@ -245,9 +261,10 @@
                       <ChevronDown v-else class="h-4 w-4 text-slate-500" />
                       <Folder
                         v-if="!isFolderOpen(status, entry.folder.id)"
-                        class="h-4 w-4 text-amber-500"
+                        class="h-4 w-4 text-[#4e3aba]"
+                        style="fill:#4e3aba;stroke:#4e3aba;stroke-width:1.7"
                       />
-                      <FolderOpen v-else class="h-4 w-4 text-amber-500" />
+                      <FolderOpen v-else class="h-4 w-4 text-[#4e3aba]" style="fill:#4e3aba;stroke:#4e3aba;stroke-width:1.7" />
                       <span
                         v-if="editingFolderId !== entry.folder.id"
                         class="text-sm font-semibold text-slate-800"
@@ -279,98 +296,62 @@
                         </button>
                       </div>
                     </span>
-                    <span class="relative flex items-center gap-2">
-                      <span class="text-xs text-slate-500">{{
-                        folderTaskCount(entry.folder)
-                      }}</span>
-                      <button
-                        type="button"
-                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                        @click.stop="toggleActionMenu(`folder:${status}:${entry.folder.id}`)"
-                      >
-                        <MoreHorizontal class="h-4 w-4" />
-                      </button>
-
-                      <div
-                        v-if="isActionMenuOpen(`folder:${status}:${entry.folder.id}`)"
-                        class="absolute right-0 top-8 z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
-                        @click.stop
+                    <span class="flex items-center gap-2">
+                      <span class="text-xs text-slate-500">{{ folderTaskCount(entry.folder) }}</span>
+                      <span
+                        v-if="editingFolderId !== entry.folder.id && !entry.folder.is_virtual"
+                        class="flex items-center gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto"
                       >
                         <button
                           type="button"
-                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                          @click.stop="
-                            openCreateTaskModal(status, entry.folder.id, null);
-                            closeActionMenu()
-                          "
-                        >
-                          <Plus class="h-3.5 w-3.5" />
-                          New task
-                        </button>
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                          @click.stop="
-                            openCreateCategoryModal(status, entry.folder.id);
-                            closeActionMenu()
-                          "
-                        >
-                          <FolderPlus class="h-3.5 w-3.5" />
-                          New subfolder
-                        </button>
-                        <button
-                          type="button"
-                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                          @click.stop="
-                            startFolderRename(entry.folder.id, entry.folder.name);
-                            closeActionMenu()
-                          "
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                          @click.stop="startFolderRename(entry.folder.id, entry.folder.name)"
                         >
                           <Pencil class="h-3.5 w-3.5" />
-                          Rename
                         </button>
                         <button
                           type="button"
-                          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
-                          @click.stop="
-                            deleteFolder(entry.folder.id, entry.folder.name);
-                            closeActionMenu()
-                          "
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
+                          @click.stop="deleteFolder(entry.folder.id, entry.folder.name)"
                         >
                           <Trash2 class="h-3.5 w-3.5" />
-                          Delete
                         </button>
-                      </div>
+                      </span>
                     </span>
-                  </button>
+                  </div>
 
                   <div
-                    v-if="isFolderOpen(status, entry.folder.id)"
-                    class="border-l border-slate-200 pl-3"
-                    :style="{ marginLeft: `${entry.depth * 18 + 30}px` }"
+                    v-if="entry.folder.is_virtual || isFolderOpen(status, entry.folder.id)"
+                    :class="entry.folder.is_virtual ? '' : 'border-l border-slate-300/80 pl-2.5'"
+                    :style="entry.folder.is_virtual ? undefined : { marginLeft: `${entry.depth * 18 + 30}px` }"
                   >
                     <div
-                      class="mb-2 space-y-1 rounded-lg transition"
-                      @dragover.prevent="setActiveDropZone(status, entry.folder.id, null, 'folder')"
+                      class="mb-1.5 space-y-1 rounded-lg transition"
+                      @dragover.prevent="setActiveDropZone(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')"
                       @dragleave="clearActiveDropZone"
-                      @drop.prevent="onTaskDrop(status, entry.folder.id, null)"
+                      @drop.prevent.stop="onTaskDrop(status, entry.folder.id, null)"
                     >
                       <div
                         v-for="task in filteredTasks(entry.folder.uncategorized_tasks)"
                         :key="`task-folder-${task.id}`"
                         :class="[
-                          'cursor-grab rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-sm transition active:cursor-grabbing hover:border-slate-300 hover:shadow-md',
+                          'group cursor-grab rounded-md border px-2.5 py-1.5 transition active:cursor-grabbing',
+                          entry.depth === 0
+                            ? 'border-slate-200 bg-slate-50/40 hover:border-slate-300 hover:bg-white'
+                            : entry.depth === 1
+                              ? 'border-slate-200/90 bg-slate-100/55 hover:border-slate-300 hover:bg-slate-50'
+                              : 'border-slate-300/80 bg-slate-100/80 hover:border-slate-400 hover:bg-slate-100',
                           isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
                         ]"
                         :draggable="true"
                         @dragstart="onTaskDragStart(task, status, entry.folder.id, null, $event)"
                         @dragend="clearActiveDropZone"
                       >
-                        <div class="flex items-start justify-between gap-3">
+                        <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3">
                           <div class="min-w-0">
                             <p
                               v-if="editingTaskId !== task.id"
-                              class="truncate text-sm font-medium text-slate-900"
+                              class="truncate text-sm font-medium text-slate-800 transition group-hover:text-[#4e3aba]"
                             >
                               {{ task.title }}
                             </p>
@@ -400,60 +381,47 @@
                                 <X class="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                              <UserRound class="h-3.5 w-3.5" />
-                              {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
-                            </p>
                           </div>
-                          <div class="relative flex items-center gap-2">
-                            <span
-                              class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600"
-                            >
-                              App #{{ task.application_id }}
+
+                          <div class="min-w-0">
+                            <span class="truncate text-xs text-slate-700">
+                              {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
                             </span>
+                          </div>
+
+                          <div>
                             <span :class="priorityPillClass(task.priority)">
                               {{ priorityLabel(task.priority) }}
                             </span>
+                          </div>
+
+                          <div>
+                            <span :class="statusPillClass(status)">
+                              {{ statusLabel(status) }}
+                            </span>
+                          </div>
+
+                          <div class="flex justify-end gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto">
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                              @click.stop="toggleActionMenu(`task:${status}:${task.id}`)"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                              @click.stop="startTaskRename(task.application_id, task.id, task.title)"
                             >
-                              <MoreHorizontal class="h-4 w-4" />
+                              <Pencil class="h-3.5 w-3.5" />
                             </button>
-
-                            <div
-                              v-if="isActionMenuOpen(`task:${status}:${task.id}`)"
-                              class="absolute bottom-8 right-0 z-30 min-w-36 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
-                              @click.stop
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
+                              @click.stop="deleteTask(task.application_id, task.id, task.title)"
                             >
-                              <button
-                                type="button"
-                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                                @click.stop="
-                                  startTaskRename(task.application_id, task.id, task.title);
-                                  closeActionMenu()
-                                "
-                              >
-                                <Pencil class="h-3.5 w-3.5" />
-                                Rename
-                              </button>
-                              <button
-                                type="button"
-                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
-                                @click.stop="
-                                  deleteTask(task.application_id, task.id, task.title);
-                                  closeActionMenu()
-                                "
-                              >
-                                <Trash2 class="h-3.5 w-3.5" />
-                                Delete
-                              </button>
-                            </div>
+                              <Trash2 class="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         </div>
                       </div>
                     </div>
+
+
 
                     <div
                       v-for="category in entry.folder.categories"
@@ -463,16 +431,21 @@
                         setActiveDropZone(status, entry.folder.id, category.id, 'category')
                       "
                       @dragleave="clearActiveDropZone"
-                      @drop.prevent="onTaskDrop(status, entry.folder.id, category.id)"
+                      @drop.prevent.stop="onCategoryDrop(status, entry.folder.id, category.id)"
                     >
-                      <button
+                      <div
                         :class="[
-                          'flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-50',
+                          'group flex w-full items-center justify-between rounded-lg px-2 py-1 text-left transition hover:bg-slate-100/80',
+                          entry.depth > 0 ? 'bg-slate-50/80' : 'bg-slate-50/40',
                           isDropZoneActive(status, entry.folder.id, category.id, 'category')
-                            ? 'bg-sky-50 ring-2 ring-sky-200'
+                            ? 'bg-[#4e3aba]/10 ring-2 ring-[#4e3aba]/25'
                             : '',
                         ]"
+                        role="button"
+                        tabindex="0"
                         @click="toggleCategory(status, category.id)"
+                        @keydown.enter.prevent="toggleCategory(status, category.id)"
+                        @keydown.space.prevent="toggleCategory(status, category.id)"
                       >
                         <span class="flex items-center gap-2">
                           <ChevronRight
@@ -480,7 +453,7 @@
                             class="h-3.5 w-3.5 text-slate-500"
                           />
                           <ChevronDown v-else class="h-3.5 w-3.5 text-slate-500" />
-                          <Folder class="h-3.5 w-3.5 text-sky-500" />
+                          <Folder class="h-3.5 w-3.5 text-[#4e3aba]" style="fill:#4e3aba;stroke:#4e3aba;stroke-width:1.7" />
                           <span
                             v-if="editingCategoryId !== category.id"
                             class="text-xs font-semibold uppercase tracking-wide text-slate-600"
@@ -514,69 +487,46 @@
                             </button>
                           </div>
                         </span>
-                        <span class="relative flex items-center gap-2">
+                        <span class="flex items-center gap-2">
                           <span class="text-xs text-slate-500">{{ category.tasks.length }}</span>
-                          <button
-                            type="button"
-                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                            @click.stop="toggleActionMenu(`category:${status}:${category.id}`)"
-                          >
-                            <MoreHorizontal class="h-4 w-4" />
-                          </button>
-
-                          <div
-                            v-if="isActionMenuOpen(`category:${status}:${category.id}`)"
-                            class="absolute right-0 top-8 z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
-                            @click.stop
+                          <span
+                            v-if="editingCategoryId !== category.id"
+                            class="flex items-center gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto"
                           >
                             <button
                               type="button"
-                              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                              @click.stop="
-                                openCreateTaskModal(status, entry.folder.id, category.id);
-                                closeActionMenu()
-                              "
-                            >
-                              <Plus class="h-3.5 w-3.5" />
-                              New task
-                            </button>
-                            <button
-                              type="button"
-                              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                              @click.stop="
-                                startCategoryRename(entry.folder.id, category.id, category.name);
-                                closeActionMenu()
-                              "
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                              @click.stop="startCategoryRename(entry.folder.id, category.id, category.name)"
                             >
                               <Pencil class="h-3.5 w-3.5" />
-                              Rename
                             </button>
                             <button
                               type="button"
-                              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
-                              @click.stop="
-                                deleteCategory(entry.folder.id, category.id, category.name);
-                                closeActionMenu()
-                              "
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
+                              @click.stop="deleteCategory(entry.folder.id, category.id, category.name)"
                             >
                               <Trash2 class="h-3.5 w-3.5" />
-                              Delete
                             </button>
-                          </div>
+                          </span>
                         </span>
-                      </button>
+                      </div>
 
                       <div
                         v-if="isCategoryOpen(status, category.id)"
-                        class="ml-5 mt-1 space-y-1 border-l border-slate-200 pl-3"
+                        class="ml-5 mt-1 space-y-1 border-l border-slate-300/80 pl-2.5"
                         @dragover.prevent
-                        @drop.prevent="onTaskDrop(status, entry.folder.id, category.id)"
+                        @drop.prevent.stop="onCategoryDrop(status, entry.folder.id, category.id)"
                       >
                         <div
                           v-for="task in filteredTasks(category.tasks)"
                           :key="`task-${task.id}`"
                           :class="[
-                            'cursor-grab rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-sm transition active:cursor-grabbing hover:border-slate-300 hover:shadow-md',
+                              'group cursor-grab rounded-md border px-2.5 py-1.5 transition active:cursor-grabbing',
+                              entry.depth === 0
+                                ? 'border-slate-200 bg-slate-50/35 hover:border-slate-300 hover:bg-white'
+                                : entry.depth === 1
+                                  ? 'border-slate-200/90 bg-slate-100/60 hover:border-slate-300 hover:bg-slate-50'
+                                  : 'border-slate-300/80 bg-slate-100/85 hover:border-slate-400 hover:bg-slate-100',
                             isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
                           ]"
                           :draggable="true"
@@ -585,11 +535,11 @@
                           "
                           @dragend="clearActiveDropZone"
                         >
-                          <div class="flex items-start justify-between gap-3">
+                          <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3">
                             <div class="min-w-0">
                               <p
                                 v-if="editingTaskId !== task.id"
-                                class="truncate text-sm font-medium text-slate-900"
+                                class="truncate text-sm font-medium text-slate-800 transition group-hover:text-[#4e3aba]"
                               >
                                 {{ task.title }}
                               </p>
@@ -619,58 +569,41 @@
                                   <X class="h-3.5 w-3.5" />
                                 </button>
                               </div>
-                              <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                                <UserRound class="h-3.5 w-3.5" />
-                                {{
-                                  task.assignee.name || task.assignee.email || 'Unknown assignee'
-                                }}
-                              </p>
                             </div>
-                            <div class="relative flex items-center gap-2">
-                              <span
-                                class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600"
-                              >
-                                App #{{ task.application_id }}
+
+                            <div class="min-w-0">
+                              <span class="truncate text-xs text-slate-700">
+                                {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
                               </span>
+                            </div>
+
+                            <div>
                               <span :class="priorityPillClass(task.priority)">
                                 {{ priorityLabel(task.priority) }}
                               </span>
+                            </div>
+
+                            <div>
+                              <span :class="statusPillClass(status)">
+                                {{ statusLabel(status) }}
+                              </span>
+                            </div>
+
+                            <div class="flex justify-end gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto">
                               <button
                                 type="button"
-                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:text-slate-700"
-                                @click.stop="toggleActionMenu(`task:${status}:${task.id}`)"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                                @click.stop="startTaskRename(task.application_id, task.id, task.title)"
                               >
-                                <MoreHorizontal class="h-4 w-4" />
+                                <Pencil class="h-3.5 w-3.5" />
                               </button>
-
-                              <div
-                                v-if="isActionMenuOpen(`task:${status}:${task.id}`)"
-                                class="absolute bottom-8 right-0 z-30 min-w-36 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
-                                @click.stop
+                              <button
+                                type="button"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
+                                @click.stop="deleteTask(task.application_id, task.id, task.title)"
                               >
-                                <button
-                                  type="button"
-                                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                                  @click.stop="
-                                    startTaskRename(task.application_id, task.id, task.title);
-                                    closeActionMenu()
-                                  "
-                                >
-                                  <Pencil class="h-3.5 w-3.5" />
-                                  Rename
-                                </button>
-                                <button
-                                  type="button"
-                                  class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50"
-                                  @click.stop="
-                                    deleteTask(task.application_id, task.id, task.title);
-                                    closeActionMenu()
-                                  "
-                                >
-                                  <Trash2 class="h-3.5 w-3.5" />
-                                  Delete
-                                </button>
-                              </div>
+                                <Trash2 class="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -681,12 +614,349 @@
                         >
                           Empty category
                         </p>
+
+                        <div class="pt-1">
+                          <div class="relative inline-block">
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                              @click.stop="toggleActionMenu(`category-add:${status}:${entry.folder.id}:${category.id}`)"
+                            >
+                              <Plus class="h-3.5 w-3.5" />
+                            </button>
+
+                            <div
+                              v-if="isActionMenuOpen(`category-add:${status}:${entry.folder.id}:${category.id}`)"
+                              class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                              @click.stop
+                            >
+                              <button
+                                type="button"
+                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                @click.stop="
+                                  startInlineFolderCreate(status, entry.folder.id);
+                                  closeActionMenu()
+                                "
+                              >
+                                <FolderPlus class="h-3.5 w-3.5" />
+                                New folder
+                              </button>
+                              <button
+                                type="button"
+                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                @click.stop="
+                                  startInlineTaskCreate(status, entry.folder.id, category.id);
+                                  closeActionMenu()
+                                "
+                              >
+                                <Plus class="h-3.5 w-3.5" />
+                                New task
+                              </button>
+                            </div>
+                          </div>
+
+                          <div
+                            v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === entry.folder.id && inlineTaskDraft.categoryId === category.id"
+                            class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                          >
+                            <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
+                              <input
+                                v-model="inlineTaskDraft.title"
+                                type="text"
+                                maxlength="160"
+                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                placeholder="Task title"
+                                @keydown.enter.prevent="confirmInlineTaskCreate"
+                                @keydown.esc.prevent="cancelInlineTaskCreate"
+                              />
+                              <select
+                                v-model="inlineTaskDraft.applicationId"
+                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                              >
+                                <option :value="null">Student</option>
+                                <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
+                                  {{ app.student_name }}
+                                </option>
+                              </select>
+                              <select
+                                v-model="inlineTaskDraft.priority"
+                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                              >
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                              </select>
+                              <div class="flex justify-end gap-1">
+                                <button
+                                  type="button"
+                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                                  @click="confirmInlineTaskCreate"
+                                >
+                                  <Check class="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                  @click="cancelInlineTaskCreate"
+                                >
+                                  <X class="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-if="!entry.folder.is_virtual" class="pt-1">
+                      <div class="relative inline-block">
+                        <button
+                          type="button"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                          @click.stop="toggleActionMenu(`folder-add:${status}:${entry.folder.id}`)"
+                        >
+                          <Plus class="h-3.5 w-3.5" />
+                        </button>
+
+                        <div
+                          v-if="isActionMenuOpen(`folder-add:${status}:${entry.folder.id}`)"
+                          class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                          @click.stop
+                        >
+                          <button
+                            type="button"
+                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                            @click.stop="
+                              startInlineFolderCreate(status, entry.folder.id);
+                              closeActionMenu()
+                            "
+                          >
+                            <FolderPlus class="h-3.5 w-3.5" />
+                            New folder
+                          </button>
+                          <button
+                            type="button"
+                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                            @click.stop="
+                              startInlineTaskCreate(status, entry.folder.id, null);
+                              closeActionMenu()
+                            "
+                          >
+                            <Plus class="h-3.5 w-3.5" />
+                            New task
+                          </button>
+                        </div>
+                      </div>
+
+                      <div
+                        v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === entry.folder.id"
+                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                      >
+                        <div class="flex items-center gap-2">
+                          <input
+                            v-model="inlineFolderDraft.name"
+                            type="text"
+                            maxlength="120"
+                            class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                            placeholder="Subfolder name"
+                            @keydown.enter.prevent="confirmInlineFolderCreate"
+                            @keydown.esc.prevent="cancelInlineFolderCreate"
+                          />
+                          <button
+                            type="button"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                            @click="confirmInlineFolderCreate"
+                          >
+                            <Check class="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                            @click="cancelInlineFolderCreate"
+                          >
+                            <X class="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div
+                        v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === entry.folder.id && inlineTaskDraft.categoryId === null"
+                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                      >
+                        <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
+                          <input
+                            v-model="inlineTaskDraft.title"
+                            type="text"
+                            maxlength="160"
+                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                            placeholder="Task title"
+                            @keydown.enter.prevent="confirmInlineTaskCreate"
+                            @keydown.esc.prevent="cancelInlineTaskCreate"
+                          />
+                          <select
+                            v-model="inlineTaskDraft.applicationId"
+                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                          >
+                            <option :value="null">Student</option>
+                            <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
+                              {{ app.student_name }}
+                            </option>
+                          </select>
+                          <select
+                            v-model="inlineTaskDraft.priority"
+                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                          >
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                          </select>
+                          <div class="flex justify-end gap-1">
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                              @click="confirmInlineTaskCreate"
+                            >
+                              <Check class="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                              @click="cancelInlineTaskCreate"
+                            >
+                              <X class="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <div class="pt-1.5">
+                  <div class="relative inline-block">
+                    <button
+                      type="button"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                      @click.stop="toggleActionMenu(`section-end-add:${status}`)"
+                    >
+                      <Plus class="h-3.5 w-3.5" />
+                    </button>
+
+                    <div
+                      v-if="isActionMenuOpen(`section-end-add:${status}`)"
+                      class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                      @click.stop
+                    >
+                      <button
+                        type="button"
+                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        @click.stop="
+                          startInlineFolderCreate(status, null);
+                          closeActionMenu()
+                        "
+                      >
+                        <FolderPlus class="h-3.5 w-3.5" />
+                        New folder
+                      </button>
+                      <button
+                        type="button"
+                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        @click.stop="openStatusQuickCreateTask(status)"
+                      >
+                        <Plus class="h-3.5 w-3.5" />
+                        New task
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === null"
+                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                  >
+                    <div class="flex items-center gap-2">
+                      <input
+                        v-model="inlineFolderDraft.name"
+                        type="text"
+                        maxlength="120"
+                        class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                        placeholder="Folder name"
+                        @keydown.enter.prevent="confirmInlineFolderCreate"
+                        @keydown.esc.prevent="cancelInlineFolderCreate"
+                      />
+                      <button
+                        type="button"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                        @click="confirmInlineFolderCreate"
+                      >
+                        <Check class="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                        @click="cancelInlineFolderCreate"
+                      >
+                        <X class="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === null"
+                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                  >
+                    <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
+                      <input
+                        v-model="inlineTaskDraft.title"
+                        type="text"
+                        maxlength="160"
+                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                        placeholder="Task title"
+                        @keydown.enter.prevent="confirmInlineTaskCreate"
+                        @keydown.esc.prevent="cancelInlineTaskCreate"
+                      />
+                      <select
+                        v-model="inlineTaskDraft.applicationId"
+                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      >
+                        <option :value="null">Student</option>
+                        <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
+                          {{ app.student_name }}
+                        </option>
+                      </select>
+                      <select
+                        v-model="inlineTaskDraft.priority"
+                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
+                      <div class="flex justify-end gap-1">
+                        <button
+                          type="button"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-emerald-600 hover:bg-emerald-50"
+                          @click="confirmInlineTaskCreate"
+                        >
+                          <Check class="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          @click="cancelInlineTaskCreate"
+                        >
+                          <X class="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </section>
+            </div>
           </div>
         </div>
       </div>
@@ -745,6 +1015,7 @@
           </select>
 
           <select
+            v-if="!createCategoryFolderLocked"
             v-model="selectedFolderId"
             class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
           >
@@ -758,6 +1029,13 @@
             </option>
           </select>
 
+          <div
+            v-else
+            class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+          >
+            {{ folderOptions.find((folder) => folder.id === selectedFolderId)?.name || 'Selected folder' }}
+          </div>
+
           <input
             v-model="newCategoryName"
             type="text"
@@ -767,7 +1045,7 @@
           />
 
           <div class="mt-4 flex justify-end gap-2">
-            <BaseButton variant="secondary" class="rounded-xl!" @click="openCreateCategory = false">
+            <BaseButton variant="secondary" class="rounded-xl!" @click="closeCreateCategoryModal">
               Cancel
             </BaseButton>
             <BaseButton
@@ -852,17 +1130,13 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
-  Circle,
-  CircleDot,
   Folder,
   FolderOpen,
   FolderPlus,
-  MoreHorizontal,
   Pencil,
   Plus,
   SlidersHorizontal,
   Trash2,
-  UserRound,
   X,
 } from 'lucide-vue-next'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -901,7 +1175,7 @@ interface TaskDragPayload {
   applicationId: number
   task: ProjectTaskBoardTask
   fromStatus: ApplicationTaskStatus
-  fromFolderId: number
+  fromFolderId: number | null
   fromCategoryId: number | null
 }
 
@@ -924,6 +1198,21 @@ interface AcceptedApplicationOption {
   student_name: string
 }
 
+interface InlineFolderDraft {
+  status: ApplicationTaskStatus
+  parentFolderId: number | null
+  name: string
+}
+
+interface InlineTaskDraft {
+  status: ApplicationTaskStatus
+  folderId: number | null
+  categoryId: number | null
+  title: string
+  applicationId: number | null
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+}
+
 export default defineComponent({
   name: 'CompanyTaskBoardView',
   components: {
@@ -931,7 +1220,6 @@ export default defineComponent({
     BaseAlert,
     BaseButton,
     Check,
-    MoreHorizontal,
     Pencil,
     FolderPlus,
     Plus,
@@ -941,9 +1229,6 @@ export default defineComponent({
     FolderOpen,
     ChevronRight,
     ChevronDown,
-    UserRound,
-    Circle,
-    CircleDot,
     CheckCircle2,
     X,
   },
@@ -977,6 +1262,7 @@ export default defineComponent({
       selectedFolderId: null as number | null,
       createFolderStatus: 'todo' as ApplicationTaskStatus,
       createCategoryStatus: 'todo' as ApplicationTaskStatus,
+      createCategoryFolderLocked: false,
       createTaskStatus: 'todo' as ApplicationTaskStatus,
       createTaskFolderId: null as number | null,
       createTaskCategoryId: null as number | null,
@@ -996,6 +1282,8 @@ export default defineComponent({
       editingTaskId: null as number | null,
       editingTaskApplicationId: null as number | null,
       taskRenameDraft: '',
+      inlineFolderDraft: null as InlineFolderDraft | null,
+      inlineTaskDraft: null as InlineTaskDraft | null,
       boardStatuses: ['todo', 'in_progress', 'complete'] as ApplicationTaskStatus[],
     }
   },
@@ -1010,6 +1298,10 @@ export default defineComponent({
     },
   },
   async mounted() {
+    // Prevent browser default drop handling (navigation/reload) during board drag & drop.
+    window.addEventListener('dragover', this.preventBrowserDrop)
+    window.addEventListener('drop', this.preventBrowserDrop)
+
     this.loading = true
     try {
       await this.projectStore.fetchProjects({
@@ -1028,7 +1320,14 @@ export default defineComponent({
       this.loading = false
     }
   },
+  beforeUnmount() {
+    window.removeEventListener('dragover', this.preventBrowserDrop)
+    window.removeEventListener('drop', this.preventBrowserDrop)
+  },
   methods: {
+    preventBrowserDrop(event: DragEvent) {
+      event.preventDefault()
+    },
     async selectProject(projectId: number) {
       if (this.selectedProjectId === projectId) {
         return
@@ -1047,8 +1346,10 @@ export default defineComponent({
       }
       await this.loadBoard(this.selectedProjectId)
     },
-    async loadBoard(projectId: number) {
-      this.loading = true
+    async loadBoard(projectId: number, showLoading: boolean = true) {
+      if (showLoading) {
+        this.loading = true
+      }
       this.errorMessage = ''
       try {
         const board = await ApplicationService.getProjectTaskBoard(projectId)
@@ -1060,7 +1361,9 @@ export default defineComponent({
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to load task board.'
       } finally {
-        this.loading = false
+        if (showLoading) {
+          this.loading = false
+        }
       }
     },
     async loadAcceptedApplications(projectId: number) {
@@ -1202,13 +1505,13 @@ export default defineComponent({
       return 'COMPLETED'
     },
     statusIcon(status: ApplicationTaskStatus) {
-      if (status === 'todo') return 'Circle'
-      if (status === 'in_progress') return 'CircleDot'
+      if (status === 'todo') return 'Folder'
+      if (status === 'in_progress') return 'Pencil'
       return 'CheckCircle2'
     },
     statusIconClass(status: ApplicationTaskStatus): string {
-      if (status === 'todo') return 'h-4 w-4 text-rose-500'
-      if (status === 'in_progress') return 'h-4 w-4 text-amber-500'
+      if (status === 'todo') return 'h-4 w-4 text-[#4e3aba]'
+      if (status === 'in_progress') return 'h-4 w-4 text-amber-600'
       return 'h-4 w-4 text-emerald-600'
     },
     priorityLabel(priority: string): string {
@@ -1230,6 +1533,15 @@ export default defineComponent({
       }
       return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600'
     },
+    statusPillClass(status: ApplicationTaskStatus): string {
+      if (status === 'todo') {
+        return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700'
+      }
+      if (status === 'in_progress') {
+        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700'
+      }
+      return 'inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700'
+    },
     onFolderDragStart(status: ApplicationTaskStatus, folderId: number, event: DragEvent) {
       this.closeActionMenu()
       this.activeDropZone = null
@@ -1243,8 +1555,10 @@ export default defineComponent({
       this.clearActiveDropZone()
       if (!this.selectedProjectId) return
 
+      const normalizedTargetFolderId = targetFolderId > 0 ? targetFolderId : null
+
       if (this.draggedTask) {
-        await this.moveTaskToTarget(this.draggedTask, status, targetFolderId, null)
+        await this.moveTaskToTarget(this.draggedTask, status, normalizedTargetFolderId, null)
         this.draggedTask = null
         return
       }
@@ -1254,14 +1568,18 @@ export default defineComponent({
       const sourceFolderId = this.draggedFolder.folderId
       this.draggedFolder = null
 
-      if (sourceFolderId === targetFolderId) return
+      if (normalizedTargetFolderId === null) {
+        return
+      }
 
-      if (this.wouldCreateLocalFolderCycle(status, sourceFolderId, targetFolderId)) {
+      if (sourceFolderId === normalizedTargetFolderId) return
+
+      if (this.wouldCreateLocalFolderCycle(status, sourceFolderId, normalizedTargetFolderId)) {
         this.errorMessage = 'This move would create a folder cycle.'
         return
       }
 
-      const targetPosition = this.nextFolderPosition(status, targetFolderId)
+      const targetPosition = this.nextFolderPosition(status, normalizedTargetFolderId)
 
       this.submitting = true
       this.errorMessage = ''
@@ -1270,14 +1588,14 @@ export default defineComponent({
           this.selectedProjectId as number,
           sourceFolderId,
           {
-            parent_folder_id: targetFolderId,
+            parent_folder_id: normalizedTargetFolderId,
             position: targetPosition,
             status,
           },
         )
 
-        await this.loadBoard(this.selectedProjectId)
-        this.openFolders[`${status}:${targetFolderId}`] = true
+        await this.loadBoard(this.selectedProjectId, false)
+        this.openFolders[`${status}:${normalizedTargetFolderId}`] = true
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to move folder.'
@@ -1299,7 +1617,7 @@ export default defineComponent({
         applicationId: task.application_id,
         task,
         fromStatus: status,
-        fromFolderId: folderId,
+        fromFolderId: folderId > 0 ? folderId : null,
         fromCategoryId: categoryId,
       }
       if (event.dataTransfer) {
@@ -1307,11 +1625,20 @@ export default defineComponent({
         event.dataTransfer.setData('text/plain', `task:${task.id}`)
       }
     },
-    async onTaskDrop(status: ApplicationTaskStatus, folderId: number, categoryId: number | null) {
+    async onTaskDrop(status: ApplicationTaskStatus, folderId: number | null, categoryId: number | null) {
       this.clearActiveDropZone()
       if (!this.draggedTask) return
-      await this.moveTaskToTarget(this.draggedTask, status, folderId, categoryId)
+      const normalizedFolderId = folderId !== null && folderId > 0 ? folderId : null
+      await this.moveTaskToTarget(this.draggedTask, status, normalizedFolderId, categoryId)
       this.draggedTask = null
+    },
+    async onCategoryDrop(status: ApplicationTaskStatus, folderId: number, categoryId: number) {
+      if (this.draggedFolder) {
+        await this.onFolderDrop(status, folderId)
+        return
+      }
+
+      await this.onTaskDrop(status, folderId, categoryId)
     },
     async onStatusDrop(status: ApplicationTaskStatus) {
       this.clearActiveDropZone()
@@ -1334,7 +1661,7 @@ export default defineComponent({
             status,
           })
 
-          await this.loadBoard(this.selectedProjectId)
+          await this.loadBoard(this.selectedProjectId, false)
         } catch (error: unknown) {
           const typedError = error as { response?: { data?: { message?: string } } }
           this.errorMessage = typedError?.response?.data?.message ?? 'Failed to move folder.'
@@ -1349,7 +1676,7 @@ export default defineComponent({
 
       const target = this.defaultDropTarget(status)
       if (!target) {
-        this.errorMessage = 'No folder available in this status for dropping task.'
+        await this.moveTaskToTarget(this.draggedTask, status, null, null)
         this.draggedTask = null
         return
       }
@@ -1413,8 +1740,227 @@ export default defineComponent({
         return
       }
 
-      this.openCreateTaskModal('todo', target.folderId, target.categoryId)
+      this.startInlineTaskCreate('todo', target.folderId, target.categoryId)
       this.closeActionMenu()
+    },
+    openStatusQuickCreateTask(status: ApplicationTaskStatus) {
+      const target = this.defaultDropTarget(status)
+      if (target) {
+        this.startInlineTaskCreate(status, target.folderId, target.categoryId)
+      } else {
+        this.startInlineTaskCreate(status, null, null)
+      }
+      this.closeActionMenu()
+    },
+    startInlineFolderCreate(status: ApplicationTaskStatus, parentFolderId: number | null) {
+      this.closeActionMenu()
+      this.inlineTaskDraft = null
+      this.inlineFolderDraft = {
+        status,
+        parentFolderId,
+        name: '',
+      }
+      this.errorMessage = ''
+    },
+    cancelInlineFolderCreate() {
+      this.inlineFolderDraft = null
+    },
+    resolveTaskApplicationId(
+      status: ApplicationTaskStatus,
+      folderId: number | null,
+      categoryId: number | null,
+    ): number | null {
+      if (folderId === null) {
+        return this.acceptedApplications[0]?.id ?? null
+      }
+      const firstTask = this.findFirstTaskInLocation(status, folderId, categoryId)
+      return firstTask?.application_id ?? this.acceptedApplications[0]?.id ?? null
+    },
+    startInlineTaskCreate(
+      status: ApplicationTaskStatus,
+      folderId: number | null,
+      categoryId: number | null,
+    ) {
+      this.closeActionMenu()
+      this.inlineFolderDraft = null
+
+      this.inlineTaskDraft = {
+        status,
+        folderId,
+        categoryId,
+        title: '',
+        applicationId: this.resolveTaskApplicationId(status, folderId, categoryId),
+        priority: 'medium',
+      }
+      this.errorMessage = ''
+    },
+    cancelInlineTaskCreate() {
+      this.inlineTaskDraft = null
+    },
+    async confirmInlineFolderCreate() {
+      if (!this.inlineFolderDraft || !this.selectedProjectId) return
+
+      const { status, parentFolderId } = this.inlineFolderDraft
+      const name = this.inlineFolderDraft.name.trim()
+      if (!name) {
+        this.errorMessage = 'Folder name is required.'
+        return
+      }
+
+      this.submitting = true
+      this.errorMessage = ''
+      try {
+        if (parentFolderId === null) {
+          const response = await ApplicationService.createTaskFolder(this.selectedProjectId, {
+            name,
+            status,
+            position: this.nextFolderPosition(status, null),
+          })
+          const created = response?.data as {
+            id: number
+            name: string
+            position?: number
+            parent_folder_id?: number | null
+          }
+
+          const nextFolder: ProjectTaskBoardFolder = {
+            id: created.id,
+            name: created.name,
+            position: created.position ?? 0,
+            parent_folder_id: created.parent_folder_id ?? null,
+            uncategorized_tasks: [],
+            categories: [],
+          }
+
+          this.sections[status] = [
+            ...this.sections[status],
+            { ...nextFolder, categories: [], uncategorized_tasks: [] },
+          ]
+          this.folderOptions = [
+            ...this.folderOptions,
+            {
+              id: nextFolder.id,
+              name: nextFolder.name,
+              status,
+              parent_folder_id: nextFolder.parent_folder_id,
+              categories: [],
+            },
+          ]
+          this.openFolders[`${status}:${nextFolder.id}`] = true
+        } else {
+          const response = await ApplicationService.createTaskCategory(
+            this.selectedProjectId,
+            parentFolderId,
+            {
+              name,
+              position: this.nextCategoryPosition(status, parentFolderId),
+            },
+          )
+
+          const created = response?.data as {
+            id: number
+            task_folder_id: number
+            name: string
+            position?: number
+          }
+
+          this.sections[status].forEach((folder) => {
+            if (folder.id !== created.task_folder_id) return
+            folder.categories = [
+              ...folder.categories,
+              {
+                id: created.id,
+                name: created.name,
+                position: created.position ?? 0,
+                tasks: [],
+              },
+            ]
+            this.openCategories[`${status}:${created.id}`] = true
+          })
+
+          this.folderOptions = this.folderOptions.map((folder) => {
+            if (folder.id !== created.task_folder_id) return folder
+            return {
+              ...folder,
+              categories: [...folder.categories, { id: created.id, name: created.name }],
+            }
+          })
+        }
+
+        this.inlineFolderDraft = null
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to create folder.'
+      } finally {
+        this.submitting = false
+      }
+    },
+    async confirmInlineTaskCreate() {
+      if (!this.inlineTaskDraft) return
+
+      const { status, folderId, categoryId, priority } = this.inlineTaskDraft
+      const applicationId = this.inlineTaskDraft.applicationId
+      const title = this.inlineTaskDraft.title.trim()
+
+      if (!applicationId) {
+        this.errorMessage = 'Select student application.'
+        return
+      }
+      if (!title) {
+        this.errorMessage = 'Task title is required.'
+        return
+      }
+
+      this.submitting = true
+      this.errorMessage = ''
+      try {
+        const createdResponse = await ApplicationService.createTask(applicationId, {
+          title,
+          priority,
+          task_folder_id: folderId ?? undefined,
+          task_category_id: categoryId ?? undefined,
+          position: this.nextTaskPosition(status, folderId, categoryId),
+        })
+
+        const createdTask = createdResponse?.data as ProjectTaskBoardTask
+
+        let finalTask = {
+          ...createdTask,
+          title,
+          priority,
+          task_folder_id: folderId,
+          task_category_id: categoryId,
+        } as ProjectTaskBoardTask
+
+        if (status !== 'todo') {
+          const targetPosition = this.nextTaskPosition(status, folderId, categoryId)
+          const updatedResponse = await ApplicationService.updateTask(applicationId, createdTask.id, {
+            status,
+            task_folder_id: folderId,
+            task_category_id: categoryId,
+            position: targetPosition,
+          })
+
+          finalTask = {
+            ...finalTask,
+            ...(updatedResponse?.data ?? {}),
+            status,
+            position: targetPosition,
+          }
+        }
+
+        this.removeTaskFromSections(createdTask.id)
+        this.insertTaskIntoSection(status, folderId, categoryId, finalTask)
+        if (folderId === null && this.selectedProjectId) {
+          await this.loadBoard(this.selectedProjectId, false)
+        }
+        this.inlineTaskDraft = null
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to create task.'
+      } finally {
+        this.submitting = false
+      }
     },
     startFolderRename(folderId: number, currentName: string) {
       this.editingFolderId = folderId
@@ -1570,6 +2116,18 @@ export default defineComponent({
         }, 0) + 1
       )
     },
+    nextCategoryPosition(status: ApplicationTaskStatus, folderId: number): number {
+      const folder = this.sections[status].find((item) => item.id === folderId)
+      if (!folder || folder.categories.length === 0) {
+        return 1
+      }
+
+      return (
+        folder.categories.reduce((max, category) => {
+          return category.position > max ? category.position : max
+        }, 0) + 1
+      )
+    },
     wouldCreateLocalFolderCycle(
       status: ApplicationTaskStatus,
       sourceFolderId: number,
@@ -1597,14 +2155,23 @@ export default defineComponent({
       this.openCreateFolder = true
       this.errorMessage = ''
     },
-    openCreateCategoryModal(status: ApplicationTaskStatus, folderId?: number) {
+    openCreateCategoryModal(
+      status: ApplicationTaskStatus,
+      folderId?: number,
+      lockFolder: boolean = false,
+    ) {
       this.closeActionMenu()
       this.createCategoryStatus = status
       const availableFolders = this.availableFoldersForCreateCategory
       const fallbackFolderId = availableFolders[0]?.id ?? null
       this.selectedFolderId = folderId ?? fallbackFolderId
+      this.createCategoryFolderLocked = lockFolder
       this.openCreateCategory = true
       this.errorMessage = ''
+    },
+    closeCreateCategoryModal() {
+      this.openCreateCategory = false
+      this.createCategoryFolderLocked = false
     },
     findFirstTaskInLocation(
       status: ApplicationTaskStatus,
@@ -1641,17 +2208,8 @@ export default defineComponent({
     defaultDropTarget(
       status: ApplicationTaskStatus,
     ): { folderId: number; categoryId: number | null } | null {
-      const statusFolders = this.sections[status]
+      const statusFolders = this.sections[status].filter((folder) => !folder.is_virtual)
       for (const folder of statusFolders) {
-        const firstCategory = folder.categories[0]
-        if (firstCategory) {
-          return { folderId: folder.id, categoryId: firstCategory.id }
-        }
-
-        return { folderId: folder.id, categoryId: null }
-      }
-
-      for (const folder of this.folderOptions) {
         const firstCategory = folder.categories[0]
         if (firstCategory) {
           return { folderId: folder.id, categoryId: firstCategory.id }
@@ -1664,9 +2222,23 @@ export default defineComponent({
     },
     nextTaskPosition(
       status: ApplicationTaskStatus,
-      folderId: number,
+      folderId: number | null,
       categoryId: number | null,
     ): number {
+      if (folderId === null) {
+        const standaloneFolder = this.sections[status].find((item) => item.is_virtual)
+        const directTasks = standaloneFolder?.uncategorized_tasks ?? []
+        if (directTasks.length === 0) {
+          return 1
+        }
+
+        return (
+          directTasks.reduce((max, task) => {
+            return task.position > max ? task.position : max
+          }, 0) + 1
+        )
+      }
+
       const folder = this.sections[status].find((item) => item.id === folderId)
       if (!folder) {
         return 1
@@ -1699,7 +2271,7 @@ export default defineComponent({
     async moveTaskToTarget(
       payload: TaskDragPayload,
       status: ApplicationTaskStatus,
-      folderId: number,
+      folderId: number | null,
       categoryId: number | null,
     ) {
       const isNoop =
@@ -1744,22 +2316,53 @@ export default defineComponent({
     },
     removeTaskFromSections(taskId: number) {
       this.boardStatuses.forEach((status) => {
+        const nextFolders: ProjectTaskBoardFolder[] = []
+
         this.sections[status].forEach((folder) => {
-          folder.uncategorized_tasks = (folder.uncategorized_tasks ?? []).filter(
-            (task) => task.id !== taskId,
-          )
-          folder.categories.forEach((category) => {
-            category.tasks = category.tasks.filter((task) => task.id !== taskId)
+          folder.uncategorized_tasks = (folder.uncategorized_tasks ?? []).filter((task) => {
+            return task.id !== taskId
           })
+          folder.categories.forEach((category) => {
+            category.tasks = category.tasks.filter((task) => {
+              return task.id !== taskId
+            })
+          })
+
+          nextFolders.push(folder)
         })
+
+        this.sections[status] = nextFolders
       })
     },
     insertTaskIntoSection(
       status: ApplicationTaskStatus,
-      folderId: number,
+      folderId: number | null,
       categoryId: number | null,
       task: ProjectTaskBoardTask,
     ) {
+      if (folderId === null) {
+        let standaloneFolder = this.sections[status].find((folder) => folder.is_virtual)
+        if (!standaloneFolder) {
+          standaloneFolder = {
+            id: 0,
+            name: 'No folder',
+            position: -1,
+            parent_folder_id: null,
+            is_virtual: true,
+            uncategorized_tasks: [],
+            categories: [],
+          }
+          this.sections[status] = [standaloneFolder, ...this.sections[status]]
+          this.openFolders[`${status}:0`] = true
+        }
+
+        standaloneFolder.uncategorized_tasks = [
+          ...(standaloneFolder.uncategorized_tasks ?? []),
+          task,
+        ].sort((a, b) => a.position - b.position)
+        return
+      }
+
       const targetFolder = this.sections[status].find((folder) => folder.id === folderId)
       if (!targetFolder) return
 
@@ -1870,6 +2473,7 @@ export default defineComponent({
         const response = await ApplicationService.createTaskFolder(this.selectedProjectId, {
           name,
           status: this.createFolderStatus,
+          position: this.nextFolderPosition(this.createFolderStatus, null),
         })
         const created = response?.data as {
           id: number
@@ -1937,6 +2541,7 @@ export default defineComponent({
           this.selectedFolderId,
           {
             name,
+            position: this.nextCategoryPosition(this.createCategoryStatus, this.selectedFolderId),
           },
         )
         const created = response?.data as {
@@ -1969,7 +2574,7 @@ export default defineComponent({
         })
 
         this.newCategoryName = ''
-        this.openCreateCategory = false
+        this.closeCreateCategoryModal()
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
         this.errorMessage = typedError?.response?.data?.message ?? 'Failed to create category.'

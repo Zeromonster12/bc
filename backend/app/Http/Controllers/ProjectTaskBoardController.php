@@ -8,6 +8,7 @@ use App\Models\ApplicationTaskFolder;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rule;
 
@@ -211,7 +212,39 @@ class ProjectTaskBoardController extends Controller
             return response()->json(['message' => 'No updatable fields were provided.'], 422);
         }
 
-        $folder->update($validated);
+        $statusProvided = array_key_exists('status', $validated);
+        $nextStatus = $validated['status'] ?? null;
+
+        DB::transaction(function () use ($project, $folder, $validated, $statusProvided, $nextStatus): void {
+            if ($statusProvided && $nextStatus !== null) {
+                $subtreeFolderIds = $this->collectFolderSubtreeIds($project->id, $folder->id);
+
+                ApplicationTaskFolder::query()
+                    ->whereIn('id', $subtreeFolderIds)
+                    ->update(['status' => $nextStatus]);
+
+                ApplicationTask::query()
+                    ->where('project_id', $project->id)
+                    ->whereIn('task_folder_id', $subtreeFolderIds)
+                    ->update([
+                        'status' => $nextStatus,
+                        'completed_at' => $nextStatus === 'complete' ? now() : null,
+                    ]);
+
+                $nonStatusPayload = $validated;
+                unset($nonStatusPayload['status']);
+
+                if ($nonStatusPayload !== []) {
+                    $folder->update($nonStatusPayload);
+                }
+
+                return;
+            }
+
+            $folder->update($validated);
+        });
+
+        $folder->refresh();
 
         return response()->json([
             'data' => [
@@ -389,8 +422,11 @@ class ProjectTaskBoardController extends Controller
         $statusFolders = $folders
             ->filter(fn(ApplicationTaskFolder $folder) => $folder->status === null || $folder->status === $status)
             ->values();
+        $standaloneTasks = $statusTasks
+            ->where('task_folder_id', null)
+            ->values();
 
-        return $statusFolders->map(function (ApplicationTaskFolder $folder) use ($categories, $statusTasks): array {
+        $sectionFolders = $statusFolders->map(function (ApplicationTaskFolder $folder) use ($categories, $statusTasks): array {
             $folderCategories = $categories->where('task_folder_id', $folder->id)->values();
             $uncategorizedTasks = $statusTasks
                 ->where('task_folder_id', $folder->id)
@@ -402,6 +438,7 @@ class ProjectTaskBoardController extends Controller
                 'name' => $folder->name,
                 'position' => $folder->position,
                 'parent_folder_id' => $folder->parent_folder_id,
+                'is_virtual' => false,
                 'uncategorized_tasks' => $uncategorizedTasks
                     ->map(fn(ApplicationTask $task) => $this->transformBoardTask($task))
                     ->values(),
@@ -418,7 +455,21 @@ class ProjectTaskBoardController extends Controller
                     ];
                 })->values(),
             ];
-        })->values()->all();
+        })->values();
+
+        $sectionFolders = collect([[
+            'id' => 0,
+            'name' => 'No folder',
+            'position' => -1,
+            'parent_folder_id' => null,
+            'is_virtual' => true,
+            'uncategorized_tasks' => $standaloneTasks
+                ->map(fn(ApplicationTask $task) => $this->transformBoardTask($task))
+                ->values(),
+            'categories' => [],
+        ]])->concat($sectionFolders)->values();
+
+        return $sectionFolders->all();
     }
 
     private function transformBoardTask(ApplicationTask $task): array
@@ -466,5 +517,35 @@ class ProjectTaskBoardController extends Controller
         }
 
         return false;
+    }
+
+    private function collectFolderSubtreeIds(int $projectId, int $rootFolderId): array
+    {
+        $rows = ApplicationTaskFolder::query()
+            ->where('project_id', $projectId)
+            ->get(['id', 'parent_folder_id']);
+
+        $childrenByParent = [];
+        foreach ($rows as $row) {
+            $parentId = $row->parent_folder_id === null ? null : (int) $row->parent_folder_id;
+            $childrenByParent[$parentId] ??= [];
+            $childrenByParent[$parentId][] = (int) $row->id;
+        }
+
+        $result = [];
+        $stack = [$rootFolderId];
+        while ($stack !== []) {
+            $currentId = array_pop($stack);
+            if (in_array($currentId, $result, true)) {
+                continue;
+            }
+
+            $result[] = $currentId;
+            foreach ($childrenByParent[$currentId] ?? [] as $childId) {
+                $stack[] = $childId;
+            }
+        }
+
+        return $result;
     }
 }

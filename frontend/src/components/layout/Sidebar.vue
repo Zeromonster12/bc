@@ -283,7 +283,7 @@ export default defineComponent({
     onLinkLeave(): void {
       if (!this.mobile && this.collapsed) {
         if (this.profileMenuOpen) {
-          this.profileMenuOpen = false
+          return
         }
         this.clearHoverCloseTimeout()
         this.hoverCloseTimeoutId = window.setTimeout(() => {

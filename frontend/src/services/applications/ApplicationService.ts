@@ -29,6 +29,7 @@ export interface ProjectTaskBoardFolder {
   name: string
   position: number
   parent_folder_id: number | null
+  is_virtual?: boolean
   uncategorized_tasks: ProjectTaskBoardTask[]
   categories: ProjectTaskBoardCategory[]
 }
