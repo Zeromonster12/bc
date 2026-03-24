@@ -42,7 +42,7 @@ export interface OAuthCallbackPayload {
 
 const AuthService = {
   async login(credentials: LoginCredentials) {
-    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
+    await http.get(`${backendOrigin}/sanctum/csrf-cookie`)
     const { data } = await http.post('/auth/login', credentials)
     return data
   },
@@ -58,13 +58,13 @@ const AuthService = {
   },
 
   async register(payload: RegisterData) {
-    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
+    await http.get(`${backendOrigin}/sanctum/csrf-cookie`)
     const { data } = await http.post('/auth/register', payload)
     return data
   },
 
   async verifyEmailCode(payload: VerifyEmailCodePayload) {
-    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
+    await http.get(`${backendOrigin}/sanctum/csrf-cookie`)
     const { data } = await http.post('/auth/verify-email-code', payload)
     return data
   },
@@ -80,7 +80,7 @@ const AuthService = {
   },
 
   async forgotPassword(payload: ForgotPasswordPayload) {
-    await http.get('https://backend.projectlinker.lznet.work/sanctum/csrf-cookie')
+    await http.get(`${backendOrigin}/sanctum/csrf-cookie`)
     const { data } = await http.post('/auth/forgot-password', payload)
     return data
   },
