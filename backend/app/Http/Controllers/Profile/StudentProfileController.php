@@ -9,6 +9,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class StudentProfileController extends Controller
 {
@@ -26,7 +27,7 @@ class StudentProfileController extends Controller
 
         $profile = StudentProfile::query()->firstWhere('user_id', $user->id);
 
-        return response()->json($this->transformProfile($profile));
+        return response()->json($this->transformProfile($profile, $user->id));
     }
 
     public function update(Request $request): JsonResponse
@@ -88,7 +89,7 @@ class StudentProfileController extends Controller
             'avatar_path' => $avatarPath,
         ]);
 
-        return response()->json($this->transformProfile($profile->fresh()));
+        return response()->json($this->transformProfile($profile->fresh(), $user->id));
     }
 
     public function avatar(Request $request)
@@ -141,6 +142,33 @@ class StudentProfileController extends Controller
         return $this->streamAvatar($avatarPath);
     }
 
+    public function signedUserAvatar(Request $request, User $user)
+    {
+        if (! $request->hasValidSignature()) {
+            return response()->json([
+                'message' => 'Invalid or expired avatar URL.',
+            ], 403);
+        }
+
+        if ($user->role !== 'student') {
+            return response()->json([
+                'message' => 'Profile photo not found.',
+            ], 404);
+        }
+
+        $avatarPath = StudentProfile::query()
+            ->where('user_id', $user->id)
+            ->value('avatar_path');
+
+        if (! is_string($avatarPath) || $avatarPath === '') {
+            return response()->json([
+                'message' => 'Profile photo not found.',
+            ], 404);
+        }
+
+        return $this->streamAvatar($avatarPath);
+    }
+
     /**
      * @param array<string, mixed> $data
      * @return array<string, mixed>
@@ -154,12 +182,17 @@ class StudentProfileController extends Controller
         return $data;
     }
 
-    private function transformProfile(?StudentProfile $profile): array
+    private function transformProfile(?StudentProfile $profile, int $userId): array
     {
         $data = is_array($profile?->profile_data) ? $profile->profile_data : [];
 
         if ($profile?->avatar_path) {
-            $data['avatar_url'] = route('profile.student.avatar.show');
+            $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+            $data['avatar_url'] = URL::temporarySignedRoute(
+                'users.avatar.signed',
+                now()->addMinutes($ttlMinutes),
+                ['user' => $userId]
+            );
         }
 
         return $data;

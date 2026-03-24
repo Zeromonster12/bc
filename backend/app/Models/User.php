@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -115,7 +116,13 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         if (is_string($avatarPath) && $avatarPath !== '') {
-            return route('users.avatar.show', ['user' => $this->id]);
+            $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+
+            return URL::temporarySignedRoute(
+                'users.avatar.signed',
+                now()->addMinutes($ttlMinutes),
+                ['user' => $this->id]
+            );
         }
 
         return null;

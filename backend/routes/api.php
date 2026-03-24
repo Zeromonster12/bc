@@ -90,3 +90,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         ->middleware('throttle:20,1')
         ->name('profile.student.cv.destroy');
 });
+
+Route::get('/users/{user}/avatar/signed', [StudentProfileController::class, 'signedUserAvatar'])
+    ->middleware('throttle:120,1')
+    ->name('users.avatar.signed');
