@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+use Throwable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -121,7 +122,13 @@ class User extends Authenticatable implements MustVerifyEmail
             $disk = Storage::disk($avatarDisk);
 
             if ($disk instanceof FilesystemAdapter) {
-                return $disk->url($avatarPath);
+                try {
+                    $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+
+                    return $disk->temporaryUrl($avatarPath, now()->addMinutes($ttlMinutes));
+                } catch (Throwable) {
+                    return $disk->url($avatarPath);
+                }
             }
 
             return '/storage/' . $avatarPath;

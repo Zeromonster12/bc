@@ -8,6 +8,7 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class StudentProfileController extends Controller
 {
@@ -54,7 +55,7 @@ class StudentProfileController extends Controller
             $previousAvatarPath = $avatarPath;
 
             try {
-                $storedAvatarPath = $validated['avatar']->storePublicly('student-avatars/' . $user->id, self::AVATAR_DISK);
+                $storedAvatarPath = $validated['avatar']->store('student-avatars/' . $user->id, self::AVATAR_DISK);
             } catch (\Throwable $e) {
                 report($e);
 
@@ -110,7 +111,12 @@ class StudentProfileController extends Controller
         if ($profile?->avatar_path) {
             $disk = Storage::disk(self::AVATAR_DISK);
             if ($disk instanceof FilesystemAdapter) {
-                $data['avatar_url'] = $disk->url($profile->avatar_path);
+                try {
+                    $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+                    $data['avatar_url'] = $disk->temporaryUrl($profile->avatar_path, now()->addMinutes($ttlMinutes));
+                } catch (Throwable) {
+                    $data['avatar_url'] = $disk->url($profile->avatar_path);
+                }
             } else {
                 $data['avatar_url'] = '/storage/' . $profile->avatar_path;
             }
