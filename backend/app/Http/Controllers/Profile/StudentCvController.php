@@ -92,15 +92,29 @@ class StudentCvController extends Controller
             ], 503);
         }
 
-        $stored = Storage::disk(self::CV_DISK)->putFileAs(
-            dirname($storagePath),
-            $file,
-            basename($storagePath)
-        );
+        try {
+            $stored = Storage::disk(self::CV_DISK)->putFileAs(
+                dirname($storagePath),
+                $file,
+                basename($storagePath)
+            );
+        } catch (Throwable $e) {
+            report($e);
 
-        if (! $stored) {
             return response()->json([
                 'message' => 'Failed to store CV file.',
+                'detail' => (bool) config('app.debug', false) ? $e->getMessage() : null,
+            ], 500);
+        }
+
+        if (! $stored) {
+            report(new \RuntimeException('Storage write returned false for CV upload on disk ' . self::CV_DISK . '.'));
+
+            return response()->json([
+                'message' => 'Failed to store CV file.',
+                'detail' => (bool) config('app.debug', false)
+                    ? 'Storage write returned false. Verify MinIO endpoint, credentials, bucket, and AWS_USE_PATH_STYLE_ENDPOINT.'
+                    : null,
             ], 500);
         }
 

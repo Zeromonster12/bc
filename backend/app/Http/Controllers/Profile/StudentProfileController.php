@@ -51,11 +51,35 @@ class StudentProfileController extends Controller
 
         $avatarPath = $profile->avatar_path;
         if (array_key_exists('avatar', $validated) && $validated['avatar']) {
-            if ($avatarPath) {
-                Storage::disk(self::AVATAR_DISK)->delete($avatarPath);
+            $previousAvatarPath = $avatarPath;
+
+            try {
+                $storedAvatarPath = $validated['avatar']->store('student-avatars/' . $user->id, self::AVATAR_DISK);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'message' => 'Failed to store profile photo.',
+                    'detail' => (bool) config('app.debug', false) ? $e->getMessage() : null,
+                ], 500);
             }
 
-            $avatarPath = $validated['avatar']->store('student-avatars/' . $user->id, self::AVATAR_DISK);
+            if (! is_string($storedAvatarPath) || $storedAvatarPath === '') {
+                report(new \RuntimeException('Storage write returned false for avatar upload on disk ' . self::AVATAR_DISK . '.'));
+
+                return response()->json([
+                    'message' => 'Failed to store profile photo.',
+                    'detail' => (bool) config('app.debug', false)
+                        ? 'Storage write returned false. Verify MinIO endpoint, credentials, bucket, and AWS_USE_PATH_STYLE_ENDPOINT.'
+                        : null,
+                ], 500);
+            }
+
+            $avatarPath = $storedAvatarPath;
+
+            if (is_string($previousAvatarPath) && $previousAvatarPath !== '') {
+                Storage::disk(self::AVATAR_DISK)->delete($previousAvatarPath);
+            }
         }
 
         $profile->update([
