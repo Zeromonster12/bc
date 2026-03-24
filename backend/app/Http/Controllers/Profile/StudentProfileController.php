@@ -54,7 +54,7 @@ class StudentProfileController extends Controller
             $previousAvatarPath = $avatarPath;
 
             try {
-                $storedAvatarPath = $validated['avatar']->store('student-avatars/' . $user->id, self::AVATAR_DISK);
+                $storedAvatarPath = $validated['avatar']->storePublicly('student-avatars/' . $user->id, self::AVATAR_DISK);
             } catch (\Throwable $e) {
                 report($e);
 
