@@ -1,14 +1,13 @@
 <template>
   <AppLayout>
     <div class="-m-6 h-[calc(100vh-4rem)] bg-slate-100 dark:bg-slate-950 md:p-5">
-      <div class="h-full overflow-hidden border border-slate-200 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900 md:rounded-2xl">
-        <div class="flex h-full overflow-hidden">
-          <div
-            :class="[
-              'w-full md:w-90 shrink-0 border-r border-slate-200 flex flex-col bg-white dark:border-slate-700 dark:bg-slate-900',
-              currentConversation ? 'hidden md:flex' : 'flex',
-            ]"
-          >
+      <div class="grid h-full gap-3 md:grid-cols-[22rem_minmax(0,1fr)]">
+        <div
+          :class="[
+            'min-h-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900 flex flex-col',
+            currentConversation ? 'hidden md:flex' : 'flex',
+          ]"
+        >
             <div class="border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
               <div class="flex items-center justify-between">
                 <h2 class="font-semibold text-slate-900 dark:text-slate-100">Messages</h2>
@@ -50,14 +49,14 @@
               @select="openConversation"
               class="flex-1 overflow-y-auto"
             />
-          </div>
+        </div>
 
-          <div
-            :class="[
-              'flex-1 flex flex-col bg-slate-50 dark:bg-slate-950',
-              !currentConversation ? 'hidden md:flex' : 'flex',
-            ]"
-          >
+        <div
+          :class="[
+            'min-h-0 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm dark:border-slate-700/80 dark:bg-slate-950 flex flex-col',
+            !currentConversation ? 'hidden md:flex' : 'flex',
+          ]"
+        >
             <div
               v-if="!currentConversation"
               class="flex-1 flex items-center justify-center text-slate-400 dark:text-slate-500"
@@ -75,7 +74,6 @@
                 @message-sent-local="onLocalMessageSent"
               />
             </template>
-          </div>
         </div>
       </div>
     </div>

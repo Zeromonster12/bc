@@ -21,7 +21,19 @@
             {{ application.project?.company?.name }}
           </p>
           <p v-if="application.student?.name" class="mt-1 text-xs text-gray-600 dark:text-slate-300">
-            Applicant: {{ application.student.name }}
+            Applicant:
+            <a
+              v-if="applicantProfileUrl"
+              :href="applicantProfileUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-teal-700 hover:text-teal-800 hover:underline dark:text-teal-300 dark:hover:text-teal-200"
+            >
+              {{ application.student.name }}
+            </a>
+            <span v-else class="font-medium">
+              {{ application.student.name }}
+            </span>
             <span v-if="application.student?.email" class="text-gray-500 dark:text-slate-400"
               >({{ application.student.email }})</span
             >
@@ -50,7 +62,9 @@
       v-if="application.status === 'accepted'"
       class="rounded-lg border border-emerald-100 bg-emerald-50/60 px-3 py-2 dark:border-emerald-500/30 dark:bg-emerald-500/10"
     >
-      <p class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Tasks summary</p>
+      <p class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+        Task summary for this application
+      </p>
       <p class="mt-1 text-xs text-emerald-900/80 dark:text-emerald-200/90">
         Total: {{ taskStats.total }} | Todo: {{ taskStats.todo }} | In progress:
         {{ taskStats.inProgress }} | Complete: {{ taskStats.complete }}
@@ -119,6 +133,9 @@ export default defineComponent({
         .join('')
         .toUpperCase()
         .slice(0, 2)
+    },
+    applicantProfileUrl(): string {
+      return this.application.student?.github_url ?? ''
     },
     taskStats(): { total: number; todo: number; inProgress: number; complete: number } {
       const tasks = this.application.tasks ?? []

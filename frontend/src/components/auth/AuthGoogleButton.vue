@@ -22,7 +22,7 @@
         d="M12 6.9c1.4 0 2.7.5 3.7 1.4l2.8-2.8C16.8 3.9 14.6 3 12 3 8.1 3 4.9 5.4 3.3 9l3.1 2.4c.8-2.7 3-4.5 5.6-4.5z"
       />
     </svg>
-    Continue with Google
+    Sign in with Google
   </button>
 </template>
 

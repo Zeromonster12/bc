@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-1">
-    <div ref="widgetContainer" class="min-h-[65px]" />
+    <div ref="widgetContainer" class="min-h-16.25" />
     <p v-if="error" class="text-xs text-red-600">{{ error }}</p>
   </div>
 </template>
@@ -47,6 +47,8 @@ export default defineComponent({
   data() {
     return {
       widgetId: null as string | null,
+      themeObserver: null as MutationObserver | null,
+      activeTheme: 'light' as 'light' | 'dark',
     }
   },
   computed: {
@@ -60,15 +62,42 @@ export default defineComponent({
     }
 
     await this.ensureScriptLoaded()
+    this.activeTheme = this.getCurrentTheme()
     this.renderWidget()
+    this.watchThemeChanges()
   },
   beforeUnmount() {
+    if (this.themeObserver) {
+      this.themeObserver.disconnect()
+      this.themeObserver = null
+    }
+
     const turnstile = getTurnstileApi()
     if (turnstile && this.widgetId) {
       turnstile.remove(this.widgetId)
     }
   },
   methods: {
+    getCurrentTheme(): 'light' | 'dark' {
+      return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+    },
+    watchThemeChanges() {
+      const root = document.documentElement
+      this.themeObserver = new MutationObserver(() => {
+        const nextTheme = this.getCurrentTheme()
+        if (nextTheme === this.activeTheme) {
+          return
+        }
+
+        this.activeTheme = nextTheme
+        this.renderWidget()
+      })
+
+      this.themeObserver.observe(root, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
+    },
     ensureScriptLoaded(): Promise<void> {
       return new Promise((resolve) => {
         const existing = document.getElementById(TURNSTILE_SCRIPT_ID) as HTMLScriptElement | null
@@ -100,9 +129,17 @@ export default defineComponent({
         return
       }
 
+      if (this.widgetId) {
+        turnstile.remove(this.widgetId)
+        this.widgetId = null
+      }
+
+      container.innerHTML = ''
+      this.$emit('update:modelValue', '')
+
       this.widgetId = turnstile.render(container, {
         sitekey: this.siteKey,
-        theme: 'light',
+        theme: this.activeTheme,
         callback: (token: string) => this.$emit('update:modelValue', token),
         'expired-callback': () => this.$emit('update:modelValue', ''),
         'error-callback': () => this.$emit('update:modelValue', ''),

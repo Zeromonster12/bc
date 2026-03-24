@@ -1,8 +1,8 @@
 <template>
   <header
-    class="w-full border-b border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/90 sm:px-6 sm:py-5 lg:px-8"
+    class="w-full border-b border-slate-200/80 bg-white/90 px-2 py-4 backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/90 sm:px-3 sm:py-5 lg:px-4"
   >
-    <div class="flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
       <div class="flex items-center gap-3">
         <button
           type="button"
@@ -20,20 +20,22 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
-        <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">ProjectLinker</h2>
+        <RouterLink
+          to="/"
+          class="text-lg font-semibold text-slate-900 transition hover:text-[#4e3aba] dark:text-slate-100 dark:hover:text-slate-200"
+        >
+          ProjectLinker
+        </RouterLink>
       </div>
-      <UserDropdown />
     </div>
   </header>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import UserDropdown from './UserDropdown.vue'
 
 export default defineComponent({
   name: 'TopNav',
-  components: { UserDropdown },
   emits: ['toggle-sidebar'],
 })
 </script>

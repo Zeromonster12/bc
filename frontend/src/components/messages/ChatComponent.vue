@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-full min-h-0 flex-col">
-    <div ref="threadRef" class="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+    <div ref="threadRef" class="message-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4">
       <div
         v-for="message in messages"
         :key="String(message.id)"
@@ -387,3 +387,41 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.message-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.message-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.message-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.message-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+:global(.dark) .message-scrollbar {
+  scrollbar-color: #475569 transparent;
+}
+
+:global(.dark) .message-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #475569;
+}
+
+:global(.dark) .message-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #64748b;
+}
+</style>

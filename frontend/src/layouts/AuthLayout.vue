@@ -5,11 +5,17 @@
       <div class="absolute -right-20 bottom-8 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl dark:bg-cyan-500/10"></div>
     </div>
 
+    <TopNav
+      v-if="showTopNav"
+      class="relative z-10 mb-8 w-full overflow-hidden rounded-2xl border border-white/60 shadow-sm dark:border-slate-700/70"
+    />
+
     <div
       class="relative mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-5xl items-center justify-center"
     >
-      <div class="grid w-full items-stretch gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div :class="['grid w-full items-stretch gap-8', showSidePanel ? 'lg:grid-cols-[1.1fr_0.9fr]' : 'max-w-xl']">
         <section
+          v-if="showSidePanel"
           class="hidden rounded-3xl border border-white/50 bg-linear-to-br from-teal-700 to-cyan-700 p-10 text-white shadow-xl lg:block dark:border-slate-700/50 dark:from-teal-800 dark:to-cyan-900"
         >
           <p class="text-xs font-semibold uppercase tracking-[0.24em] text-teal-100">BC Platform</p>
@@ -22,11 +28,7 @@
           </p>
         </section>
 
-        <div class="surface-glass w-full p-5 shadow-xl sm:p-8">
-          <div class="mb-8 text-center lg:text-left">
-            <h1 class="text-3xl font-extrabold tracking-tight text-teal-700 dark:text-teal-300">BC Platform</h1>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Student and company collaboration workspace</p>
-          </div>
+        <div class="surface-glass w-full rounded-3xl! p-7 shadow-xl sm:p-10">
           <slot />
         </div>
       </div>
@@ -36,8 +38,22 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import TopNav from '@/components/layout/TopNav.vue'
 
 export default defineComponent({
   name: 'AuthLayout',
+  components: {
+    TopNav,
+  },
+  props: {
+    showSidePanel: {
+      type: Boolean,
+      default: true,
+    },
+    showTopNav: {
+      type: Boolean,
+      default: false,
+    },
+  },
 })
 </script>

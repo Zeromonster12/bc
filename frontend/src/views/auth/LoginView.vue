@@ -1,6 +1,6 @@
 <template>
-  <AuthLayout>
-    <h2 class="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">Sign in to your account</h2>
+  <AuthLayout :show-side-panel="false" :show-top-nav="true">
+    <h2 class="mb-6 mt-6 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">Sign in to your account</h2>
 
     <BaseAlert
       v-if="errorMessage"
@@ -19,14 +19,6 @@
       dismissible
       @dismiss="turnstileError = ''"
     />
-
-    <AuthGoogleButton @click="handleGoogleLogin" />
-
-    <div class="mb-4 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
-      <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
-      <span>or use email and password</span>
-      <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
-    </div>
 
     <form @submit.prevent="handleLogin" novalidate>
       <div class="space-y-4">
@@ -47,7 +39,7 @@
           required
         />
 
-        <TurnstileWidget ref="turnstileWidget" v-model="turnstileToken" />
+        <TurnstileWidget ref="turnstileWidget" v-model="turnstileToken" class="my-2 pt-5 sm:my-3" />
       </div>
 
       <div class="flex items-center justify-end mt-3">
@@ -60,6 +52,14 @@
         Sign in
       </BaseButton>
     </form>
+
+    <div class="mt-5 mb-4 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+      <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
+      <span>or continue with Google</span>
+      <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
+    </div>
+
+    <AuthGoogleButton @click="handleGoogleLogin" />
 
     <p class="mt-6 text-center text-sm text-gray-600 dark:text-slate-300">
       Don't have an account?

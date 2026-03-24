@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-y-auto bg-white dark:bg-slate-900">
+  <div class="message-scrollbar h-full overflow-y-auto bg-white dark:bg-slate-900">
     <div v-if="loading" class="flex h-full items-center justify-center">
       <p class="text-sm text-slate-400 dark:text-slate-500">Loading conversations...</p>
     </div>
@@ -156,3 +156,41 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.message-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.message-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.message-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.message-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+:global(.dark) .message-scrollbar {
+  scrollbar-color: #475569 transparent;
+}
+
+:global(.dark) .message-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #475569;
+}
+
+:global(.dark) .message-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #64748b;
+}
+</style>
