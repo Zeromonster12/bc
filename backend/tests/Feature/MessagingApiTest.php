@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Application;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\Message;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -18,6 +20,7 @@ class MessagingApiTest extends TestCase
     {
         $student = User::factory()->create(['role' => 'student']);
         $company = User::factory()->create(['role' => 'company']);
+        $this->createAcceptedAssignment($student, $company);
 
         Sanctum::actingAs($student);
 
@@ -43,6 +46,7 @@ class MessagingApiTest extends TestCase
     {
         $student = User::factory()->create(['role' => 'student']);
         $company = User::factory()->create(['role' => 'company']);
+        $this->createAcceptedAssignment($student, $company);
 
         $conversation = Conversation::query()->create([
             'type' => 'direct',
@@ -112,6 +116,7 @@ class MessagingApiTest extends TestCase
     {
         $student = User::factory()->create(['role' => 'student']);
         $company = User::factory()->create(['role' => 'company']);
+        $this->createAcceptedAssignment($student, $company);
 
         $conversation = Conversation::query()->create([
             'type' => 'direct',
@@ -157,6 +162,7 @@ class MessagingApiTest extends TestCase
             'name' => 'Bob Recruiter',
             'email' => 'bob@example.com',
         ]);
+        $this->createAcceptedAssignment($student, $target);
 
         Sanctum::actingAs($student);
 
@@ -168,6 +174,56 @@ class MessagingApiTest extends TestCase
         $searchByEmail->assertOk();
         $searchByEmail->assertJsonMissing([
             'id' => $student->id,
+        ]);
+    }
+
+    public function test_student_cannot_start_conversation_with_non_assigned_company(): void
+    {
+        $student = User::factory()->create(['role' => 'student']);
+        $company = User::factory()->create(['role' => 'company']);
+
+        Sanctum::actingAs($student);
+
+        $create = $this->postJson('/api/conversations', [
+            'recipient_user_id' => $company->id,
+        ]);
+
+        $create->assertForbidden();
+    }
+
+    public function test_admin_can_start_conversation_with_any_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $company = User::factory()->create(['role' => 'company']);
+
+        Sanctum::actingAs($admin);
+
+        $create = $this->postJson('/api/conversations', [
+            'recipient_user_id' => $company->id,
+        ]);
+
+        $create->assertCreated();
+    }
+
+    private function createAcceptedAssignment(User $student, User $company): void
+    {
+        $project = Project::query()->create([
+            'company_user_id' => $company->id,
+            'title' => 'Messaging Test Project',
+            'description' => 'Project used for messaging authorization tests.',
+            'requirements' => 'Strong communication skills.',
+            'tech_stack' => ['Laravel'],
+            'status' => 'open',
+            'max_students' => 1,
+            'deadline' => now()->addMonth()->toDateString(),
+        ]);
+
+        Application::query()->create([
+            'project_id' => $project->id,
+            'student_user_id' => $student->id,
+            'cover_letter' => 'I am interested in this project and ready to collaborate with the company team.',
+            'status' => 'accepted',
+            'reviewed_at' => now(),
         ]);
     }
 }

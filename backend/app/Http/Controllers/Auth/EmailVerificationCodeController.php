@@ -84,8 +84,13 @@ class EmailVerificationCodeController extends Controller
 
         RateLimiter::clear($limiterKey);
 
+        $nextStep = $user->role === 'company' ? 'complete_company_profile' : 'login';
+
         return response()->json([
             'message' => 'Email verified successfully. You can now log in.',
+            'role' => $user->role,
+            'company_verification_status' => $user->company_verification_status,
+            'next_step' => $nextStep,
         ]);
     }
 }

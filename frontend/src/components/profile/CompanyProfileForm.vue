@@ -2,9 +2,9 @@
   <form
     @submit.prevent="$emit('submit')"
     novalidate
-    class="space-y-6 rounded-xl border border-gray-200 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90"
+    class="space-y-6"
   >
-    <div class="surface-card p-3 sm:p-4">
+    <div class="p-3 sm:p-4">
       <div class="flex flex-wrap gap-2">
         <button
           v-for="tab in tabs"
@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <section v-show="activeTab === 'identity'" class="surface-card space-y-5 p-6 sm:p-7">
+    <section v-show="activeTab === 'identity'" class="surface-card !rounded-3xl space-y-5 p-6 sm:p-7">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Identity</h2>
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -221,7 +221,7 @@
       </div>
     </section>
 
-    <div class="surface-card p-4 sm:p-5">
+    <div class="surface-card !rounded-3xl p-4 sm:p-5">
       <div class="flex justify-end">
         <BaseButton type="submit" variant="primary" :loading="saving" class="rounded-full px-6">
           {{ saveButtonLabel }}

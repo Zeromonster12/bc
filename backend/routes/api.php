@@ -25,6 +25,8 @@ Route::prefix('auth')->group(function (): void {
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function (): void {
     Route::get('/users', [AdminUserController::class, 'index']);
     Route::patch('/users/{user}', [AdminUserController::class, 'update']);
+    Route::patch('/users/{user}/approve-company', [AdminUserController::class, 'approveCompany']);
+    Route::patch('/users/{user}/reject-company', [AdminUserController::class, 'rejectCompany']);
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
 
     Route::get('/projects', [AdminProjectController::class, 'index']);

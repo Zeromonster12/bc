@@ -4,9 +4,13 @@ import AuthService, { type LoginCredentials, type RegisterData } from '@/service
 interface User {
   id: number
   name: string
+  first_name?: string | null
+  last_name?: string | null
   email: string
   role: 'student' | 'company' | 'admin'
   email_verified_at: string | null
+  company_verification_status?: 'pending' | 'approved' | 'rejected'
+  company_verified_at?: string | null
   avatar_url?: string | null
   student?: Record<string, unknown> | null
   company?: Record<string, unknown> | null

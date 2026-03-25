@@ -55,8 +55,16 @@ class ProjectController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        if (! in_array($request->user()?->role, ['company', 'admin'], true)) {
+        $user = $request->user();
+
+        if (! in_array($user?->role, ['company', 'admin'], true)) {
             return response()->json(['message' => 'Only company or admin users can create projects.'], 403);
+        }
+
+        if ($user?->role === 'company' && ! $user->isCompanyVerified()) {
+            return response()->json([
+                'message' => 'Your company account is pending admin approval. You can create projects after approval.',
+            ], 403);
         }
 
         $validated = $request->validate([
@@ -88,6 +96,12 @@ class ProjectController extends Controller
 
         if (! $user || ($user->role !== 'admin' && $project->company_user_id !== $user->id)) {
             return response()->json(['message' => 'You are not allowed to update this project.'], 403);
+        }
+
+        if ($user->role === 'company' && ! $user->isCompanyVerified()) {
+            return response()->json([
+                'message' => 'Your company account is pending admin approval. You can update projects after approval.',
+            ], 403);
         }
 
         $validated = $request->validate([

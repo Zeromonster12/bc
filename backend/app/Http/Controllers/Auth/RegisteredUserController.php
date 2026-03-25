@@ -32,17 +32,29 @@ class RegisteredUserController extends Controller
         }
 
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:student,company'],
         ]);
 
+        $role = (string) $request->string('role');
+        $firstName = trim((string) $request->string('first_name'));
+        $lastName = trim((string) $request->string('last_name'));
+        $companyStatus = $role === 'company'
+            ? User::COMPANY_STATUS_PENDING
+            : User::COMPANY_STATUS_APPROVED;
+
         $user = User::create([
-            'name' => $request->name,
+            'name' => trim($firstName . ' ' . $lastName),
+            'first_name' => $firstName,
+            'last_name' => $lastName,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
-            'role' => $request->string('role'),
+            'role' => $role,
+            'company_verification_status' => $companyStatus,
+            'company_verified_at' => $companyStatus === User::COMPANY_STATUS_APPROVED ? now() : null,
         ]);
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -59,11 +71,22 @@ class RegisteredUserController extends Controller
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        $user->notify(new EmailVerificationCodeNotification($code));
+        $notificationSent = true;
+        try {
+            $user->notify(new EmailVerificationCodeNotification($code));
+        } catch (\Throwable $e) {
+            $notificationSent = false;
+            report($e);
+        }
+
+        $message = $notificationSent
+            ? 'Verification code sent to your email.'
+            : 'Account created, but verification code could not be sent. Please use resend code on the verification screen.';
 
         return response()->json([
-            'message' => 'Verification code sent to your email.',
+            'message' => $message,
             'email' => $user->email,
+            'verification_email_sent' => $notificationSent,
         ], 201);
     }
 }

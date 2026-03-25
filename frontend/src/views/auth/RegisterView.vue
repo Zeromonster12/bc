@@ -23,11 +23,19 @@
     <form @submit.prevent="handleRegister" novalidate>
       <div class="space-y-4">
         <BaseInput
-          v-model="form.name"
-          label="Full name"
+          v-model="form.first_name"
+          label="First name"
           type="text"
-          autocomplete="name"
-          :error="errors.name"
+          autocomplete="given-name"
+          :error="errors.first_name"
+          required
+        />
+        <BaseInput
+          v-model="form.last_name"
+          label="Surname"
+          type="text"
+          autocomplete="family-name"
+          :error="errors.last_name"
           required
         />
         <BaseInput
@@ -107,7 +115,8 @@ export default defineComponent({
   data() {
     return {
       form: {
-        name: '',
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
         password_confirmation: '',

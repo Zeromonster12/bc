@@ -1,7 +1,7 @@
 import http from '@/services/core/http'
 
 const AdminService = {
-  async getUsers(params: { page?: number; search?: string; role?: string }) {
+  async getUsers(params: { page?: number; search?: string; role?: string; company_status?: string }) {
     const { data } = await http.get('/admin/users', { params })
     return data
   },
@@ -18,6 +18,16 @@ const AdminService = {
 
   async deleteUser(userId: number) {
     const { data } = await http.delete(`/admin/users/${userId}`)
+    return data
+  },
+
+  async approveCompany(userId: number) {
+    const { data } = await http.patch(`/admin/users/${userId}/approve-company`)
+    return data
+  },
+
+  async rejectCompany(userId: number) {
+    const { data } = await http.patch(`/admin/users/${userId}/reject-company`)
     return data
   },
 

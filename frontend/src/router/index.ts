@@ -162,6 +162,18 @@ router.beforeEach(async (to) => {
       return { name: 'dashboard' }
     }
   }
+
+  if (to.name === 'projects.create') {
+    const isPendingCompany =
+      auth.user?.role === 'company' && auth.user?.company_verification_status !== 'approved'
+
+    if (isPendingCompany) {
+      return {
+        name: 'profile.company',
+        query: { approval: String(auth.user?.company_verification_status ?? 'pending') },
+      }
+    }
+  }
 })
 
 const DYNAMIC_IMPORT_RELOAD_KEY = 'bc_platform_dynamic_import_reload'

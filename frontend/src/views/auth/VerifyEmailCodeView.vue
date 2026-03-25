@@ -120,14 +120,24 @@ export default defineComponent({
       this.loading = true
 
       try {
-        await AuthService.verifyEmailCode({
+        const result = await AuthService.verifyEmailCode({
           email: this.email,
           code: this.code.trim(),
         })
 
-        this.successMessage = 'Email verified. You can now sign in.'
+        this.successMessage = result?.message ?? 'Email verified. You can now continue.'
         this.verificationCompleted = true
+
+        const shouldOpenCompanyProfile = result?.next_step === 'complete_company_profile'
         setTimeout(() => {
+          if (shouldOpenCompanyProfile) {
+            this.$router.push({
+              name: 'login',
+              query: { redirect: '/profile/company' },
+            })
+            return
+          }
+
           this.$router.push({ name: 'login' })
         }, 1200)
       } catch (e: unknown) {

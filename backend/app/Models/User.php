@@ -16,6 +16,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public const COMPANY_STATUS_PENDING = 'pending';
+    public const COMPANY_STATUS_APPROVED = 'approved';
+    public const COMPANY_STATUS_REJECTED = 'rejected';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,9 +27,13 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'role',
+        'company_verification_status',
+        'company_verified_at',
     ];
 
     /**
@@ -55,7 +63,30 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'company_verified_at' => 'datetime',
         ];
+    }
+
+    public function isCompanyVerified(): bool
+    {
+        if ($this->role !== 'company') {
+            return true;
+        }
+
+        return $this->company_verification_status === self::COMPANY_STATUS_APPROVED;
+    }
+
+    public function getNameAttribute($value): string
+    {
+        $firstName = trim((string) ($this->attributes['first_name'] ?? ''));
+        $lastName = trim((string) ($this->attributes['last_name'] ?? ''));
+        $fullName = trim($firstName . ' ' . $lastName);
+
+        if ($fullName !== '') {
+            return $fullName;
+        }
+
+        return (string) $value;
     }
 
     public function companyProjects(): HasMany

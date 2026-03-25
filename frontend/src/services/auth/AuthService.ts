@@ -8,7 +8,8 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
-  name: string
+  first_name: string
+  last_name: string
   email: string
   password: string
   password_confirmation: string
@@ -19,6 +20,13 @@ export interface RegisterData {
 export interface VerifyEmailCodePayload {
   email: string
   code: string
+}
+
+export interface VerifyEmailCodeResponse {
+  message: string
+  role?: 'student' | 'company' | 'admin'
+  company_verification_status?: 'pending' | 'approved' | 'rejected'
+  next_step?: 'login' | 'complete_company_profile'
 }
 
 export interface ResendVerificationEmailPayload {
@@ -63,7 +71,7 @@ const AuthService = {
     return data
   },
 
-  async verifyEmailCode(payload: VerifyEmailCodePayload) {
+  async verifyEmailCode(payload: VerifyEmailCodePayload): Promise<VerifyEmailCodeResponse> {
     await http.get(`${backendOrigin}/sanctum/csrf-cookie`)
     const { data } = await http.post('/auth/verify-email-code', payload)
     return data

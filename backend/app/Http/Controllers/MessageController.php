@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MessageSent;
 use App\Events\MessageRead;
 use App\Events\UserTyping;
+use App\Models\Application;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\Message;
@@ -36,9 +37,17 @@ class MessageController extends Controller
         }
 
         $limit = (int) ($validated['limit'] ?? 8);
+        $allowedRecipientIds = $this->allowedDirectRecipientIds($user);
+
+        if ($allowedRecipientIds === []) {
+            return response()->json([
+                'data' => [],
+            ]);
+        }
 
         $users = User::query()
             ->where('id', '!=', $user->id)
+            ->whereIn('id', $allowedRecipientIds)
             ->where(function ($q) use ($query): void {
                 $q->where('name', 'like', '%' . $query . '%')
                     ->orWhere('email', 'like', '%' . $query . '%');
@@ -71,7 +80,9 @@ class MessageController extends Controller
                 'messages.senderUser:id,name,email',
             ])
             ->latest('updated_at')
-            ->get();
+            ->get()
+            ->filter(fn(Conversation $conversation) => $this->canUseConversation($user, $conversation))
+            ->values();
 
         return response()->json([
             'data' => $conversations->map(fn(Conversation $conversation) => $this->transformConversation($conversation, $user->id))->values(),
@@ -114,6 +125,12 @@ class MessageController extends Controller
             return response()->json([
                 'message' => 'You cannot start a conversation with yourself.',
             ], 422);
+        }
+
+        if (! $this->canDirectMessage($user, $recipient)) {
+            return response()->json([
+                'message' => 'You are not allowed to start a conversation with this user.',
+            ], 403);
         }
 
         $existing = Conversation::query()
@@ -178,6 +195,10 @@ class MessageController extends Controller
             return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
         }
 
+        if (! $this->canUseConversation($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
+        }
+
         $conversation->load([
             'project:id,title',
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
@@ -200,6 +221,10 @@ class MessageController extends Controller
         }
 
         if (! $this->isParticipant($conversation, $user->id)) {
+            return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
+        }
+
+        if (! $this->canUseConversation($user, $conversation)) {
             return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
         }
 
@@ -250,6 +275,10 @@ class MessageController extends Controller
             return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
         }
 
+        if (! $this->canUseConversation($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
+        }
+
         $validated = $request->validate([
             'up_to_message_id' => ['nullable', 'integer', 'min:1'],
         ]);
@@ -293,6 +322,10 @@ class MessageController extends Controller
         }
 
         if (! $this->isParticipant($conversation, $user->id)) {
+            return response()->json(['message' => 'You are not allowed to post in this conversation.'], 403);
+        }
+
+        if (! $this->canUseConversation($user, $conversation)) {
             return response()->json(['message' => 'You are not allowed to post in this conversation.'], 403);
         }
 
@@ -340,6 +373,10 @@ class MessageController extends Controller
             return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
         }
 
+        if (! $this->canUseConversation($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to access this conversation.'], 403);
+        }
+
         $validated = $request->validate([
             'is_typing' => ['required', 'boolean'],
         ]);
@@ -355,6 +392,108 @@ class MessageController extends Controller
             ->where('conversation_id', $conversation->id)
             ->where('user_id', $userId)
             ->exists();
+    }
+
+    private function canUseConversation(User $user, Conversation $conversation): bool
+    {
+        if ($conversation->type !== 'direct') {
+            return true;
+        }
+
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        $participantIds = ConversationParticipant::query()
+            ->where('conversation_id', $conversation->id)
+            ->pluck('user_id')
+            ->map(fn($id) => (int) $id)
+            ->values();
+
+        $otherUserId = $participantIds
+            ->first(fn(int $participantId) => $participantId !== (int) $user->id);
+
+        if (! is_int($otherUserId)) {
+            return false;
+        }
+
+        $allowedRecipientIds = $this->allowedDirectRecipientIds($user);
+
+        return in_array($otherUserId, $allowedRecipientIds, true);
+    }
+
+    private function canDirectMessage(User $sender, User $recipient): bool
+    {
+        if ($sender->id === $recipient->id) {
+            return false;
+        }
+
+        if ($sender->role === 'admin') {
+            return true;
+        }
+
+        $allowedRecipientIds = $this->allowedDirectRecipientIds($sender);
+
+        return in_array((int) $recipient->id, $allowedRecipientIds, true);
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function allowedDirectRecipientIds(User $user): array
+    {
+        if ($user->role === 'admin') {
+            return User::query()
+                ->where('id', '!=', $user->id)
+                ->pluck('id')
+                ->map(fn($id) => (int) $id)
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        $adminIds = User::query()
+            ->where('role', 'admin')
+            ->where('id', '!=', $user->id)
+            ->pluck('id')
+            ->map(fn($id) => (int) $id)
+            ->all();
+
+        if ($user->role === 'student') {
+            $companyIds = Application::query()
+                ->where('student_user_id', $user->id)
+                ->where('status', 'accepted')
+                ->with('project:id,company_user_id')
+                ->get()
+                ->pluck('project.company_user_id')
+                ->filter(fn($companyUserId) => is_numeric($companyUserId))
+                ->map(fn($companyUserId) => (int) $companyUserId)
+                ->values()
+                ->all();
+
+            return collect(array_merge($companyIds, $adminIds))
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        if ($user->role === 'company') {
+            $studentIds = Application::query()
+                ->where('status', 'accepted')
+                ->whereHas('project', fn($query) => $query->where('company_user_id', $user->id))
+                ->pluck('student_user_id')
+                ->map(fn($studentUserId) => (int) $studentUserId)
+                ->unique()
+                ->values()
+                ->all();
+
+            return collect(array_merge($studentIds, $adminIds))
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        return $adminIds;
     }
 
     private function transformConversation(Conversation $conversation, int $currentUserId): array

@@ -14,7 +14,11 @@
         :pagination="userPagination"
         @update:search="handleUserSearch"
         @update:roleFilter="handleUserRoleFilter"
+        @update:companyStatusFilter="handleCompanyStatusFilter"
+        :company-status-filter="userCompanyStatusFilter"
         @change-role="changeRoleFromEvent"
+        @approve-company="approveCompany"
+        @reject-company="rejectCompany"
         @delete-user="deleteUser"
         @page-change="fetchUsers"
       />
@@ -43,6 +47,8 @@ import AdminProjectsPanel from '@/components/admin/AdminProjectsPanel.vue'
 interface AdminUser {
   id: number
   role: string
+  company_verification_status?: 'pending' | 'approved' | 'rejected'
+  company_verified_at?: string | null
   [key: string]: unknown
 }
 
@@ -71,6 +77,7 @@ export default defineComponent({
       users: [] as AdminUser[],
       userSearch: '',
       userRoleFilter: '',
+      userCompanyStatusFilter: '',
       userPagination: null as AdminPagination | null,
       usersLoading: false,
       // Projects
@@ -98,6 +105,10 @@ export default defineComponent({
       this.userRoleFilter = value
       this.fetchUsers(1)
     },
+    handleCompanyStatusFilter(value: string) {
+      this.userCompanyStatusFilter = value
+      this.fetchUsers(1)
+    },
     changeRoleFromEvent(payload: { id: number; role: string }) {
       return this.changeRole(payload.id, payload.role)
     },
@@ -106,7 +117,12 @@ export default defineComponent({
       this.searchTimeout = setTimeout(async () => {
         this.usersLoading = true
         try {
-          const params = buildAdminUsersParams(page, this.userSearch, this.userRoleFilter)
+          const params = buildAdminUsersParams(
+            page,
+            this.userSearch,
+            this.userRoleFilter,
+            this.userCompanyStatusFilter,
+          )
           const result = await AdminService.getUsers(params)
           this.users = result.data
           this.userPagination = result.meta
@@ -134,6 +150,20 @@ export default defineComponent({
       if (!confirm('Delete this user? This cannot be undone.')) return
       await AdminService.deleteUser(userId)
       this.users = filterOutById(this.users, userId)
+    },
+    async approveCompany(userId: number) {
+      const result = await AdminService.approveCompany(userId)
+      const user = this.users.find((u) => u.id === userId)
+      if (user && result?.data) {
+        Object.assign(user, result.data)
+      }
+    },
+    async rejectCompany(userId: number) {
+      const result = await AdminService.rejectCompany(userId)
+      const user = this.users.find((u) => u.id === userId)
+      if (user && result?.data) {
+        Object.assign(user, result.data)
+      }
     },
     async deleteProject(projectId: number) {
       if (!confirm('Permanently delete this project?')) return

@@ -18,6 +18,16 @@
         <option value="company">Company</option>
         <option value="admin">Admin</option>
       </select>
+      <select
+        :value="companyStatusFilter"
+        class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+        @change="$emit('update:companyStatusFilter', ($event.target as HTMLSelectElement).value)"
+      >
+        <option value="">All company statuses</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
     </div>
 
     <div v-if="loading" class="space-y-2">
@@ -34,13 +44,14 @@
             <th class="px-4 py-3 text-left">Name</th>
             <th class="px-4 py-3 text-left">Email</th>
             <th class="px-4 py-3 text-left">Role</th>
+            <th class="px-4 py-3 text-left">Company status</th>
             <th class="px-4 py-3 text-left">Verified</th>
             <th class="px-4 py-3 text-left">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 dark:divide-slate-700/60">
           <tr v-if="users.length === 0">
-            <td colspan="5" class="px-4 py-10 text-center text-gray-400 dark:text-slate-500">No users found.</td>
+            <td colspan="6" class="px-4 py-10 text-center text-gray-400 dark:text-slate-500">No users found.</td>
           </tr>
           <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-slate-800/70">
             <td class="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">{{ user.name }}</td>
@@ -49,6 +60,14 @@
               <span class="rounded bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-slate-700 dark:text-slate-200">{{
                 user.role
               }}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span
+                :class="companyStatusClass(user)"
+                class="rounded px-2 py-0.5 text-xs capitalize"
+              >
+                {{ user.role === 'company' ? user.company_verification_status ?? 'pending' : 'n/a' }}
+              </span>
             </td>
             <td class="px-4 py-3">
               <span
@@ -79,6 +98,20 @@
                   class="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                 >
                   Delete
+                </button>
+                <button
+                  v-if="user.role === 'company' && user.company_verification_status !== 'approved'"
+                  @click="$emit('approve-company', user.id)"
+                  class="text-xs text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+                >
+                  Approve
+                </button>
+                <button
+                  v-if="user.role === 'company' && user.company_verification_status !== 'rejected'"
+                  @click="$emit('reject-company', user.id)"
+                  class="text-xs text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"
+                >
+                  Reject
                 </button>
               </div>
             </td>
@@ -113,6 +146,7 @@ interface AdminUserRow {
   email?: string
   role?: string
   email_verified_at?: string | null
+  company_verification_status?: 'pending' | 'approved' | 'rejected'
 }
 
 export default defineComponent({
@@ -135,11 +169,41 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    companyStatusFilter: {
+      type: String,
+      default: '',
+    },
     pagination: {
       type: Object as PropType<Pagination | null>,
       default: null,
     },
   },
-  emits: ['update:search', 'update:roleFilter', 'change-role', 'delete-user', 'page-change'],
+  emits: [
+    'update:search',
+    'update:roleFilter',
+    'update:companyStatusFilter',
+    'change-role',
+    'delete-user',
+    'approve-company',
+    'reject-company',
+    'page-change',
+  ],
+  methods: {
+    companyStatusClass(user: AdminUserRow): string {
+      if (user.role !== 'company') {
+        return 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-300'
+      }
+
+      if (user.company_verification_status === 'approved') {
+        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+      }
+
+      if (user.company_verification_status === 'rejected') {
+        return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+      }
+
+      return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+    },
+  },
 })
 </script>

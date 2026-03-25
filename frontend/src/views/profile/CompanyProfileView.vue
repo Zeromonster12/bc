@@ -1,11 +1,14 @@
 <template>
   <AppLayout>
     <div class="max-w-5xl mx-auto space-y-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Company Profile</h1>
-      <p class="text-sm text-slate-600 dark:text-slate-300">
-        Build a detailed company profile so students can quickly understand your business, culture,
-        and opportunities.
-      </p>
+
+      <BaseAlert
+        v-if="showApprovalAlert"
+        :type="approvalAlertType"
+        :title="approvalAlertTitle"
+        :message="approvalAlertMessage"
+        :dismissible="false"
+      />
 
       <BaseAlert
         v-if="successMessage"
@@ -43,9 +46,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import ProfileService from '@/services/profile/ProfileService'
 import {
-  type CompanyProfileForm,
+  type CompanyProfileForm as CompanyProfileFormModel,
   createDefaultCompanyProfileForm,
   hydrateCompanyProfileForm,
   toCompanyProfileFormData,
@@ -59,6 +63,11 @@ import CompanyProfileForm from '@/components/profile/CompanyProfileForm.vue'
 export default defineComponent({
   name: 'CompanyProfileView',
   components: { AppLayout, BaseAlert, CompanyProfileForm },
+  setup() {
+    return {
+      auth: useAuthStore(),
+    }
+  },
   data() {
     return {
       form: createDefaultCompanyProfileForm(),
@@ -71,6 +80,39 @@ export default defineComponent({
       loading: true,
       saving: false,
     }
+  },
+  computed: {
+    companyApprovalStatus(): 'pending' | 'approved' | 'rejected' {
+      const userStatus = this.auth.user?.company_verification_status
+      if (userStatus === 'pending' || userStatus === 'approved' || userStatus === 'rejected') {
+        return userStatus
+      }
+
+      const routeStatus = String(this.$route.query.approval ?? '').toLowerCase()
+      if (routeStatus === 'pending' || routeStatus === 'approved' || routeStatus === 'rejected') {
+        return routeStatus
+      }
+
+      return 'pending'
+    },
+    showApprovalAlert(): boolean {
+      return this.companyApprovalStatus !== 'approved'
+    },
+    approvalAlertType(): 'warning' | 'error' {
+      return this.companyApprovalStatus === 'rejected' ? 'error' : 'warning'
+    },
+    approvalAlertTitle(): string {
+      return this.companyApprovalStatus === 'rejected'
+        ? 'Company account rejected'
+        : 'Company account pending approval'
+    },
+    approvalAlertMessage(): string {
+      if (this.companyApprovalStatus === 'rejected') {
+        return 'Your company account was not approved yet. Please update your company profile details and contact support for review.'
+      }
+
+      return 'Your company account is waiting for admin approval. You can complete your profile now, but project creation stays locked until approval.'
+    },
   },
   async mounted() {
     try {
@@ -86,7 +128,7 @@ export default defineComponent({
     }
   },
   methods: {
-    updateField(payload: { field: keyof CompanyProfileForm; value: string }) {
+    updateField(payload: { field: keyof CompanyProfileFormModel; value: string }) {
       this.form[payload.field] = payload.value
     },
     handleLogo(e: Event) {
