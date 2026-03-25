@@ -1,13 +1,13 @@
 <template>
   <section class="surface-card p-6 sm:p-7 space-y-5">
     <div class="flex items-center justify-between gap-4">
-      <h2 class="text-lg font-semibold text-slate-900">Languages</h2>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Languages</h2>
       <BaseButton type="button" variant="secondary" size="sm" @click="$emit('add')"
         >Add language</BaseButton
       >
     </div>
 
-    <div v-if="languages.length === 0" class="text-sm text-slate-500">No language added yet.</div>
+    <div v-if="languages.length === 0" class="text-sm text-slate-500 dark:text-slate-400">No language added yet.</div>
 
     <div
       v-for="(language, index) in languages"

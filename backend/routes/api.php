@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProjectTaskBoardController;
+use App\Http\Controllers\Profile\CompanyProfileController;
 use App\Http\Controllers\Profile\StudentCvController;
 use App\Http\Controllers\Profile\StudentProfileController;
 use App\Http\Controllers\ProjectController;
@@ -77,6 +78,11 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::put('/profile/student', [StudentProfileController::class, 'update'])
         ->middleware('throttle:15,1');
 
+    Route::get('/profile/company', [CompanyProfileController::class, 'show'])
+        ->middleware('throttle:30,1');
+    Route::put('/profile/company', [CompanyProfileController::class, 'update'])
+        ->middleware('throttle:15,1');
+
     Route::get('/profile/student/cv', [StudentCvController::class, 'index'])
         ->middleware('throttle:30,1')
         ->name('profile.student.cv.index');
@@ -94,3 +100,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
 Route::get('/users/{user}/avatar/signed', [StudentProfileController::class, 'signedUserAvatar'])
     ->middleware('throttle:120,1')
     ->name('users.avatar.signed');
+
+Route::get('/users/{user}/company-logo/signed', [CompanyProfileController::class, 'signedUserLogo'])
+    ->middleware('throttle:120,1')
+    ->name('users.company-logo.signed');

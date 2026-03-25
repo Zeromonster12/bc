@@ -14,8 +14,8 @@
           <span v-else class="text-2xl font-bold text-indigo-700">{{ initials }}</span>
         </div>
         <div class="space-y-1">
-          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Student Profile</h1>
-          <p class="text-sm text-slate-600 max-w-xl">
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">Student Profile</h1>
+          <p class="text-sm text-slate-600 dark:text-slate-300 max-w-xl">
             Complete your profile so companies can quickly understand your skills, education, and
             career goals.
           </p>
@@ -23,9 +23,9 @@
       </div>
 
       <div class="w-full md:w-72">
-        <div class="flex items-center justify-between text-sm text-slate-600 mb-2">
+        <div class="mb-2 flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
           <span>Profile completion</span>
-          <span class="font-semibold text-slate-800">{{ completionRate }}%</span>
+          <span class="font-semibold text-slate-800 dark:text-slate-100">{{ completionRate }}%</span>
         </div>
         <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
           <div

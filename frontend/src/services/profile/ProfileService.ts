@@ -85,9 +85,19 @@ const ProfileService = {
   },
 
   async updateCompanyProfile(payload: FormData | Record<string, unknown>) {
-    const config =
-      payload instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}
-    const { data } = await http.put('/profile/company', payload, config)
+    if (payload instanceof FormData) {
+      if (!payload.has('_method')) {
+        payload.append('_method', 'PUT')
+      }
+
+      const { data } = await http.post('/profile/company', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      return data
+    }
+
+    const { data } = await http.put('/profile/company', payload)
     return data
   },
 

@@ -27,38 +27,49 @@
       </div>
 
       <form v-else @submit.prevent="handleSubmit" novalidate class="space-y-6">
-        <div class="flex justify-end gap-2">
-          <BaseButton
-            v-if="!isEditing"
-            type="button"
-            variant="secondary"
-            size="lg"
-            @click="startEditing"
-          >
-            Edit profile
-          </BaseButton>
-          <template v-else>
-            <BaseButton type="button" variant="ghost" size="lg" @click="cancelEditing"
-              >Cancel</BaseButton
+        <div class="p-3 sm:p-4">
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="tab in profileTabs"
+              :key="tab.id"
+              type="button"
+              class="rounded-full px-5 py-2 text-sm font-medium transition"
+              :class="
+                activeTab === tab.id
+                  ? 'bg-[#4e3aba] text-white shadow-sm'
+                  : 'bg-[#4e3aba]/10 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+              "
+              @click="activeTab = tab.id"
             >
-            <BaseButton type="submit" variant="primary" size="lg" :loading="saving"
-              >Save profile</BaseButton
-            >
-          </template>
+              {{ tab.label }}
+            </button>
+          </div>
         </div>
 
-        <fieldset :disabled="!isEditing" :class="!isEditing ? 'opacity-90' : ''" class="space-y-6">
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">Identity and Contact</h2>
+        <fieldset class="space-y-6">
+          <section v-show="activeTab === 'personal'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Identity and Contact</h2>
 
             <div>
               <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Profile photo</label>
-              <input
-                type="file"
-                accept="image/*"
-                @change="handleAvatar"
-                class="text-sm text-gray-500 dark:text-slate-400"
-              />
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <label
+                  for="avatar-upload"
+                  class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#4e3aba] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#3f2ea1]"
+                >
+                  Choose photo
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  @change="handleAvatar"
+                  class="sr-only"
+                />
+                <span class="text-xs text-slate-500 dark:text-slate-400">
+                  {{ avatarFileName || 'No photo selected' }}
+                </span>
+              </div>
               <p v-if="errors.avatar" class="mt-1 text-xs text-red-600">{{ errors.avatar }}</p>
             </div>
 
@@ -108,8 +119,8 @@
             </div>
           </section>
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">Location</h2>
+          <section v-show="activeTab === 'personal'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Location</h2>
             <div class="grid gap-4 sm:grid-cols-2">
               <BaseInput v-model="form.country" label="Country" :error="errors.country" />
               <BaseInput v-model="form.city" label="City" :error="errors.city" />
@@ -126,8 +137,8 @@
             </div>
           </section>
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">Education</h2>
+          <section v-show="activeTab === 'education'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Education</h2>
             <div class="grid gap-4 sm:grid-cols-2">
               <BaseInput v-model="form.university" label="University" :error="errors.university" />
               <BaseInput
@@ -186,8 +197,8 @@
             </div>
           </section>
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">About You</h2>
+          <section v-show="activeTab === 'personal'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">About You</h2>
 
             <div>
               <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Short bio</label>
@@ -212,8 +223,8 @@
             </div>
           </section>
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">Career Preferences</h2>
+          <section v-show="activeTab === 'career'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Career Preferences</h2>
 
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
@@ -272,8 +283,8 @@
             />
           </section>
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">Skills, Interests, and Links</h2>
+          <section v-show="activeTab === 'skills'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Skills, Interests, and Links</h2>
 
             <ProfileTagInput
               label="Skills"
@@ -316,8 +327,8 @@
             <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/60">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-sm font-semibold text-slate-900">GitHub account connection</p>
-                  <p class="mt-1 text-xs text-slate-600">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">GitHub account connection</p>
+                  <p class="mt-1 text-xs text-slate-600 dark:text-slate-300">
                     <span v-if="githubConnectionLoading">Loading connection status...</span>
                     <template v-else-if="githubConnected">
                       Connected
@@ -493,6 +504,7 @@
           </section>
 
           <StudentLanguagesEditor
+            v-show="activeTab === 'portfolio'"
             :languages="form.languages"
             @add="addLanguage"
             @remove="removeLanguage"
@@ -501,6 +513,7 @@
           />
 
           <StudentCertificationsEditor
+            v-show="activeTab === 'portfolio'"
             :certifications="form.certifications"
             @add="addCertification"
             @remove="removeCertification"
@@ -508,26 +521,35 @@
           />
 
           <StudentProjectsEditor
+            v-show="activeTab === 'portfolio'"
             :projects="form.projects"
             @add="addProject"
             @remove="removeProject"
             @update-field="updateProjectField"
           />
 
-          <section class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900">CV Upload (Secure Storage)</h2>
+          <section v-show="activeTab === 'documents'" class="surface-card p-6 sm:p-7 space-y-5">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">CV Upload (Secure Storage)</h2>
             <p class="text-sm text-slate-600 dark:text-slate-300">
               Upload your CV as PDF, DOC, or DOCX. Files are stored in private storage and are not
               publicly accessible.
             </p>
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <label
+                for="cv-upload"
+                class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#4e3aba] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#3f2ea1]"
+              >
+                Choose CV file
+              </label>
               <input
+                id="cv-upload"
                 type="file"
                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 @change="handleCvFileSelected"
-                class="text-sm text-slate-600 dark:text-slate-300"
+                class="sr-only"
               />
+              <span class="text-xs text-slate-500 dark:text-slate-400">{{ cvFileName || 'No file selected' }}</span>
               <BaseButton
                 type="button"
                 variant="secondary"
@@ -609,6 +631,20 @@
               </li>
             </ul>
           </section>
+
+          <div class="surface-card p-4 sm:p-5">
+            <div class="flex justify-end">
+              <BaseButton
+                type="submit"
+                variant="primary"
+                size="lg"
+                :loading="saving"
+                class="!rounded-full px-6"
+              >
+                {{ saveButtonLabel }}
+              </BaseButton>
+            </div>
+          </div>
         </fieldset>
       </form>
     </div>
@@ -651,6 +687,7 @@ import { resolveAssetUrl } from '@/services/core/url'
 
 type TagField = 'skills' | 'interests' | 'preferred_locations'
 type InputField = 'skillInput' | 'interestInput' | 'locationInput'
+type ProfileTab = 'personal' | 'education' | 'career' | 'skills' | 'portfolio' | 'documents'
 
 export default defineComponent({
   name: 'StudentProfileView',
@@ -672,6 +709,7 @@ export default defineComponent({
     return {
       form: createDefaultStudentProfileForm(),
       avatarFile: null as File | null,
+      avatarFileName: '',
       avatarPreview: '',
       skillInput: '',
       interestInput: '',
@@ -681,9 +719,15 @@ export default defineComponent({
       errorMessage: '',
       loading: true,
       saving: false,
-      isEditing: false,
-      initialFormSnapshot: createDefaultStudentProfileForm() as StudentProfileForm,
-      initialAvatarPreview: '',
+      activeTab: 'personal' as ProfileTab,
+      profileTabs: [
+        { id: 'personal' as ProfileTab, label: 'Personal Information' },
+        { id: 'education' as ProfileTab, label: 'Education' },
+        { id: 'career' as ProfileTab, label: 'Career Preferences' },
+        { id: 'skills' as ProfileTab, label: 'Skills & Links' },
+        { id: 'portfolio' as ProfileTab, label: 'Portfolio' },
+        { id: 'documents' as ProfileTab, label: 'Documents' },
+      ],
       githubConnected: false,
       githubConnection: null as GitHubConnectionData | null,
       githubConnectionLoading: true,
@@ -696,6 +740,7 @@ export default defineComponent({
       cvUploadProgress: 0,
       cvUploadPhase: 'idle' as 'idle' | 'uploading' | 'scanning',
       cvFileToUpload: null as File | null,
+      cvFileName: '',
       cvFiles: [] as StudentCvFileItem[],
       downloadingCvId: null as number | null,
       deletingCvId: null as number | null,
@@ -713,6 +758,14 @@ export default defineComponent({
     completionRate(): number {
       return calculateStudentProfileCompletion(this.form)
     },
+    saveButtonLabel(): string {
+      if (this.activeTab === 'personal') return 'Save personal information'
+      if (this.activeTab === 'education') return 'Save education'
+      if (this.activeTab === 'career') return 'Save career preferences'
+      if (this.activeTab === 'skills') return 'Save skills and links'
+      if (this.activeTab === 'portfolio') return 'Save portfolio'
+      return 'Save profile'
+    },
   },
   async mounted() {
     if (this.$route.query.github === 'connected') {
@@ -726,12 +779,8 @@ export default defineComponent({
         this.avatarPreview = resolveAssetUrl(data.avatar_url)
       }
 
-      this.initialFormSnapshot = this.cloneForm(this.form)
-      this.initialAvatarPreview = this.avatarPreview
     } catch {
       // Keep default values for a new profile.
-      this.initialFormSnapshot = this.cloneForm(this.form)
-      this.initialAvatarPreview = this.avatarPreview
     } finally {
       this.loading = false
     }
@@ -740,23 +789,6 @@ export default defineComponent({
     await this.loadCvFiles()
   },
   methods: {
-    cloneForm(form: StudentProfileForm): StudentProfileForm {
-      return JSON.parse(JSON.stringify(form)) as StudentProfileForm
-    },
-    startEditing() {
-      this.isEditing = true
-      this.errorMessage = ''
-      this.successMessage = ''
-    },
-    cancelEditing() {
-      this.form = this.cloneForm(this.initialFormSnapshot)
-      this.avatarPreview = this.initialAvatarPreview
-      this.avatarFile = null
-      this.errors = {}
-      this.errorMessage = ''
-      this.successMessage = ''
-      this.isEditing = false
-    },
     async loadGitHubConnection() {
       this.githubConnectionLoading = true
       try {
@@ -862,6 +894,7 @@ export default defineComponent({
     handleCvFileSelected(event: Event) {
       const file = (event.target as HTMLInputElement).files?.[0] ?? null
       this.cvFileToUpload = file
+      this.cvFileName = file?.name ?? ''
     },
     async handleCvUpload() {
       if (!this.cvFileToUpload) return
@@ -887,6 +920,7 @@ export default defineComponent({
         this.cvUploadProgress = 100
         this.successMessage = 'CV uploaded successfully.'
         this.cvFileToUpload = null
+        this.cvFileName = ''
         await this.loadCvFiles()
       } catch (error: unknown) {
         const typedError = error as { response?: { data?: { message?: string } } }
@@ -972,8 +1006,13 @@ export default defineComponent({
     },
     handleAvatar(event: Event) {
       const file = (event.target as HTMLInputElement).files?.[0]
-      if (!file) return
+      if (!file) {
+        this.avatarFile = null
+        this.avatarFileName = ''
+        return
+      }
       this.avatarFile = file
+      this.avatarFileName = file.name
       this.avatarPreview = URL.createObjectURL(file)
     },
     addTag(field: TagField, rawValue: string, inputField: InputField) {
@@ -1026,8 +1065,6 @@ export default defineComponent({
       project[payload.field] = payload.value
     },
     async handleSubmit() {
-      if (!this.isEditing) return
-
       this.successMessage = ''
       this.errorMessage = ''
 
@@ -1045,10 +1082,8 @@ export default defineComponent({
         const payload = toStudentProfileFormData(this.form, this.avatarFile)
         await ProfileService.updateStudentProfile(payload)
         this.successMessage = 'Profile updated successfully.'
-        this.isEditing = false
         this.avatarFile = null
-        this.initialFormSnapshot = this.cloneForm(this.form)
-        this.initialAvatarPreview = this.avatarPreview
+        this.avatarFileName = ''
       } catch (error: unknown) {
         const typedError = error as {
           response?: {
