@@ -17,9 +17,9 @@
     </template>
 
     <template #right>
-      <section class="rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] sm:rounded-4xl sm:p-10 lg:p-16">
-        <h2 class="text-3xl font-semibold text-[#1d1f31] sm:text-4xl">Create Account</h2>
-        <p class="mt-2 text-sm font-medium text-[#7d8195]">Select your journey type to get started.</p>
+      <section class="rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.5)] sm:rounded-4xl sm:p-10 lg:p-16">
+        <h2 class="text-3xl font-semibold text-[#1d1f31] dark:text-slate-100 sm:text-4xl">Create Account</h2>
+        <p class="mt-2 text-sm font-medium text-[#7d8195] dark:text-slate-400">Select your journey type to get started.</p>
 
         <BaseAlert
           v-if="errorMessage"
@@ -41,14 +41,14 @@
 
         <form @submit.prevent="handleSubmit" novalidate class="mt-5 sm:mt-6">
           <div
-            class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1"
+            class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-700 dark:bg-slate-800"
             role="tablist"
             aria-label="Account type"
           >
             <button
               type="button"
               class="rounded-full px-3 py-2.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
-              :class="form.role === 'student' ? 'bg-white text-[#201f35] shadow-sm' : 'text-[#5f6078]'"
+              :class="form.role === 'student' ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100' : 'text-[#5f6078] dark:text-slate-300'"
               @click="form.role = 'student'"
             >
               As a Student
@@ -56,7 +56,7 @@
             <button
               type="button"
               class="rounded-full px-3 py-2.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
-              :class="form.role === 'company' ? 'bg-white text-[#201f35] shadow-sm' : 'text-[#5f6078]'"
+              :class="form.role === 'company' ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100' : 'text-[#5f6078] dark:text-slate-300'"
               @click="form.role = 'company'"
             >
               As a Company
@@ -74,7 +74,7 @@
                       ? 'border-[#4b35cb] bg-[#4b35cb] text-white'
                       : step < currentStep
                         ? 'border-[#4b35cb]/50 bg-[#ebe5ff] text-[#4b35cb]'
-                        : 'border-[#d7d3e7] bg-white text-[#8b90a7]'
+                        : 'border-[#d7d3e7] bg-white text-[#8b90a7] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
                   "
                 >
                   {{ step }}
@@ -82,11 +82,11 @@
                 <span
                   v-if="step < 3"
                   class="h-0.5 w-6"
-                  :class="step < currentStep ? 'bg-[#4b35cb]/45' : 'bg-[#d7d3e7]'"
+                  :class="step < currentStep ? 'bg-[#4b35cb]/45' : 'bg-[#d7d3e7] dark:bg-slate-700'"
                 />
               </template>
             </div>
-            <p class="mt-2 text-center text-[11px] font-semibold tracking-[0.04em] text-[#4f536f] sm:text-xs sm:tracking-[0.06em]">
+            <p class="mt-2 text-center text-[11px] font-semibold tracking-[0.04em] text-[#4f536f] dark:text-slate-400 sm:text-xs sm:tracking-[0.06em]">
               {{
                 currentStep === 1
                   ? 'Step 1: Account details'
@@ -122,7 +122,7 @@
               <BaseInput
                 v-model="form.email"
                 label="EMAIL"
-                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f]"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="email"
                 placeholder="vance.e@university.edu"
                 autocomplete="email"
@@ -224,9 +224,9 @@
             <TurnstileWidget v-if="!isCompanyFlow" ref="turnstileWidget" v-model="turnstileToken" class="pt-1" />
           </div>
 
-          <label class="mt-4 flex items-start gap-2 text-xs text-[#676b84]">
-            <input type="checkbox" class="mt-0.5 h-4 w-4 rounded border-[#cdc7de] text-[#4b35cb] focus:ring-[#4b35cb]" />
-            <span>I agree to the <span class="font-semibold text-[#4b35cb]">Terms of Service</span> and <span class="font-semibold text-[#4b35cb]">Privacy Policy</span>.</span>
+          <label class="mt-4 flex items-start gap-2 text-xs text-[#676b84] dark:text-slate-400">
+            <input type="checkbox" class="mt-0.5 h-4 w-4 rounded border-[#cdc7de] text-[#4b35cb] focus:ring-[#4b35cb] dark:border-slate-600 dark:bg-slate-800 dark:focus:ring-indigo-400" />
+            <span>I agree to the <span class="font-semibold text-[#4b35cb] dark:text-indigo-300">Terms of Service</span> and <span class="font-semibold text-[#4b35cb] dark:text-indigo-300">Privacy Policy</span>.</span>
           </label>
 
           <div class="mt-5 flex items-center gap-3">
@@ -254,16 +254,16 @@
           </div>
         </form>
 
-        <div class="mt-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a3a7bb] sm:mt-7 sm:text-[11px]">
-          <span class="h-px flex-1 bg-[#ebebf1]" />
+        <div class="mt-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a3a7bb] dark:text-slate-500 sm:mt-7 sm:text-[11px]">
+          <span class="h-px flex-1 bg-[#ebebf1] dark:bg-slate-700" />
           or sign up with
-          <span class="h-px flex-1 bg-[#ebebf1]" />
+          <span class="h-px flex-1 bg-[#ebebf1] dark:bg-slate-700" />
         </div>
 
         <div class="mt-4">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#ebeaf2] bg-white px-4 py-3 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc]"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#ebeaf2] bg-white px-4 py-3 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             @click="handleGoogleLogin"
           >
             <img :src="googleLogo" alt="Google logo" class="h-4 w-4" />
@@ -271,9 +271,9 @@
           </button>
         </div>
 
-        <p class="mt-5 text-center text-sm text-[#686d84] sm:mt-6">
+        <p class="mt-5 text-center text-sm text-[#686d84] dark:text-slate-400 sm:mt-6">
           Already have an account?
-          <RouterLink to="/login" class="font-semibold text-[#4b35cb] hover:text-[#3d28b2]">Sign in</RouterLink>
+          <RouterLink to="/login" class="font-semibold text-[#4b35cb] hover:text-[#3d28b2] dark:text-indigo-300 dark:hover:text-indigo-200">Sign in</RouterLink>
         </p>
       </section>
     </template>

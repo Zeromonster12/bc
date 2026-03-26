@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f8f4ff] px-3 py-3 sm:px-6 sm:py-0 lg:px-8">
+  <div class="min-h-screen bg-[#f8f4ff] px-3 py-3 dark:bg-slate-950 sm:px-6 sm:py-0 lg:px-8">
     <slot name="top-nav">
       <AuthTopNav :prompt-text="promptText" :link-text="linkText" :link-to="linkTo" />
     </slot>

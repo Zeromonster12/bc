@@ -17,9 +17,9 @@
     </template>
 
     <template #right>
-      <section class="rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] sm:rounded-4xl sm:p-10 lg:p-16">
-        <h2 class="text-3xl font-semibold text-[#1d1f31] sm:text-4xl">Welcome Back</h2>
-        <p class="mt-2 text-sm font-medium text-[#7d8195]">Sign in to continue your journey.</p>
+      <section class="rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.5)] sm:rounded-4xl sm:p-10 lg:p-16">
+        <h2 class="text-3xl font-semibold text-[#1d1f31] dark:text-slate-100 sm:text-4xl">Welcome Back</h2>
+        <p class="mt-2 text-sm font-medium text-[#7d8195] dark:text-slate-400">Sign in to continue your journey.</p>
 
         <BaseAlert
           v-if="errorMessage"
@@ -44,7 +44,7 @@
             <BaseInput
               v-model="form.email"
               label="EMAIL"
-              label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f]"
+              label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
               type="email"
               placeholder="vance.e@university.edu"
               autocomplete="email"
@@ -65,7 +65,7 @@
           </div>
 
           <div class="mt-3 flex items-center justify-end">
-            <RouterLink to="/forgot-password" class="text-sm font-medium text-[#4b35cb] hover:text-[#3d28b2]">
+            <RouterLink to="/forgot-password" class="text-sm font-medium text-[#4b35cb] hover:text-[#3d28b2] dark:text-indigo-300 dark:hover:text-indigo-200">
               Forgot your password?
             </RouterLink>
           </div>
@@ -83,16 +83,16 @@
           </button>
         </form>
 
-        <div class="mt-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a3a7bb] sm:mt-7 sm:text-[11px]">
-          <span class="h-px flex-1 bg-[#ebebf1]" />
+        <div class="mt-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a3a7bb] dark:text-slate-500 sm:mt-7 sm:text-[11px]">
+          <span class="h-px flex-1 bg-[#ebebf1] dark:bg-slate-700" />
           or sign in with
-          <span class="h-px flex-1 bg-[#ebebf1]" />
+          <span class="h-px flex-1 bg-[#ebebf1] dark:bg-slate-700" />
         </div>
 
         <div class="mt-4">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#ebeaf2] bg-white px-4 py-3 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc]"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#ebeaf2] bg-white px-4 py-3 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             @click="handleGoogleLogin"
           >
             <img :src="googleLogo" alt="Google logo" class="h-4 w-4" />
@@ -100,9 +100,9 @@
           </button>
         </div>
 
-        <p class="mt-5 text-center text-sm text-[#686d84] sm:mt-6">
+        <p class="mt-5 text-center text-sm text-[#686d84] dark:text-slate-400 sm:mt-6">
           Don't have an account?
-          <RouterLink to="/register" class="font-semibold text-[#4b35cb] hover:text-[#3d28b2]">Sign up</RouterLink>
+          <RouterLink to="/register" class="font-semibold text-[#4b35cb] hover:text-[#3d28b2] dark:text-indigo-300 dark:hover:text-indigo-200">Sign up</RouterLink>
         </p>
       </section>
     </template>

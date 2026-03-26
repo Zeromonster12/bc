@@ -1,18 +1,18 @@
 <template>
   <section
-    class="relative hidden overflow-hidden rounded-4xl bg-[#f6f1ff] px-10 py-12 shadow-[0_10px_30px_rgba(62,43,131,0.08)] lg:flex lg:flex-col lg:justify-between"
+    class="relative hidden overflow-hidden rounded-4xl bg-[#f6f1ff] px-10 py-12 shadow-[0_10px_30px_rgba(62,43,131,0.08)] dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.5)] lg:flex lg:flex-col lg:justify-between"
   >
     <div>
-      <span class="inline-flex rounded-full bg-[#dcd5f2] px-4 py-1 text-xs font-semibold tracking-[0.18em] text-[#4d37c5]">
+      <span class="inline-flex rounded-full bg-[#dcd5f2] px-4 py-1 text-xs font-semibold tracking-[0.18em] text-[#4d37c5] dark:bg-indigo-500/20 dark:text-indigo-200">
         {{ badgeText }}
       </span>
-      <h1 class="mt-7 text-6xl font-semibold leading-[1.03] text-[#15162e]">
+      <h1 class="mt-7 text-6xl font-semibold leading-[1.03] text-[#15162e] dark:text-slate-100">
         {{ titleLine1 }}<br />
         {{ titleLine2 }}<br />
         {{ titleLine3 }}
-        <span class="italic text-[#4d37c5]">{{ titleAccent }}</span>
+        <span class="italic text-[#4d37c5] dark:text-indigo-300">{{ titleAccent }}</span>
       </h1>
-      <p class="mt-6 max-w-md text-[1.32rem] leading-relaxed text-[#474c66]">
+      <p class="mt-6 max-w-md text-[1.32rem] leading-relaxed text-[#474c66] dark:text-slate-300">
         {{ description }}
       </p>
     </div>
@@ -23,8 +23,8 @@
         <span class="h-9 w-9 rounded-full border-2 border-white bg-[#7f6be1]"></span>
         <span class="h-9 w-9 rounded-full border-2 border-white bg-[#a091ea]"></span>
       </div>
-      <p class="text-sm text-[#3d415c]">
-        {{ footerLead }} <span class="font-semibold text-[#17192f]">{{ footerHighlight }}</span>
+      <p class="text-sm text-[#3d415c] dark:text-slate-300">
+        {{ footerLead }} <span class="font-semibold text-[#17192f] dark:text-slate-100">{{ footerHighlight }}</span>
         {{ footerTail }}
       </p>
     </div>

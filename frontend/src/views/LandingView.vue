@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#fcf8ff] text-[#1c1a24]">
+  <div class="min-h-screen bg-[#fcf8ff] text-[#1c1a24] dark:bg-slate-950 dark:text-slate-100">
     <LandingTopBar />
 
     <main class="pt-24 sm:pt-24">
