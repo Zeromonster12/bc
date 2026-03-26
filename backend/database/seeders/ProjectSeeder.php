@@ -27,7 +27,6 @@ class ProjectSeeder extends Seeder
                 'tech_stack' => ['Vue', 'TypeScript', 'Laravel', 'MySQL'],
                 'status' => 'open',
                 'max_students' => 3,
-                'deadline' => now()->addDays(25)->toDateString(),
             ],
             [
                 'title' => 'Inventory Dashboard for SME',
@@ -36,7 +35,6 @@ class ProjectSeeder extends Seeder
                 'tech_stack' => ['Vue', 'Tailwind', 'Chart.js', 'Laravel'],
                 'status' => 'open',
                 'max_students' => 2,
-                'deadline' => now()->addDays(18)->toDateString(),
             ],
             [
                 'title' => 'AI Resume Parser Prototype',
@@ -45,7 +43,6 @@ class ProjectSeeder extends Seeder
                 'tech_stack' => ['Laravel', 'Python', 'OpenAI API'],
                 'status' => 'draft',
                 'max_students' => 2,
-                'deadline' => now()->addDays(35)->toDateString(),
             ],
             [
                 'title' => 'Internal Support Chat Module',
@@ -54,7 +51,6 @@ class ProjectSeeder extends Seeder
                 'tech_stack' => ['Laravel', 'Reverb', 'Vue', 'Redis'],
                 'status' => 'open',
                 'max_students' => 4,
-                'deadline' => now()->addDays(30)->toDateString(),
             ],
             [
                 'title' => 'Company Portfolio Website Revamp',
@@ -63,7 +59,6 @@ class ProjectSeeder extends Seeder
                 'tech_stack' => ['Vue', 'Tailwind', 'Headless CMS'],
                 'status' => 'open',
                 'max_students' => 2,
-                'deadline' => now()->addDays(20)->toDateString(),
             ],
             [
                 'title' => 'Analytics ETL for Hiring Funnel',
@@ -72,7 +67,6 @@ class ProjectSeeder extends Seeder
                 'tech_stack' => ['Laravel', 'MySQL', 'Metabase'],
                 'status' => 'draft',
                 'max_students' => 2,
-                'deadline' => now()->addDays(40)->toDateString(),
             ],
         ];
 
@@ -90,7 +84,6 @@ class ProjectSeeder extends Seeder
                     'tech_stack' => $template['tech_stack'],
                     'status' => $template['status'],
                     'max_students' => $template['max_students'],
-                    'deadline' => $template['deadline'],
                 ]
             );
         }

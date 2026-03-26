@@ -52,38 +52,39 @@
         </span>
       </RouterLink>
 
-      <div class="pt-2">
-        <button
-          type="button"
+    </div>
+
+    <div class="px-3 pb-0">
+      <button
+        type="button"
+        :class="[
+          'group flex items-center rounded-2xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
+          collapsed && !mobile
+            ? isHoverExpanded
+              ? 'h-9 w-full justify-start px-3'
+              : 'mx-auto h-9 w-9 justify-center overflow-hidden p-0'
+            : 'w-full gap-2.5 px-3 py-2',
+        ]"
+        @click="toggleTheme"
+        :aria-label="themeStore.resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+      >
+        <span class="inline-flex h-7 w-7 items-center justify-center text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]">
+          <Moon v-if="themeStore.resolvedTheme === 'dark'" class="h-4 w-4" />
+          <Sun v-else class="h-4 w-4" />
+        </span>
+        <span
           :class="[
-            'group flex items-center rounded-2xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
+            'truncate whitespace-nowrap transition-all duration-200',
             collapsed && !mobile
               ? isHoverExpanded
-                ? 'h-9 w-full justify-start px-3'
-                : 'mx-auto h-9 w-9 justify-center overflow-hidden p-0'
-              : 'gap-2.5 px-3 py-2',
+                ? 'ml-2 max-w-42 opacity-100'
+                : 'max-w-0 opacity-0'
+              : '',
           ]"
-          @click="toggleTheme"
-          :aria-label="themeStore.resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
         >
-          <span class="inline-flex h-7 w-7 items-center justify-center text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]">
-            <Moon v-if="themeStore.resolvedTheme === 'dark'" class="h-4 w-4" />
-            <Sun v-else class="h-4 w-4" />
-          </span>
-          <span
-            :class="[
-              'truncate whitespace-nowrap transition-all duration-200',
-              collapsed && !mobile
-                ? isHoverExpanded
-                  ? 'ml-2 max-w-42 opacity-100'
-                  : 'max-w-0 opacity-0'
-                : '',
-            ]"
-          >
-            {{ themeStore.resolvedTheme === 'dark' ? 'Dark Mode' : 'Light Mode' }}
-          </span>
-        </button>
-      </div>
+          {{ themeStore.resolvedTheme === 'dark' ? 'Dark Mode' : 'Light Mode' }}
+        </span>
+      </button>
     </div>
 
     <div
@@ -112,6 +113,7 @@
             :src="avatarUrl"
             alt="User avatar"
             class="h-full w-full object-cover"
+            @error="handleAvatarError"
           />
           <span v-else>{{ initials }}</span>
         </div>
@@ -225,12 +227,16 @@ export default defineComponent({
     hoverCloseTimeoutId: number | null
     hoverCloseDelayMs: number
     profileMenuOpen: boolean
+    avatarRefreshAttempted: boolean
+    avatarLoadFailed: boolean
   } {
     return {
       hoveredLink: null,
       hoverCloseTimeoutId: null,
       hoverCloseDelayMs: 420,
       profileMenuOpen: false,
+      avatarRefreshAttempted: false,
+      avatarLoadFailed: false,
       links: [
         {
           name: 'dashboard',
@@ -297,6 +303,7 @@ export default defineComponent({
         .slice(0, 2)
     },
     avatarUrl(): string {
+      if (this.avatarLoadFailed) return ''
       return resolveAssetUrl(this.auth.user?.avatar_url)
     },
     profileRoute(): string {
@@ -306,6 +313,18 @@ export default defineComponent({
     },
   },
   methods: {
+    async handleAvatarError(): Promise<void> {
+      if (this.avatarRefreshAttempted) {
+        this.avatarLoadFailed = true
+        return
+      }
+
+      this.avatarRefreshAttempted = true
+      const refreshed = await this.auth.fetchUserSilently()
+      if (!refreshed) {
+        this.avatarLoadFailed = true
+      }
+    },
     toggleTheme(): void {
       this.themeStore.toggleTheme()
     },
@@ -358,6 +377,12 @@ export default defineComponent({
   },
   mounted() {
     document.addEventListener('click', this.handleOutsideClick)
+  },
+  watch: {
+    'auth.user.avatar_url'() {
+      this.avatarRefreshAttempted = false
+      this.avatarLoadFailed = false
+    },
   },
   beforeUnmount() {
     this.clearHoverCloseTimeout()

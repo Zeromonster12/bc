@@ -119,6 +119,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(StudentProfile::class);
     }
 
+    public function companyProfile(): HasOne
+    {
+        return $this->hasOne(CompanyProfile::class);
+    }
+
     public function chatConversations(): BelongsToMany
     {
         return $this->belongsToMany(Conversation::class, 'conversation_participants')

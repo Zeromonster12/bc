@@ -4,20 +4,20 @@ export interface CreateProjectForm {
   title: string
   description: string
   requirements: string
+  location: string
   tech_stack: string[]
   status: string
   max_students: number
-  deadline: string
 }
 
 export const createDefaultProjectForm = (): CreateProjectForm => ({
   title: '',
   description: '',
   requirements: '',
+  location: '',
   tech_stack: [],
   status: 'draft',
   max_students: 1,
-  deadline: '',
 })
 
 export const addTechTag = (form: CreateProjectForm, rawValue: string): CreateProjectForm => {

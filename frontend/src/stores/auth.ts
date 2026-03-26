@@ -94,6 +94,17 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async fetchUserSilently(): Promise<boolean> {
+      if (!this.token) return false
+      try {
+        const result = await AuthService.getUser()
+        this.user = result.data
+        return true
+      } catch {
+        return false
+      }
+    },
+
     setAuthenticatedSession(result: AuthResult) {
       this.token = result.token
       this.user = result.data

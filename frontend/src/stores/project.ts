@@ -7,10 +7,11 @@ interface Project {
   title: string
   description: string
   requirements: string | null
+  location?: string | null
   tech_stack: string[]
   status: string
   max_students: number
-  deadline: string | null
+  posted_at?: string | null
   applications_count: number
   created_at: string
 }

@@ -1,10 +1,11 @@
 <template>
   <span
     :class="[
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+      'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset',
       statusClasses,
     ]"
   >
+    <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClasses"></span>
     {{ label }}
   </span>
 </template>
@@ -12,21 +13,29 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-const CONFIG: Record<string, { label: string; classes: string }> = {
-  draft: { label: 'Draft', classes: 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-300' },
-  open: { label: 'Open', classes: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' },
-  in_progress: {
-    label: 'In Progress',
-    classes: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300',
+const CONFIG: Record<string, { label: string; classes: string; dotClasses: string }> = {
+  draft: {
+    label: 'Draft',
+    classes: 'bg-gray-100 text-gray-600 ring-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600',
+    dotClasses: 'bg-gray-500 dark:bg-slate-300',
   },
-  completed: {
-    label: 'Completed',
-    classes: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
+  open: {
+    label: 'Open',
+    classes: 'bg-green-100 text-green-700 ring-green-200 dark:bg-green-500/20 dark:text-green-300 dark:ring-green-500/40',
+    dotClasses: 'bg-green-500 dark:bg-green-300',
   },
-  cancelled: { label: 'Cancelled', classes: 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-300' },
+  closed: {
+    label: 'Closed',
+    classes: 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-700/70 dark:text-slate-200 dark:ring-slate-600',
+    dotClasses: 'bg-slate-500 dark:bg-slate-300',
+  },
 }
 
-const FALLBACK_CONFIG = { label: 'Draft', classes: 'bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-300' }
+const FALLBACK_CONFIG = {
+  label: 'Draft',
+  classes: 'bg-gray-100 text-gray-600 ring-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600',
+  dotClasses: 'bg-gray-500 dark:bg-slate-300',
+}
 
 export default defineComponent({
   name: 'ProjectStatusBadge',
@@ -37,7 +46,7 @@ export default defineComponent({
     },
   },
   computed: {
-    config(): { label: string; classes: string } {
+    config(): { label: string; classes: string; dotClasses: string } {
       const config = CONFIG[this.status]
       return config ?? FALLBACK_CONFIG
     },
@@ -46,6 +55,9 @@ export default defineComponent({
     },
     statusClasses(): string {
       return this.config.classes
+    },
+    statusDotClasses(): string {
+      return this.config.dotClasses
     },
   },
 })

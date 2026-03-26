@@ -58,7 +58,7 @@ export default defineComponent({
   },
   methods: {
     updateField(payload: {
-      field: 'title' | 'description' | 'requirements' | 'status' | 'max_students' | 'deadline'
+      field: 'title' | 'location' | 'description' | 'requirements' | 'status' | 'max_students'
       value: string | number
     }) {
       ;(this.form[payload.field] as string | number) = payload.value

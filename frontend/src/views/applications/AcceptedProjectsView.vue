@@ -48,10 +48,13 @@
               <p class="text-sm text-gray-600 dark:text-slate-300">
                 Company: {{ application.project?.company?.name ?? 'Unknown' }}
               </p>
+              <p v-if="application.project?.location" class="mt-1 text-xs text-gray-500 dark:text-slate-400">
+                Location: {{ application.project?.location }}
+              </p>
               <p class="mt-1 text-xs text-gray-500 dark:text-slate-400">
                 Project status: {{ projectStatusLabel(application.project?.status) }}
-                <span v-if="application.project?.deadline">
-                  | Deadline: {{ formatDate(application.project?.deadline) }}</span
+                <span v-if="application.project?.posted_at">
+                  | Posted: {{ formatDate(application.project?.posted_at) }}</span
                 >
               </p>
             </div>
@@ -171,7 +174,8 @@ interface AcceptedApplicationItem {
   project?: {
     title?: string
     status?: string
-    deadline?: string | null
+    location?: string | null
+    posted_at?: string | null
     company?: {
       name?: string
     }

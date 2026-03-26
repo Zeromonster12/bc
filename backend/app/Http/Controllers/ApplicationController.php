@@ -43,8 +43,9 @@ class ApplicationController extends Controller
 
         $query = Application::query()
             ->with([
-                'project:id,company_user_id,title,status,deadline',
+                'project:id,company_user_id,title,status,location,created_at',
                 'project.companyUser:id,name',
+                'project.companyUser.companyProfile:id,user_id,profile_data',
                 'studentUser:id,name,email',
                 'studentUser.studentProfile:id,user_id,avatar_path',
                 'studentUser.githubAccount:id,user_id,provider,profile_data',
@@ -110,8 +111,9 @@ class ApplicationController extends Controller
         ]);
 
         $application->load([
-            'project:id,company_user_id,title,status,deadline',
+            'project:id,company_user_id,title,status,location,created_at',
             'project.companyUser:id,name',
+            'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
             'studentUser.studentProfile:id,user_id,avatar_path',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
@@ -157,8 +159,9 @@ class ApplicationController extends Controller
         $application->update($updatePayload);
 
         $application->load([
-            'project:id,company_user_id,title,status,deadline',
+            'project:id,company_user_id,title,status,location,created_at',
             'project.companyUser:id,name',
+            'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
             'studentUser.studentProfile:id,user_id,avatar_path',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
@@ -199,8 +202,9 @@ class ApplicationController extends Controller
         }
 
         $application->load([
-            'project:id,company_user_id,title,status,deadline',
+            'project:id,company_user_id,title,status,location,created_at',
             'project.companyUser:id,name',
+            'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
             'studentUser.studentProfile:id,user_id,avatar_path',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
@@ -307,8 +311,9 @@ class ApplicationController extends Controller
 
         $task->load('assignee:id,name,email');
         $application->load([
-            'project:id,company_user_id,title,status,deadline',
+            'project:id,company_user_id,title,status,location,created_at',
             'project.companyUser:id,name',
+            'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
             'studentUser.studentProfile:id,user_id,avatar_path',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
@@ -446,6 +451,13 @@ class ApplicationController extends Controller
     {
         $githubAccount = $application->studentUser?->githubAccount;
         $githubProfileData = is_array($githubAccount?->profile_data) ? $githubAccount->profile_data : [];
+        $companyProfileData = is_array($application->project?->companyUser?->companyProfile?->profile_data)
+            ? $application->project->companyUser->companyProfile->profile_data
+            : [];
+        $companyName = trim((string) ($companyProfileData['business_name']
+            ?? $companyProfileData['name']
+            ?? $application->project?->companyUser?->name
+            ?? ''));
 
         return [
             'id' => $application->id,
@@ -455,9 +467,10 @@ class ApplicationController extends Controller
                 'id' => $application->project?->id,
                 'title' => $application->project?->title,
                 'status' => $application->project?->status,
-                'deadline' => optional($application->project?->deadline)?->toDateString(),
+                'location' => $application->project?->location,
+                'posted_at' => optional($application->project?->created_at)?->toISOString(),
                 'company' => [
-                    'name' => $application->project?->companyUser?->name,
+                    'name' => $companyName !== '' ? $companyName : null,
                 ],
             ],
             'student' => [

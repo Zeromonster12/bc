@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen overflow-hidden bg-transparent">
+  <div class="min-h-screen bg-transparent">
     <button
       type="button"
       class="fixed left-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur lg:hidden dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-300"
@@ -12,7 +12,7 @@
     </button>
 
     <div class="flex min-h-screen">
-      <aside class="hidden lg:block p-4">
+      <aside class="hidden self-start p-4 lg:sticky lg:top-0 lg:block lg:h-screen">
         <Sidebar :collapsed="true" />
       </aside>
 
@@ -44,8 +44,8 @@
         </aside>
       </Transition>
 
-      <div class="flex-1 flex flex-col overflow-hidden">
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <div class="flex-1 flex flex-col">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
           <slot />
         </main>
       </div>

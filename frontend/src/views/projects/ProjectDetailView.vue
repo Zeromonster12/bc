@@ -1,44 +1,123 @@
 <template>
   <AppLayout>
-    <!-- Loading skeleton -->
-    <div v-if="loading" class="space-y-4">
-      <div class="h-8 w-64 rounded bg-gray-100 animate-pulse dark:bg-slate-800" />
-      <div class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+    <div v-if="loading" class="space-y-4 pt-12 lg:pt-0">
+      <div class="h-12 w-full rounded-2xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+      <div class="h-80 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+      <div class="h-56 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
     </div>
 
-    <!-- Error -->
     <BaseAlert v-else-if="fetchError" type="error" :message="fetchError" class="mt-4" />
 
-    <!-- Content -->
     <template v-else-if="project">
-      <div class="space-y-6">
-        <ProjectDetailHeader
-          :project="project"
-          :is-owner-company="auth.isCompany && project.company?.user_id === auth.user?.id"
-          :can-student-apply="auth.isStudent && project.status === 'open'"
-          :has-applied="hasApplied"
-          :deleting="deleting"
-          @delete="confirmDelete"
-          @open-apply="showApplyModal = true"
-        />
+      <div class="space-y-8 pt-12 lg:space-y-10 lg:pt-0">
+        <section class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-linear-to-br from-slate-50 via-white to-indigo-50/50 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/30 sm:p-7 lg:p-10">
+          <div class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-indigo-400/10 blur-3xl"></div>
+          <div class="pointer-events-none absolute -bottom-28 -left-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl"></div>
 
-        <!-- Details grid -->
-        <div class="grid lg:grid-cols-3 gap-6">
-          <!-- Main content -->
-          <div class="lg:col-span-2 space-y-6">
-            <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
-              <div>
-                <h2 class="mb-2 text-base font-semibold text-gray-900 dark:text-slate-100">Description</h2>
-                <p class="whitespace-pre-line text-sm text-gray-600 dark:text-slate-300">{{ project.description }}</p>
+          <div class="relative z-10 flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+            <div class="max-w-3xl space-y-5">
+              <button
+                type="button"
+                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                @click="goBack"
+              >
+                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6" />
+                </svg>
+                Back
+              </button>
+
+              <div class="flex flex-wrap items-center gap-3">
+                <ProjectStatusBadge :status="project.status ?? 'draft'" />
+                <span class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ project.company?.name ?? 'Unknown company' }}</span>
               </div>
-              <div>
-                <h2 class="mb-2 text-base font-semibold text-gray-900 dark:text-slate-100">Requirements</h2>
-                <p class="whitespace-pre-line text-sm text-gray-600 dark:text-slate-300">{{ project.requirements }}</p>
+
+              <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl lg:text-5xl">
+                {{ project.title }}
+              </h1>
+
+              <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:text-base">
+                {{ project.description }}
+              </p>
+
+              <div class="grid gap-3 sm:grid-cols-3">
+                <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Posted</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ formatDate(project.posted_at ?? project.created_at ?? '') }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Location</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ project.location || 'Not specified' }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Applications</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ project.applications_count ?? 0 }}</p>
+                </div>
               </div>
             </div>
 
-            <!-- Applications for company -->
-            <div v-if="auth.isCompany && project.company?.user_id === auth.user?.id">
+            <div class="flex w-full flex-wrap items-center gap-2 xl:w-auto xl:justify-end">
+              <template v-if="isOwnerCompany">
+                <RouterLink :to="'/projects/' + project.id + '/edit'">
+                  <BaseButton variant="secondary" size="sm">Edit</BaseButton>
+                </RouterLink>
+                <BaseButton variant="danger" size="sm" :loading="deleting" @click="confirmDelete">
+                  Delete
+                </BaseButton>
+              </template>
+
+              <template v-if="canStudentApply">
+                <button
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                  @click="showApplyModal = true"
+                  :disabled="hasApplied"
+                >
+                  {{ hasApplied ? 'Applied' : 'Apply now' }}
+                </button>
+              </template>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid gap-8 lg:grid-cols-12">
+          <div class="space-y-8 lg:col-span-8">
+            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-8">
+              <h2 class="mb-5 flex items-center gap-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
+                About the Project
+                <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
+              </h2>
+              <p class="whitespace-pre-line text-[15px] leading-relaxed text-slate-600 dark:text-slate-300">
+                {{ project.description }}
+              </p>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-8">
+              <h2 class="mb-5 flex items-center gap-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
+                Requirements & Skills
+                <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
+              </h2>
+
+              <p
+                v-if="project.requirements"
+                class="whitespace-pre-line text-[15px] leading-relaxed text-slate-600 dark:text-slate-300"
+              >
+                {{ project.requirements }}
+              </p>
+              <p v-else class="text-sm text-slate-500 dark:text-slate-400">No specific requirements were provided yet.</p>
+
+              <div v-if="project.tech_stack?.length" class="mt-6 flex flex-wrap gap-2">
+                <span
+                  v-for="tech in project.tech_stack"
+                  :key="tech"
+                  class="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/20 dark:text-indigo-300"
+                >
+                  {{ tech }}
+                </span>
+              </div>
+            </div>
+
+            <div v-if="isOwnerCompany" class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-8">
               <h2 class="mb-3 text-lg font-semibold text-gray-900 dark:text-slate-100">
                 Applications
                 <span class="ml-2 rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
@@ -55,25 +134,13 @@
                 No applications yet.
               </div>
               <div v-else class="space-y-3">
-                <ApplicationCard
-                  v-for="app in applicationStore.applications"
-                  :key="app.id"
-                  :application="app"
-                >
+                <ApplicationCard v-for="app in applicationStore.applications" :key="app.id" :application="app">
                   <template #actions>
                     <div class="flex gap-2 mt-3" v-if="app.status === 'pending'">
-                      <BaseButton
-                        variant="primary"
-                        size="sm"
-                        @click="updateStatus(app.id, 'accepted')"
-                      >
+                      <BaseButton variant="primary" size="sm" @click="updateStatus(app.id, 'accepted')">
                         Accept
                       </BaseButton>
-                      <BaseButton
-                        variant="danger"
-                        size="sm"
-                        @click="updateStatus(app.id, 'rejected')"
-                      >
+                      <BaseButton variant="danger" size="sm" @click="updateStatus(app.id, 'rejected')">
                         Reject
                       </BaseButton>
                     </div>
@@ -83,11 +150,119 @@
             </div>
           </div>
 
-          <ProjectDetailSidebar
-            :project="project"
-            :formatted-deadline="formatDate(project.deadline ?? '')"
-          />
-        </div>
+          <aside class="space-y-6 lg:col-span-4">
+            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+              <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Project Overview</h3>
+              <div class="space-y-3 text-sm">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Company</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.company?.name ?? 'Unknown' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Status</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.status ?? 'draft' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Posted</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ formatDate(project.posted_at ?? project.created_at ?? '') }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Location</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.location || 'Not specified' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Max students</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.max_students ?? '-' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+              <h3 class="mb-5 text-lg font-semibold text-slate-900 dark:text-slate-100">Timeline</h3>
+              <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 0a6 6 0 0 1 6 6m-6-6a6 6 0 0 0-6 6m6 9c3.314 0 6-2.686 6-6m-6 6c-3.314 0-6-2.686-6-6m6 0-2.5 2.5M12 15l2.5-2.5" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Project posted</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ formatDate(project.posted_at ?? project.created_at ?? '') }}</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm8 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6ZM3 19a5 5 0 0 1 10 0m8 0a5 5 0 0 0-8-4.33" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Applications in progress</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Current status: {{ project.status ?? 'draft' }}</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14v12H5z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 20h6M12 16v4" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Selection and start</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Date to be confirmed by company</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+              <h3 class="mb-2 text-base font-semibold text-slate-900 dark:text-slate-100">Location</h3>
+              <div class="mb-4 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 dark:border-slate-700/70 dark:bg-slate-800/70">
+                <iframe
+                  v-if="mapQuery"
+                  :src="mapEmbedUrl"
+                  class="h-44 w-full"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  title="Project location map"
+                />
+                <div
+                  v-else
+                  class="flex h-44 w-full items-center justify-center text-xs font-medium text-slate-500 dark:text-slate-400"
+                >
+                  No location available for map preview
+                </div>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-300">{{ project.location || 'Not specified' }}</p>
+              <a
+                v-if="mapQuery"
+                :href="mapExternalUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-2 inline-flex text-xs font-semibold text-indigo-600 transition hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200"
+              >
+                Open in maps
+              </a>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Internship place provided by company.</p>
+            </div>
+
+            <div class="rounded-3xl border border-indigo-200/70 bg-indigo-50/70 p-6 dark:border-indigo-500/30 dark:bg-indigo-500/10">
+              <h3 class="mb-2 text-base font-semibold text-indigo-700 dark:text-indigo-300">Need more info?</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-300">Reach out to the company via application and cover letter.</p>
+              <button
+                v-if="canStudentApply"
+                type="button"
+                class="mt-4 inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                @click="showApplyModal = true"
+                :disabled="hasApplied"
+              >
+                {{ hasApplied ? 'Applied' : 'Apply now' }}
+              </button>
+            </div>
+          </aside>
+        </section>
       </div>
 
       <ProjectApplyModal
@@ -110,8 +285,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import ApplicationCard from '@/components/applications/ApplicationCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
-import ProjectDetailHeader from '@/components/projects/ProjectDetailHeader.vue'
-import ProjectDetailSidebar from '@/components/projects/ProjectDetailSidebar.vue'
+import ProjectStatusBadge from '@/components/projects/ProjectStatusBadge.vue'
 import ProjectApplyModal from '@/components/projects/ProjectApplyModal.vue'
 
 interface ProjectOwnerCompany {
@@ -125,7 +299,9 @@ interface ProjectDetail {
   status?: string
   description?: string
   requirements?: string
-  deadline?: string
+  location?: string | null
+  posted_at?: string
+  created_at?: string
   max_students?: number
   applications_count?: number
   company?: ProjectOwnerCompany
@@ -145,8 +321,7 @@ export default defineComponent({
     ApplicationCard,
     BaseButton,
     BaseAlert,
-    ProjectDetailHeader,
-    ProjectDetailSidebar,
+    ProjectStatusBadge,
     ProjectApplyModal,
   },
   setup() {
@@ -171,6 +346,26 @@ export default defineComponent({
     project(): ProjectDetail | null {
       return this.projectStore.currentProject as ProjectDetail | null
     },
+    isOwnerCompany(): boolean {
+      return this.auth.isCompany && this.project?.company?.user_id === this.auth.user?.id
+    },
+    canStudentApply(): boolean {
+      return this.auth.isStudent && this.project?.status === 'open'
+    },
+    mapQuery(): string {
+      const location = this.project?.location?.trim() ?? ''
+      if (location) return location
+
+      return this.project?.company?.name?.trim() ?? ''
+    },
+    mapEmbedUrl(): string {
+      if (!this.mapQuery) return ''
+      return `https://www.google.com/maps?q=${encodeURIComponent(this.mapQuery)}&z=13&output=embed`
+    },
+    mapExternalUrl(): string {
+      if (!this.mapQuery) return '#'
+      return `https://www.google.com/maps?q=${encodeURIComponent(this.mapQuery)}`
+    },
     hasApplied(): boolean {
       return this.applicationStore.applications.some(
         (a) => (a as ProjectApplication).project_id === this.project?.id,
@@ -194,6 +389,13 @@ export default defineComponent({
     }
   },
   methods: {
+    goBack() {
+      if (window.history.length > 1) {
+        this.$router.back()
+        return
+      }
+      this.$router.push('/projects')
+    },
     formatDate(date: string): string {
       return date
         ? new Date(date).toLocaleDateString('en-US', {

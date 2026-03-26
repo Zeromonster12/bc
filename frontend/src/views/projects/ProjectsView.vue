@@ -1,17 +1,64 @@
 <template>
   <AppLayout>
-    <div class="space-y-6">
-      <div class="flex items-center justify-between">
+    <div class="space-y-5 pt-12 lg:space-y-6 lg:pt-0">
+      <div class="flex items-center justify-between gap-3">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Projects</h1>
-        <RouterLink v-if="auth.isCompany" to="/projects/create">
-          <BaseButton variant="primary" size="sm">+ New project</BaseButton>
-        </RouterLink>
       </div>
 
-      <ProjectFilters @change="handleFilterChange" />
+      <ProjectFilters :tech-options="availableTechOptions" @change="handleFilterChange">
+        <template #actions>
+          <div class="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap">
+            <div class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-600 dark:bg-slate-800">
+              <button
+                type="button"
+                class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+                :class="
+                  viewMode === 'grid'
+                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
+                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                "
+                @click="viewMode = 'grid'"
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+                :class="
+                  viewMode === 'list'
+                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
+                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                "
+                @click="viewMode = 'list'"
+              >
+                List
+              </button>
+            </div>
 
-      <div v-if="projectStore.loading" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="n in 6" :key="n" class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+            <RouterLink v-if="auth.isCompany" to="/projects/create">
+              <span
+                class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-3 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 sm:px-5 sm:py-2.5 sm:text-sm"
+              >
+                + New project
+              </span>
+            </RouterLink>
+          </div>
+        </template>
+      </ProjectFilters>
+
+      <div
+        v-if="projectStore.loading"
+        :class="
+          viewMode === 'grid'
+            ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
+            : 'grid gap-4 grid-cols-1'
+        "
+      >
+        <div
+          v-for="n in viewMode === 'grid' ? 6 : 4"
+          :key="n"
+          class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800"
+        />
       </div>
 
       <template v-else>
@@ -20,7 +67,14 @@
           <p class="font-medium">No projects found</p>
           <p class="text-sm mt-1">Try adjusting your filters.</p>
         </div>
-        <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-else
+          :class="
+            viewMode === 'grid'
+              ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
+              : 'grid gap-4 grid-cols-1'
+          "
+        >
           <ProjectCard
             v-for="project in projectStore.projects"
             :key="project.id"
@@ -50,12 +104,11 @@ import { buildProjectsListParams } from '@/services/projects/ProjectsViewService
 import AppLayout from '@/layouts/AppLayout.vue'
 import ProjectCard from '@/components/projects/ProjectCard.vue'
 import ProjectFilters from '@/components/projects/ProjectFilters.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
 
 export default defineComponent({
   name: 'ProjectsView',
-  components: { AppLayout, ProjectCard, ProjectFilters, BaseButton, BasePagination },
+  components: { AppLayout, ProjectCard, ProjectFilters, BasePagination },
   setup() {
     return {
       auth: useAuthStore(),
@@ -65,7 +118,18 @@ export default defineComponent({
   data() {
     return {
       filters: {} as Record<string, unknown>,
+      viewMode: 'grid' as 'grid' | 'list',
     }
+  },
+  computed: {
+    availableTechOptions(): string[] {
+      const fromProjects = this.projectStore.projects.flatMap((project) => project.tech_stack ?? [])
+      const selected = Array.isArray(this.filters.tech_stack)
+        ? (this.filters.tech_stack as string[])
+        : []
+
+      return Array.from(new Set([...fromProjects, ...selected])).sort((a, b) => a.localeCompare(b))
+    },
   },
   mounted() {
     this.projectStore.fetchProjects(buildProjectsListParams(this.filters, 1))

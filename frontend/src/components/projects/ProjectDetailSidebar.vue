@@ -6,8 +6,12 @@
         <span class="font-medium text-gray-900 dark:text-slate-100">{{ project.company?.name }}</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-gray-500 dark:text-slate-400">Deadline</span>
-        <span class="font-medium text-gray-900 dark:text-slate-100">{{ formattedDeadline }}</span>
+        <span class="text-gray-500 dark:text-slate-400">Posted</span>
+        <span class="font-medium text-gray-900 dark:text-slate-100">{{ formattedPostedAt }}</span>
+      </div>
+      <div class="flex justify-between gap-4">
+        <span class="text-gray-500 dark:text-slate-400">Location</span>
+        <span class="text-right font-medium text-gray-900 dark:text-slate-100">{{ project.location || 'Not specified' }}</span>
       </div>
       <div class="flex justify-between">
         <span class="text-gray-500 dark:text-slate-400">Max students</span>
@@ -44,6 +48,7 @@ interface ProjectDetailSidebarItem {
   company?: {
     name?: string
   }
+  location?: string | null
   max_students?: number
   applications_count?: number
   tech_stack?: string[]
@@ -56,7 +61,7 @@ export default defineComponent({
       type: Object as PropType<ProjectDetailSidebarItem>,
       required: true,
     },
-    formattedDeadline: {
+    formattedPostedAt: {
       type: String,
       default: '-',
     },

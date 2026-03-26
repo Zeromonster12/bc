@@ -16,17 +16,16 @@ class Project extends Model
         'title',
         'description',
         'requirements',
+        'location',
         'tech_stack',
         'status',
         'max_students',
-        'deadline',
     ];
 
     protected function casts(): array
     {
         return [
             'tech_stack' => 'array',
-            'deadline' => 'date',
         ];
     }
 

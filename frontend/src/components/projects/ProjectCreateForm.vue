@@ -12,6 +12,14 @@
       @update:modelValue="$emit('update-field', { field: 'title', value: $event })"
     />
 
+    <BaseInput
+      :model-value="form.location"
+      label="Location"
+      :error="errors.location"
+      placeholder="e.g. Bratislava / Hybrid / Remote"
+      @update:modelValue="$emit('update-field', { field: 'location', value: $event })"
+    />
+
     <div>
       <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
       <textarea
@@ -96,15 +104,6 @@
       </div>
     </div>
 
-    <BaseInput
-      :model-value="form.deadline"
-      label="Application deadline"
-      type="date"
-      :error="errors.deadline"
-      required
-      @update:modelValue="$emit('update-field', { field: 'deadline', value: $event })"
-    />
-
     <div class="flex justify-end gap-3 pt-2">
       <BaseButton type="button" variant="secondary" @click="$emit('cancel')">Cancel</BaseButton>
       <BaseButton type="submit" variant="primary" :loading="loading">Create project</BaseButton>
@@ -120,12 +119,12 @@ import ProfileTagInput from '@/components/profile/ProfileTagInput.vue'
 
 interface ProjectFormData {
   title: string
+  location: string
   description: string
   requirements: string
   tech_stack: string[]
   status: string
   max_students: number
-  deadline: string
 }
 
 export default defineComponent({

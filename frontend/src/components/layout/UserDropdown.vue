@@ -12,6 +12,7 @@
           :src="avatarUrl"
           alt="User avatar"
           class="h-full w-full object-cover"
+          @error="handleAvatarError"
         />
         <span v-else>{{ initials }}</span>
       </div>
@@ -59,7 +60,11 @@ export default defineComponent({
     return { auth: useAuthStore() }
   },
   data() {
-    return { open: false }
+    return {
+      open: false,
+      avatarRefreshAttempted: false,
+      avatarLoadFailed: false,
+    }
   },
   computed: {
     initials(): string {
@@ -71,6 +76,7 @@ export default defineComponent({
         .slice(0, 2)
     },
     avatarUrl(): string {
+      if (this.avatarLoadFailed) return ''
       return resolveAssetUrl(this.auth.user?.avatar_url)
     },
     profileRoute(): string {
@@ -82,10 +88,28 @@ export default defineComponent({
   mounted() {
     document.addEventListener('click', this.handleOutsideClick)
   },
+  watch: {
+    'auth.user.avatar_url'() {
+      this.avatarRefreshAttempted = false
+      this.avatarLoadFailed = false
+    },
+  },
   beforeUnmount() {
     document.removeEventListener('click', this.handleOutsideClick)
   },
   methods: {
+    async handleAvatarError() {
+      if (this.avatarRefreshAttempted) {
+        this.avatarLoadFailed = true
+        return
+      }
+
+      this.avatarRefreshAttempted = true
+      const refreshed = await this.auth.fetchUserSilently()
+      if (!refreshed) {
+        this.avatarLoadFailed = true
+      }
+    },
     async handleLogout() {
       this.open = false
       await this.auth.logout()

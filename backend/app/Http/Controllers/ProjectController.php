@@ -13,6 +13,10 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'in:draft,open,closed'],
+            'location' => ['nullable', 'string', 'max:120'],
+            'sort_date' => ['nullable', 'in:newest,oldest'],
+            'tech_stack' => ['nullable', 'array'],
+            'tech_stack.*' => ['string', 'max:50'],
             'company_id' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
@@ -20,7 +24,10 @@ class ProjectController extends Controller
         $perPage = $validated['per_page'] ?? 12;
 
         $projects = Project::query()
-            ->with('companyUser:id,name')
+            ->with([
+                'companyUser:id,name',
+                'companyUser.companyProfile:id,user_id,profile_data',
+            ])
             ->withCount('applications')
             ->when($validated['search'] ?? null, function ($query, $search): void {
                 $query->where(function ($inner) use ($search): void {
@@ -29,8 +36,22 @@ class ProjectController extends Controller
                 });
             })
             ->when($validated['status'] ?? null, fn($query, $status) => $query->where('status', $status))
+            ->when($validated['location'] ?? null, function ($query, $location): void {
+                $query->where('location', 'like', '%' . $location . '%');
+            })
+            ->when($validated['tech_stack'] ?? null, function ($query, $techStack): void {
+                $query->where(function ($inner) use ($techStack): void {
+                    foreach ($techStack as $technology) {
+                        $inner->orWhereJsonContains('tech_stack', $technology);
+                    }
+                });
+            })
             ->when($validated['company_id'] ?? null, fn($query, $companyId) => $query->where('company_user_id', $companyId))
-            ->latest('id')
+            ->when(
+                ($validated['sort_date'] ?? 'newest') === 'oldest',
+                fn($query) => $query->oldest('created_at'),
+                fn($query) => $query->latest('created_at')
+            )
             ->paginate($perPage);
 
         return response()->json([
@@ -46,7 +67,10 @@ class ProjectController extends Controller
 
     public function show(Project $project): JsonResponse
     {
-        $project->load('companyUser:id,name')->loadCount('applications');
+        $project->load([
+            'companyUser:id,name',
+            'companyUser.companyProfile:id,user_id,profile_data',
+        ])->loadCount('applications');
 
         return response()->json([
             'data' => $this->transformProject($project),
@@ -71,11 +95,11 @@ class ProjectController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:10'],
             'requirements' => ['nullable', 'string'],
+            'location' => ['nullable', 'string', 'max:120'],
             'tech_stack' => ['nullable', 'array'],
             'tech_stack.*' => ['string', 'max:50'],
             'status' => ['required', 'in:draft,open,closed'],
             'max_students' => ['required', 'integer', 'min:1', 'max:100'],
-            'deadline' => ['nullable', 'date'],
         ]);
 
         $project = Project::query()->create([
@@ -83,7 +107,10 @@ class ProjectController extends Controller
             'company_user_id' => $request->user()->id,
         ]);
 
-        $project->load('companyUser:id,name')->loadCount('applications');
+        $project->load([
+            'companyUser:id,name',
+            'companyUser.companyProfile:id,user_id,profile_data',
+        ])->loadCount('applications');
 
         return response()->json([
             'data' => $this->transformProject($project),
@@ -108,15 +135,18 @@ class ProjectController extends Controller
             'title' => ['sometimes', 'string', 'max:255'],
             'description' => ['sometimes', 'string', 'min:10'],
             'requirements' => ['nullable', 'string'],
+            'location' => ['nullable', 'string', 'max:120'],
             'tech_stack' => ['nullable', 'array'],
             'tech_stack.*' => ['string', 'max:50'],
             'status' => ['sometimes', 'in:draft,open,closed'],
             'max_students' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'deadline' => ['nullable', 'date'],
         ]);
 
         $project->update($validated);
-        $project->load('companyUser:id,name')->loadCount('applications');
+        $project->load([
+            'companyUser:id,name',
+            'companyUser.companyProfile:id,user_id,profile_data',
+        ])->loadCount('applications');
 
         return response()->json([
             'data' => $this->transformProject($project),
@@ -140,19 +170,28 @@ class ProjectController extends Controller
 
     private function transformProject(Project $project): array
     {
+        $companyProfileData = is_array($project->companyUser?->companyProfile?->profile_data)
+            ? $project->companyUser->companyProfile->profile_data
+            : [];
+        $companyName = trim((string) ($companyProfileData['business_name']
+            ?? $companyProfileData['name']
+            ?? $project->companyUser?->name
+            ?? ''));
+
         return [
             'id' => $project->id,
             'company' => [
                 'user_id' => $project->company_user_id,
-                'name' => $project->companyUser?->name,
+                'name' => $companyName !== '' ? $companyName : null,
             ],
             'title' => $project->title,
             'description' => $project->description,
             'requirements' => $project->requirements,
+            'location' => $project->location,
             'tech_stack' => $project->tech_stack ?? [],
             'status' => $project->status,
             'max_students' => $project->max_students,
-            'deadline' => optional($project->deadline)->format('Y-m-d'),
+            'posted_at' => optional($project->created_at)?->toISOString(),
             'applications_count' => $project->applications_count ?? 0,
             'created_at' => optional($project->created_at)?->toISOString(),
         ];

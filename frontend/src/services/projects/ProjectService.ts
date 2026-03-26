@@ -3,6 +3,9 @@ import http from '@/services/core/http'
 export interface ProjectFilters {
   search?: string
   status?: string
+  location?: string
+  sort_date?: 'newest' | 'oldest'
+  tech_stack?: string[]
   company_id?: number
   per_page?: number
   page?: number
