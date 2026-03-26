@@ -4,6 +4,8 @@
       <StudentProfileHeader
         :avatar-preview="avatarPreview"
         :initials="initials"
+        :student-name="studentDisplayName"
+        :student-bio="studentDisplayBio"
         :completion-rate="completionRate"
       />
 
@@ -223,66 +225,6 @@
             </div>
           </section>
 
-          <section v-show="activeTab === 'career'" class="surface-card p-6 sm:p-7 space-y-5">
-            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Career Preferences</h2>
-
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Availability</label>
-                <select
-                  v-model="form.availability"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                >
-                  <option value="">Select</option>
-                  <option value="immediately">Immediately</option>
-                  <option value="within-1-month">Within 1 month</option>
-                  <option value="within-3-months">Within 3 months</option>
-                  <option value="custom">Custom</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300"
-                  >Preferred work type</label
-                >
-                <select
-                  v-model="form.preferred_work_type"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-                >
-                  <option value="">Select</option>
-                  <option value="internship">Internship</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="full-time">Full-time</option>
-                  <option value="freelance">Freelance</option>
-                </select>
-              </div>
-
-              <BaseInput
-                v-model="form.expected_salary_min"
-                label="Expected salary from"
-                type="number"
-                :error="errors.expected_salary_min"
-              />
-              <BaseInput
-                v-model="form.expected_salary_max"
-                label="Expected salary to"
-                type="number"
-                :error="errors.expected_salary_max"
-              />
-            </div>
-
-            <ProfileTagInput
-              label="Preferred locations"
-              tone="emerald"
-              :tags="form.preferred_locations"
-              :input-value="locationInput"
-              placeholder="e.g. Bratislava, Kosice, Remote"
-              @update:inputValue="locationInput = $event"
-              @add="addTag('preferred_locations', locationInput, 'locationInput')"
-              @remove="removeTag('preferred_locations', $event)"
-            />
-          </section>
-
           <section v-show="activeTab === 'skills'" class="surface-card p-6 sm:p-7 space-y-5">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Skills, Interests, and Links</h2>
 
@@ -314,13 +256,6 @@
                 label="Portfolio URL"
                 type="url"
                 :error="errors.portfolio_url"
-              />
-              <BaseInput v-model="form.cv_url" label="CV URL" type="url" :error="errors.cv_url" />
-              <BaseInput
-                v-model="form.website_url"
-                label="Personal website"
-                type="url"
-                :error="errors.website_url"
               />
             </div>
 
@@ -685,9 +620,9 @@ import StudentCertificationsEditor from '@/components/profile/StudentCertificati
 import StudentProjectsEditor from '@/components/profile/StudentProjectsEditor.vue'
 import { resolveAssetUrl } from '@/services/core/url'
 
-type TagField = 'skills' | 'interests' | 'preferred_locations'
-type InputField = 'skillInput' | 'interestInput' | 'locationInput'
-type ProfileTab = 'personal' | 'education' | 'career' | 'skills' | 'portfolio' | 'documents'
+type TagField = 'skills' | 'interests'
+type InputField = 'skillInput' | 'interestInput'
+type ProfileTab = 'personal' | 'education' | 'skills' | 'portfolio' | 'documents'
 
 export default defineComponent({
   name: 'StudentProfileView',
@@ -713,7 +648,6 @@ export default defineComponent({
       avatarPreview: '',
       skillInput: '',
       interestInput: '',
-      locationInput: '',
       errors: {} as Record<string, string>,
       successMessage: '',
       errorMessage: '',
@@ -723,7 +657,6 @@ export default defineComponent({
       profileTabs: [
         { id: 'personal' as ProfileTab, label: 'Personal Information' },
         { id: 'education' as ProfileTab, label: 'Education' },
-        { id: 'career' as ProfileTab, label: 'Career Preferences' },
         { id: 'skills' as ProfileTab, label: 'Skills & Links' },
         { id: 'portfolio' as ProfileTab, label: 'Portfolio' },
         { id: 'documents' as ProfileTab, label: 'Documents' },
@@ -758,10 +691,19 @@ export default defineComponent({
     completionRate(): number {
       return calculateStudentProfileCompletion(this.form)
     },
+    studentDisplayName(): string {
+      const name = this.auth.user?.name?.trim()
+      return name && name.length > 0 ? name : 'Student Profile'
+    },
+    studentDisplayBio(): string {
+      const bio = this.form.bio?.trim()
+      return bio && bio.length > 0
+        ? bio
+        : 'Add a short bio so companies can quickly understand your profile.'
+    },
     saveButtonLabel(): string {
       if (this.activeTab === 'personal') return 'Save personal information'
       if (this.activeTab === 'education') return 'Save education'
-      if (this.activeTab === 'career') return 'Save career preferences'
       if (this.activeTab === 'skills') return 'Save skills and links'
       if (this.activeTab === 'portfolio') return 'Save portfolio'
       return 'Save profile'

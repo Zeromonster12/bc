@@ -14,10 +14,9 @@
           <span v-else class="text-2xl font-bold text-indigo-700">{{ initials }}</span>
         </div>
         <div class="space-y-1">
-          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">Student Profile</h1>
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">{{ studentName }}</h1>
           <p class="text-sm text-slate-600 dark:text-slate-300 max-w-xl">
-            Complete your profile so companies can quickly understand your skills, education, and
-            career goals.
+            {{ studentBio }}
           </p>
         </div>
       </div>
@@ -51,6 +50,14 @@ export default defineComponent({
     initials: {
       type: String,
       default: 'U',
+    },
+    studentName: {
+      type: String,
+      default: 'Student Profile',
+    },
+    studentBio: {
+      type: String,
+      default: 'Complete your profile so companies can quickly understand your skills and education.',
     },
     completionRate: {
       type: Number,

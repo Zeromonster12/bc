@@ -1,182 +1,302 @@
 <template>
-  <AuthLayout>
-    <h2 class="mb-6 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">Create an account</h2>
+  <AuthPageFrame prompt-text="Already have an account?" link-text="Log in" link-to="/login">
+    <template #top-nav>
+      <LandingTopBar />
+    </template>
 
-    <BaseAlert
-      v-if="errorMessage"
-      type="error"
-      class="mb-4"
-      :message="errorMessage"
-      dismissible
-      @dismiss="errorMessage = ''"
-    />
+    <template #left>
+      <AuthPromoPanel
+        title-line1="Begin your"
+        title-line2="curated"
+        title-line3="professional"
+        description="Join an elite network where academic excellence meets industry demand. Every achievement, a curated artifact of your journey."
+        footer-lead="Joined by"
+        footer-highlight="2,400+"
+        footer-tail="top-tier scholars"
+      />
+    </template>
 
-    <BaseAlert
-      v-if="turnstileError"
-      type="error"
-      class="mb-4"
-      :message="turnstileError"
-      dismissible
-      @dismiss="turnstileError = ''"
-    />
+    <template #right>
+      <section class="rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] sm:rounded-4xl sm:p-10 lg:p-16">
+        <h2 class="text-3xl font-semibold text-[#1d1f31] sm:text-4xl">Create Account</h2>
+        <p class="mt-2 text-sm font-medium text-[#7d8195]">Select your journey type to get started.</p>
 
-    <form @submit.prevent="handleSubmit" novalidate>
-      <div
-        v-if="isCompanyFlow"
-        class="mb-5 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800"
-      >
-        <p class="font-medium text-slate-900 dark:text-slate-100">
-          Company registration: Step {{ currentStep }} of {{ totalSteps }}
+        <BaseAlert
+          v-if="errorMessage"
+          type="error"
+          class="mt-5"
+          :message="errorMessage"
+          dismissible
+          @dismiss="errorMessage = ''"
+        />
+
+        <BaseAlert
+          v-if="turnstileError"
+          type="error"
+          class="mt-4"
+          :message="turnstileError"
+          dismissible
+          @dismiss="turnstileError = ''"
+        />
+
+        <form @submit.prevent="handleSubmit" novalidate class="mt-5 sm:mt-6">
+          <div
+            class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1"
+            role="tablist"
+            aria-label="Account type"
+          >
+            <button
+              type="button"
+              class="rounded-full px-3 py-2.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+              :class="form.role === 'student' ? 'bg-white text-[#201f35] shadow-sm' : 'text-[#5f6078]'"
+              @click="form.role = 'student'"
+            >
+              As a Student
+            </button>
+            <button
+              type="button"
+              class="rounded-full px-3 py-2.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+              :class="form.role === 'company' ? 'bg-white text-[#201f35] shadow-sm' : 'text-[#5f6078]'"
+              @click="form.role = 'company'"
+            >
+              As a Company
+            </button>
+          </div>
+          <p v-if="errors.role" class="mt-2 text-xs text-red-600">{{ errors.role }}</p>
+
+          <div v-if="isCompanyFlow" class="mt-5">
+            <div class="flex items-center justify-center gap-2">
+              <template v-for="step in [1, 2, 3]" :key="step">
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold"
+                  :class="
+                    step === currentStep
+                      ? 'border-[#4b35cb] bg-[#4b35cb] text-white'
+                      : step < currentStep
+                        ? 'border-[#4b35cb]/50 bg-[#ebe5ff] text-[#4b35cb]'
+                        : 'border-[#d7d3e7] bg-white text-[#8b90a7]'
+                  "
+                >
+                  {{ step }}
+                </span>
+                <span
+                  v-if="step < 3"
+                  class="h-0.5 w-6"
+                  :class="step < currentStep ? 'bg-[#4b35cb]/45' : 'bg-[#d7d3e7]'"
+                />
+              </template>
+            </div>
+            <p class="mt-2 text-center text-[11px] font-semibold tracking-[0.04em] text-[#4f536f] sm:text-xs sm:tracking-[0.06em]">
+              {{
+                currentStep === 1
+                  ? 'Step 1: Account details'
+                  : currentStep === 2
+                    ? 'Step 2: Company billing details'
+                    : 'Step 3: Contact person details'
+              }}
+            </p>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <div v-if="!isCompanyFlow || currentStep === 1" class="space-y-4">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <BaseInput
+                  v-model="form.first_name"
+                  label="FIRST NAME"
+                  type="text"
+                  placeholder="Eleanor"
+                  autocomplete="given-name"
+                  :error="errors.first_name"
+                  required
+                />
+                <BaseInput
+                  v-model="form.last_name"
+                  label="SURNAME"
+                  type="text"
+                  placeholder="Vance"
+                  autocomplete="family-name"
+                  :error="errors.last_name"
+                  required
+                />
+              </div>
+              <BaseInput
+                v-model="form.email"
+                label="EMAIL"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f]"
+                type="email"
+                placeholder="vance.e@university.edu"
+                autocomplete="email"
+                :error="errors.email"
+                required
+              />
+              <div class="grid gap-4 sm:grid-cols-2">
+                <BaseInput
+                  v-model="form.password"
+                  label="PASSWORD"
+                  type="password"
+                  :allow-password-toggle="true"
+                  autocomplete="new-password"
+                  :error="errors.password"
+                  required
+                />
+                <BaseInput
+                  v-model="form.password_confirmation"
+                  label="CONFIRM"
+                  type="password"
+                  :allow-password-toggle="true"
+                  autocomplete="new-password"
+                  :error="errors.password_confirmation"
+                  required
+                />
+              </div>
+            </div>
+
+            <div v-if="isCompanyFlow && currentStep === 2" class="space-y-4">
+              <BaseInput
+                v-model="form.business_name"
+                label="BUSINESS NAME"
+                type="text"
+                :error="errors.business_name"
+                required
+              />
+              <BaseInput
+                v-model="form.billing_street"
+                label="BILLING STREET AND NUMBER"
+                type="text"
+                :error="errors.billing_street"
+                required
+              />
+              <BaseInput
+                v-model="form.billing_city"
+                label="BILLING CITY"
+                type="text"
+                :error="errors.billing_city"
+                required
+              />
+              <BaseInput
+                v-model="form.billing_postal_code"
+                label="BILLING POSTAL CODE"
+                type="text"
+                placeholder="821 01"
+                :error="errors.billing_postal_code"
+                required
+              />
+              <div class="grid gap-4 sm:grid-cols-2">
+                <BaseInput v-model="form.ico" label="ICO" type="text" placeholder="12345678" :error="errors.ico" required />
+                <BaseInput v-model="form.dic" label="DIC" type="text" placeholder="1234567890" :error="errors.dic" required />
+              </div>
+              <BaseInput
+                v-model="form.ic_dph"
+                label="IC DPH (OPTIONAL)"
+                type="text"
+                placeholder="SK1234567890"
+                :error="errors.ic_dph"
+              />
+            </div>
+
+            <div v-if="isCompanyFlow && currentStep === 3" class="space-y-4">
+              <BaseInput
+                v-model="form.contact_person_full_name"
+                label="CONTACT PERSON FULL NAME"
+                type="text"
+                :error="errors.contact_person_full_name"
+                required
+              />
+              <BaseInput
+                v-model="form.contact_email"
+                label="CONTACT EMAIL"
+                type="email"
+                :error="errors.contact_email"
+                required
+              />
+              <BaseInput
+                v-model="form.phone"
+                label="CONTACT PHONE"
+                type="text"
+                placeholder="+421 900 123 456"
+                :error="errors.phone"
+                required
+              />
+
+              <TurnstileWidget ref="turnstileWidget" v-model="turnstileToken" class="pt-1" />
+            </div>
+
+            <TurnstileWidget v-if="!isCompanyFlow" ref="turnstileWidget" v-model="turnstileToken" class="pt-1" />
+          </div>
+
+          <label class="mt-4 flex items-start gap-2 text-xs text-[#676b84]">
+            <input type="checkbox" class="mt-0.5 h-4 w-4 rounded border-[#cdc7de] text-[#4b35cb] focus:ring-[#4b35cb]" />
+            <span>I agree to the <span class="font-semibold text-[#4b35cb]">Terms of Service</span> and <span class="font-semibold text-[#4b35cb]">Privacy Policy</span>.</span>
+          </label>
+
+          <div class="mt-5 flex items-center gap-3">
+            <BaseButton
+              v-if="isCompanyFlow && currentStep > 1"
+              type="button"
+              variant="ghost"
+              size="lg"
+              @click="goToPreviousStep"
+            >
+              Back
+            </BaseButton>
+
+            <button
+              type="submit"
+              :disabled="loading"
+              class="inline-flex w-full items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-6 py-3 text-base font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <svg v-if="loading" class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25" />
+                <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="3" class="opacity-90" />
+              </svg>
+              {{ submitLabel }}
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#a3a7bb] sm:mt-7 sm:text-[11px]">
+          <span class="h-px flex-1 bg-[#ebebf1]" />
+          or sign up with
+          <span class="h-px flex-1 bg-[#ebebf1]" />
+        </div>
+
+        <div class="mt-4">
+          <button
+            type="button"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#ebeaf2] bg-white px-4 py-3 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc]"
+            @click="handleGoogleLogin"
+          >
+            <img :src="googleLogo" alt="Google logo" class="h-4 w-4" />
+            Google
+          </button>
+        </div>
+
+        <p class="mt-5 text-center text-sm text-[#686d84] sm:mt-6">
+          Already have an account?
+          <RouterLink to="/login" class="font-semibold text-[#4b35cb] hover:text-[#3d28b2]">Sign in</RouterLink>
         </p>
-      </div>
-
-      <div class="space-y-4">
-        <div v-if="!isCompanyFlow || currentStep === 1" class="space-y-4">
-          <AuthRoleSelector v-model="form.role" :options="roleOptions" :error="errors.role" />
-
-          <BaseInput
-            v-model="form.first_name"
-            label="First name"
-            type="text"
-            autocomplete="given-name"
-            :error="errors.first_name"
-            required
-          />
-          <BaseInput
-            v-model="form.last_name"
-            label="Surname"
-            type="text"
-            autocomplete="family-name"
-            :error="errors.last_name"
-            required
-          />
-          <BaseInput
-            v-model="form.email"
-            label="Login email"
-            type="email"
-            autocomplete="email"
-            :error="errors.email"
-            required
-          />
-          <BaseInput
-            v-model="form.password"
-            label="Password"
-            type="password"
-            autocomplete="new-password"
-            :error="errors.password"
-            hint="Min. 8 characters, mixed case and numbers"
-            required
-          />
-          <BaseInput
-            v-model="form.password_confirmation"
-            label="Confirm password"
-            type="password"
-            autocomplete="new-password"
-            :error="errors.password_confirmation"
-            required
-          />
-        </div>
-
-        <div v-if="isCompanyFlow && currentStep === 2" class="space-y-4">
-          <BaseInput v-model="form.business_name" label="Business name" type="text" :error="errors.business_name" required />
-          <BaseInput
-            v-model="form.billing_street"
-            label="Billing street and number"
-            type="text"
-            :error="errors.billing_street"
-            required
-          />
-          <BaseInput v-model="form.billing_city" label="Billing city" type="text" :error="errors.billing_city" required />
-          <BaseInput
-            v-model="form.billing_postal_code"
-            label="Billing postal code"
-            type="text"
-            placeholder="821 01"
-            :error="errors.billing_postal_code"
-            required
-          />
-          <BaseInput v-model="form.ico" label="ICO" type="text" placeholder="12345678" :error="errors.ico" required />
-          <BaseInput v-model="form.dic" label="DIC" type="text" placeholder="1234567890" :error="errors.dic" required />
-          <BaseInput
-            v-model="form.ic_dph"
-            label="IC DPH (optional)"
-            type="text"
-            placeholder="SK1234567890"
-            :error="errors.ic_dph"
-          />
-        </div>
-
-        <div v-if="isCompanyFlow && currentStep === 3" class="space-y-4">
-          <BaseInput
-            v-model="form.contact_person_full_name"
-            label="Contact person full name"
-            type="text"
-            :error="errors.contact_person_full_name"
-            required
-          />
-          <BaseInput
-            v-model="form.contact_email"
-            label="Contact email"
-            type="email"
-            :error="errors.contact_email"
-            required
-          />
-          <BaseInput
-            v-model="form.phone"
-            label="Contact phone"
-            type="text"
-            placeholder="+421 900 123 456"
-            :error="errors.phone"
-            required
-          />
-
-          <TurnstileWidget ref="turnstileWidget" v-model="turnstileToken" />
-        </div>
-
-        <TurnstileWidget v-if="!isCompanyFlow" ref="turnstileWidget" v-model="turnstileToken" />
-      </div>
-
-      <div class="mt-6 flex items-center gap-3">
-        <BaseButton
-          v-if="isCompanyFlow && currentStep > 1"
-          type="button"
-          variant="ghost"
-          size="lg"
-          @click="goToPreviousStep"
-        >
-          Back
-        </BaseButton>
-        <BaseButton type="submit" variant="primary" size="lg" :loading="loading" class="w-full">
-          {{ submitLabel }}
-        </BaseButton>
-      </div>
-    </form>
-
-    <p class="mt-6 text-center text-sm text-gray-600 dark:text-slate-300">
-      Already have an account?
-      <RouterLink
-        to="/login"
-        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-        >Sign in</RouterLink
-      >
-    </p>
-  </AuthLayout>
+      </section>
+    </template>
+  </AuthPageFrame>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import AuthService from '@/services/auth/AuthService'
+import googleLogo from '@/assets/icons/google-logo.svg'
 import {
   hasTurnstileToken,
   resolveErrorMessage,
   resolveValidationErrors,
 } from '@/services/auth/AuthViewService'
-import AuthLayout from '@/layouts/AuthLayout.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
 import TurnstileWidget from '@/components/ui/TurnstileWidget.vue'
-import AuthRoleSelector from '@/components/auth/AuthRoleSelector.vue'
+import AuthPageFrame from '@/components/auth/AuthPageFrame.vue'
+import AuthPromoPanel from '@/components/auth/AuthPromoPanel.vue'
+import LandingTopBar from '@/components/landing/LandingTopBar.vue'
 
 interface ResettableWidgetRef {
   reset?: () => void
@@ -189,7 +309,15 @@ interface RoleOption {
 
 export default defineComponent({
   name: 'RegisterView',
-  components: { AuthLayout, BaseInput, BaseButton, BaseAlert, TurnstileWidget, AuthRoleSelector },
+  components: {
+    BaseInput,
+    BaseButton,
+    BaseAlert,
+    TurnstileWidget,
+    AuthPageFrame,
+    AuthPromoPanel,
+    LandingTopBar,
+  },
   data() {
     return {
       form: {
@@ -214,6 +342,7 @@ export default defineComponent({
         { value: 'student', label: 'Student' },
         { value: 'company', label: 'Company' },
       ] as RoleOption[],
+      googleLogo,
       errors: {} as Record<string, string>,
       errorMessage: '',
       turnstileToken: '',
@@ -323,7 +452,7 @@ export default defineComponent({
         3: ['contact_person_full_name', 'contact_email', 'phone'],
       }
 
-      return !stepFields[this.currentStep].some((field) => Boolean(this.errors[field]))
+      return !(stepFields[this.currentStep] ?? []).some((field) => Boolean(this.errors[field]))
     },
 
     async handleSubmit() {
@@ -369,6 +498,16 @@ export default defineComponent({
       } finally {
         ;(this.$refs.turnstileWidget as ResettableWidgetRef | undefined)?.reset?.()
         this.loading = false
+      }
+    },
+    async handleGoogleLogin() {
+      this.errorMessage = ''
+
+      try {
+        const response = await AuthService.getGoogleOAuthRedirectUrl()
+        window.location.href = response.url
+      } catch (e: unknown) {
+        this.errorMessage = resolveErrorMessage(e, 'Google sign-in is unavailable right now.')
       }
     },
   },
