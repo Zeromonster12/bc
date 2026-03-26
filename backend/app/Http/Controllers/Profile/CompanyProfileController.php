@@ -49,7 +49,9 @@ class CompanyProfileController extends Controller
             ['profile_data' => []]
         );
 
-        $profileData = $request->except(['logo']);
+        $incomingProfileData = $request->except(['logo']);
+        $existingProfileData = is_array($profile->profile_data) ? $profile->profile_data : [];
+        $profileData = array_merge($existingProfileData, $incomingProfileData);
 
         $logoPath = $profile->logo_path;
         if (array_key_exists('logo', $validated) && $validated['logo']) {

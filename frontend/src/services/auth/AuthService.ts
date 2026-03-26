@@ -14,6 +14,16 @@ export interface RegisterData {
   password: string
   password_confirmation: string
   role: 'student' | 'company'
+  business_name?: string
+  billing_street?: string
+  billing_city?: string
+  billing_postal_code?: string
+  ico?: string
+  dic?: string
+  ic_dph?: string
+  contact_person_full_name?: string
+  contact_email?: string
+  phone?: string
   turnstile_token: string
 }
 

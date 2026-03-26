@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\CompanyProfile;
 use App\Models\EmailVerificationCode;
 use App\Models\User;
 use App\Notifications\EmailVerificationCodeNotification;
@@ -37,6 +38,16 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:student,company'],
+            'business_name' => ['nullable', 'string', 'max:255', 'required_if:role,company'],
+            'billing_street' => ['nullable', 'string', 'max:255', 'required_if:role,company'],
+            'billing_city' => ['nullable', 'string', 'max:120', 'required_if:role,company'],
+            'billing_postal_code' => ['nullable', 'regex:/^\d{3}\s?\d{2}$/', 'required_if:role,company'],
+            'ico' => ['nullable', 'regex:/^\d{8}$/', 'required_if:role,company'],
+            'dic' => ['nullable', 'regex:/^\d{10}$/', 'required_if:role,company'],
+            'ic_dph' => ['nullable', 'regex:/^SK\d{10}$/i'],
+            'contact_person_full_name' => ['nullable', 'string', 'max:255', 'required_if:role,company'],
+            'contact_email' => ['nullable', 'email', 'max:255', 'different:email', 'required_if:role,company'],
+            'phone' => ['nullable', 'string', 'max:32', 'regex:/^\+?[0-9\s]{9,20}$/', 'required_if:role,company'],
         ]);
 
         $role = (string) $request->string('role');
@@ -56,6 +67,41 @@ class RegisteredUserController extends Controller
             'company_verification_status' => $companyStatus,
             'company_verified_at' => $companyStatus === User::COMPANY_STATUS_APPROVED ? now() : null,
         ]);
+
+        if ($role === 'company') {
+            $businessName = trim((string) $request->string('business_name'));
+            $billingStreet = trim((string) $request->string('billing_street'));
+            $billingCity = trim((string) $request->string('billing_city'));
+            $billingPostalCode = preg_replace('/\s+/', ' ', trim((string) $request->string('billing_postal_code'))) ?? '';
+            $ico = trim((string) $request->string('ico'));
+            $dic = trim((string) $request->string('dic'));
+            $icDph = strtoupper(str_replace(' ', '', trim((string) $request->string('ic_dph'))));
+            $contactPersonFullName = trim((string) $request->string('contact_person_full_name'));
+            $contactEmail = strtolower(trim((string) $request->string('contact_email')));
+            $contactPhone = preg_replace('/\s+/', ' ', trim((string) $request->string('phone'))) ?? '';
+
+            CompanyProfile::query()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'profile_data' => [
+                        'name' => $businessName,
+                        'business_name' => $businessName,
+                        'billing_street' => $billingStreet,
+                        'billing_city' => $billingCity,
+                        'billing_postal_code' => $billingPostalCode,
+                        'billing_country' => 'Slovakia',
+                        'ico' => $ico,
+                        'dic' => $dic,
+                        'ic_dph' => $icDph,
+                        'contact_person_full_name' => $contactPersonFullName,
+                        'contact_email' => $contactEmail,
+                        'contact_phone' => $contactPhone,
+                        'headquarters_city' => $billingCity,
+                        'headquarters_country' => 'Slovakia',
+                    ],
+                ]
+            );
+        }
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
