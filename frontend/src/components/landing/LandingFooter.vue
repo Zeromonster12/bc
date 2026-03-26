@@ -1,12 +1,12 @@
 <template>
   <footer class="bg-slate-50">
-    <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-8 px-4 py-10 sm:px-6 md:flex-row">
+    <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-4 py-8 sm:px-6 sm:py-10 md:flex-row md:gap-8">
       <div class="text-center md:text-left">
         <div class="text-lg font-bold text-slate-900">Project Linker</div>
         <p class="text-xs uppercase tracking-[0.2em] text-slate-500">The Academic Curator.</p>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-6 text-xs uppercase tracking-[0.12em] text-slate-500">
+      <div class="flex flex-wrap justify-center gap-4 text-[11px] uppercase tracking-[0.1em] text-slate-500 sm:gap-6 sm:text-xs sm:tracking-[0.12em]">
         <a href="#" class="transition hover:text-indigo-600">Resources</a>
         <a href="#" class="transition hover:text-indigo-600">Privacy Policy</a>
         <a href="#" class="transition hover:text-indigo-600">Terms of Service</a>

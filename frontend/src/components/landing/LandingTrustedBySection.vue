@@ -1,10 +1,10 @@
 <template>
-  <section class="bg-[#f6f1ff] py-14">
+  <section class="bg-[#f6f1ff] py-12 sm:py-14">
     <div class="mx-auto w-full max-w-7xl px-4 sm:px-6">
-      <p class="mb-10 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[#787587]">
+      <p class="mb-8 text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-[#787587] sm:mb-10 sm:text-xs sm:tracking-[0.2em]">
         Empowering talent at institutions like
       </p>
-      <div class="flex flex-wrap items-center justify-center gap-10 text-xl font-bold text-[#1c1a24] opacity-60 grayscale sm:gap-16">
+      <div class="flex flex-wrap items-center justify-center gap-6 text-base font-bold text-[#1c1a24] opacity-60 grayscale sm:gap-16 sm:text-xl">
         <span>Stanford</span>
         <span>NVIDIA</span>
         <span>MIT</span>

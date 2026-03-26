@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-[#fcf8ff] text-[#1c1a24]">
     <LandingTopBar />
 
-    <main class="pt-20 sm:pt-24">
+    <main class="pt-24 sm:pt-24">
       <LandingHeroSection />
       <LandingTrustedBySection />
       <LandingFeaturesSection />
