@@ -1,5 +1,7 @@
 FROM pgsty/minio:latest
 
+VOLUME ["/data"]
+
 EXPOSE 9000 9001
 
 ENTRYPOINT ["/usr/bin/minio"]
