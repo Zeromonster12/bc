@@ -110,8 +110,8 @@ class MessageController extends Controller
             'project_id' => ['nullable', 'integer', 'exists:projects,id'],
             'participant_user_ids' => ['nullable', 'array', 'min:1'],
             'participant_user_ids.*' => ['integer', 'distinct', 'exists:users,id'],
-            'recipient_user_id' => ['nullable', 'integer', 'exists:users,id', 'required_without:recipient_email'],
-            'recipient_email' => ['nullable', 'string', 'email', 'max:255', 'required_without:recipient_user_id'],
+            'recipient_user_id' => ['exclude_if:type,group', 'nullable', 'integer', 'exists:users,id', 'required_without:recipient_email'],
+            'recipient_email' => ['exclude_if:type,group', 'nullable', 'string', 'email', 'max:255', 'required_without:recipient_user_id'],
         ]);
 
         $conversationType = (string) ($validated['type'] ?? 'direct');
