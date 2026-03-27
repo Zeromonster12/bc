@@ -25,11 +25,11 @@ class EmailVerificationCodeNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('BC Platform - Verification Code')
-            ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('Use this code to verify your email and finish registration:')
-            ->line('Verification code: ' . $this->code)
-            ->line('This code expires in 10 minutes.');
+            ->subject('Project Linker - Verification Code')
+            ->view('emails.verification-code', [
+                'name' => (string) ($notifiable->name ?? ''),
+                'code' => $this->code,
+            ]);
     }
 
     /**

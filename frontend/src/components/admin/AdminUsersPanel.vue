@@ -8,26 +8,45 @@
         class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         @input="$emit('update:search', ($event.target as HTMLInputElement).value)"
       />
-      <select
-        :value="roleFilter"
-        class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-        @change="$emit('update:roleFilter', ($event.target as HTMLSelectElement).value)"
-      >
-        <option value="">All roles</option>
-        <option value="student">Student</option>
-        <option value="company">Company</option>
-        <option value="admin">Admin</option>
-      </select>
-      <select
-        :value="companyStatusFilter"
-        class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-        @change="$emit('update:companyStatusFilter', ($event.target as HTMLSelectElement).value)"
-      >
-        <option value="">All company statuses</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
-      </select>
+      <div class="relative">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+          @click="roleFilterDropdownOpen = !roleFilterDropdownOpen"
+        >
+          {{ roleFilterLabel }}
+          <span class="text-xs">v</span>
+        </button>
+        <div
+          v-if="roleFilterDropdownOpen"
+          class="absolute z-20 mt-1 min-w-44 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-slate-600 dark:bg-slate-900"
+        >
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setRoleFilter('')">All roles</button>
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setRoleFilter('student')">Student</button>
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setRoleFilter('company')">Company</button>
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setRoleFilter('admin')">Admin</button>
+        </div>
+      </div>
+
+      <div class="relative">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+          @click="companyStatusDropdownOpen = !companyStatusDropdownOpen"
+        >
+          {{ companyStatusFilterLabel }}
+          <span class="text-xs">v</span>
+        </button>
+        <div
+          v-if="companyStatusDropdownOpen"
+          class="absolute z-20 mt-1 min-w-52 rounded-xl border border-gray-200 bg-white p-1 shadow-lg dark:border-slate-600 dark:bg-slate-900"
+        >
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('')">All company statuses</button>
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('pending')">Pending</button>
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('approved')">Approved</button>
+          <button type="button" class="block w-full rounded-lg px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('rejected')">Rejected</button>
+        </div>
+      </div>
     </div>
 
     <div v-if="loading" class="space-y-2">
@@ -54,7 +73,23 @@
             <td colspan="6" class="px-4 py-10 text-center text-gray-400 dark:text-slate-500">No users found.</td>
           </tr>
           <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 dark:hover:bg-slate-800/70">
-            <td class="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">{{ user.name }}</td>
+            <td class="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">
+              <RouterLink
+                v-if="user.role === 'student'"
+                :to="{ name: 'students.profile', params: { id: user.id } }"
+                class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200"
+              >
+                {{ user.name }}
+              </RouterLink>
+              <RouterLink
+                v-else-if="user.role === 'company'"
+                :to="{ name: 'companies.profile', params: { id: user.id } }"
+                class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200"
+              >
+                {{ user.name }}
+              </RouterLink>
+              <span v-else>{{ user.name }}</span>
+            </td>
             <td class="px-4 py-3 text-gray-600 dark:text-slate-300">{{ user.email }}</td>
             <td class="px-4 py-3">
               <span class="rounded bg-gray-100 px-2 py-0.5 text-xs capitalize dark:bg-slate-700 dark:text-slate-200">{{
@@ -78,21 +113,23 @@
               </span>
             </td>
             <td class="px-4 py-3">
-              <div class="flex gap-2">
-                <select
-                  :value="user.role"
-                  @change="
-                    $emit('change-role', {
-                      id: user.id,
-                      role: ($event.target as HTMLSelectElement).value,
-                    })
-                  "
-                  class="rounded border border-gray-200 bg-white px-2 py-1 text-xs text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+              <div class="relative flex gap-2">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-2 rounded border border-gray-200 bg-white px-2 py-1 text-xs text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                  @click="roleDropdownUserId = roleDropdownUserId === user.id ? null : user.id"
                 >
-                  <option value="student">student</option>
-                  <option value="company">company</option>
-                  <option value="admin">admin</option>
-                </select>
+                  {{ user.role }}
+                  <span class="text-[10px]">v</span>
+                </button>
+                <div
+                  v-if="roleDropdownUserId === user.id"
+                  class="absolute left-0 top-[calc(100%+4px)] z-20 min-w-28 rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-slate-600 dark:bg-slate-900"
+                >
+                  <button type="button" class="block w-full rounded px-2 py-1 text-left text-xs capitalize hover:bg-gray-50 dark:hover:bg-slate-800" @click="changeRole(user.id, 'student')">student</button>
+                  <button type="button" class="block w-full rounded px-2 py-1 text-left text-xs capitalize hover:bg-gray-50 dark:hover:bg-slate-800" @click="changeRole(user.id, 'company')">company</button>
+                  <button type="button" class="block w-full rounded px-2 py-1 text-left text-xs capitalize hover:bg-gray-50 dark:hover:bg-slate-800" @click="changeRole(user.id, 'admin')">admin</button>
+                </div>
                 <button
                   @click="$emit('delete-user', user.id)"
                   class="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
@@ -189,6 +226,18 @@ export default defineComponent({
     'page-change',
   ],
   methods: {
+    setRoleFilter(value: string) {
+      this.roleFilterDropdownOpen = false
+      this.$emit('update:roleFilter', value)
+    },
+    setCompanyStatusFilter(value: string) {
+      this.companyStatusDropdownOpen = false
+      this.$emit('update:companyStatusFilter', value)
+    },
+    changeRole(userId: number, role: string) {
+      this.roleDropdownUserId = null
+      this.$emit('change-role', { id: userId, role })
+    },
     companyStatusClass(user: AdminUserRow): string {
       if (user.role !== 'company') {
         return 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-300'
@@ -203,6 +252,23 @@ export default defineComponent({
       }
 
       return 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+    },
+  },
+  data() {
+    return {
+      roleFilterDropdownOpen: false,
+      companyStatusDropdownOpen: false,
+      roleDropdownUserId: null as number | null,
+    }
+  },
+  computed: {
+    roleFilterLabel(): string {
+      if (!this.roleFilter) return 'All roles'
+      return this.roleFilter.charAt(0).toUpperCase() + this.roleFilter.slice(1)
+    },
+    companyStatusFilterLabel(): string {
+      if (!this.companyStatusFilter) return 'All company statuses'
+      return this.companyStatusFilter.charAt(0).toUpperCase() + this.companyStatusFilter.slice(1)
     },
   },
 })

@@ -33,6 +33,7 @@
               :recipient-query="newParticipantQuery"
               :group-subject="groupSubject"
               :selected-project-id="selectedProjectId"
+              :project-required="!auth.isAdmin"
               :direct-dropdown-value="directRecipientDropdownId"
               :participant-dropdown-value="groupParticipantDropdownId"
               :project-options="projectOptions"
@@ -339,6 +340,11 @@ export default defineComponent({
       }
 
       this.selectedRecipient = null
+
+      if (this.auth.isAdmin) {
+        this.selectedProjectId = null
+        void this.loadGroupParticipantOptions(null)
+      }
     },
     onProjectChange(projectId: number | null) {
       this.selectedProjectId = projectId
@@ -352,14 +358,16 @@ export default defineComponent({
     },
     async loadGroupParticipantOptions(projectId: number | null) {
       const normalizedProjectId = Number(projectId ?? 0)
-      if (!Number.isFinite(normalizedProjectId) || normalizedProjectId <= 0) {
+      const isAdmin = this.auth.isAdmin
+
+      if (!isAdmin && (!Number.isFinite(normalizedProjectId) || normalizedProjectId <= 0)) {
         this.recipientOptions = []
         return
       }
 
       this.searchingUsers = true
       try {
-        const response = await MessageService.searchConversationUsers('', 20, normalizedProjectId)
+        const response = await MessageService.searchConversationUsers('', 50, isAdmin ? null : normalizedProjectId)
         const options = Array.isArray(response?.data) ? response.data : []
 
         this.recipientOptions = options
@@ -378,6 +386,21 @@ export default defineComponent({
     async loadGroupProjectOptions() {
       this.loadingProjectOptions = true
       try {
+        if (this.auth.isAdmin) {
+          const response = await ProjectService.getAll({
+            per_page: 100,
+          })
+
+          const projects = Array.isArray(response?.data) ? response.data : []
+          this.projectOptions = projects
+            .map((project: { id?: number; title?: string }) => ({
+              id: Number(project.id ?? 0),
+              title: String(project.title ?? '').trim(),
+            }))
+            .filter((project: ProjectOption) => project.id > 0 && project.title.length > 0)
+          return
+        }
+
         if (this.auth.isCompany) {
           const response = await ProjectService.getAll({
             company_id: Number(this.auth.user?.id ?? 0),
@@ -475,6 +498,12 @@ export default defineComponent({
       if (this.showNewConversation && this.conversationMode === 'direct') {
         this.newConvError = ''
         void this.searchRecipients('')
+        return
+      }
+
+      if (this.showNewConversation && this.conversationMode === 'group' && this.auth.isAdmin) {
+        this.newConvError = ''
+        void this.loadGroupParticipantOptions(null)
       }
     },
     refreshRealtimeSubscriptions() {
@@ -604,11 +633,17 @@ export default defineComponent({
     async startConversation() {
       if (this.conversationMode === 'group') {
         const participantIds = this.selectedParticipants.map((participant) => participant.id)
-        const validationError = validateNewGroupConversation(
-          this.selectedProjectId,
-          this.groupSubject,
-          participantIds,
-        )
+        const validationError = this.auth.isAdmin
+          ? (participantIds.length < 1
+              ? 'Select at least one participant.'
+              : (String(this.groupSubject ?? '').trim().length < 3
+                  ? 'Group name must have at least 3 characters.'
+                  : ''))
+          : validateNewGroupConversation(
+              this.selectedProjectId,
+              this.groupSubject,
+              participantIds,
+            )
 
         if (validationError) {
           this.newConvError = validationError
@@ -619,11 +654,19 @@ export default defineComponent({
         this.creating = true
 
         try {
-          const payload = toNewGroupConversationPayload(
-            Number(this.selectedProjectId),
-            this.groupSubject,
-            participantIds,
-          )
+          const payload = this.auth.isAdmin
+            ? {
+                subject: String(this.groupSubject ?? '').trim(),
+                participant_user_ids: Array.from(new Set(participantIds)),
+                ...(Number(this.selectedProjectId ?? 0) > 0
+                  ? { project_id: Number(this.selectedProjectId) }
+                  : {}),
+              }
+            : toNewGroupConversationPayload(
+                Number(this.selectedProjectId),
+                this.groupSubject,
+                participantIds,
+              )
 
           await this.messageStore.startConversation({
             ...payload,

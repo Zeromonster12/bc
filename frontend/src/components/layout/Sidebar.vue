@@ -359,7 +359,7 @@ export default defineComponent({
           name: 'messages',
           label: 'Messages',
           icon: 'MessageSquare',
-          roles: ['student', 'company'],
+          roles: ['student', 'company', 'admin'],
           section: 'Account',
         },
         {

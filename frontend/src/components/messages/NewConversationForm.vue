@@ -31,17 +31,44 @@
       />
 
       <div>
-        <label class="mb-2 block text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300">Project</label>
-        <select
-          :value="selectedProjectId ?? ''"
-          class="block w-full rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400"
-          @change="$emit('update:selectedProjectId', Number(($event.target as HTMLSelectElement).value) || null)"
-        >
-          <option value="">Select project</option>
-          <option v-for="project in projectOptions" :key="project.id" :value="project.id">
-            {{ project.title }}
-          </option>
-        </select>
+        <label class="mb-2 block text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300">{{ projectLabelText }}</label>
+        <div class="relative">
+          <button
+            type="button"
+            class="flex w-full items-center justify-between rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ece6f7] focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400"
+            @click="projectDropdownOpen = !projectDropdownOpen"
+          >
+            <span class="truncate">{{ projectDropdownLabel }}</span>
+            <span class="ml-2 text-xs text-slate-500 dark:text-slate-400">v</span>
+          </button>
+
+          <div
+            v-if="projectDropdownOpen"
+            class="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          >
+            <div class="sticky top-0 z-10 border-b border-slate-100 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+              <input
+                v-model="projectSearchQuery"
+                type="text"
+                placeholder="Search project"
+                class="w-full rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-indigo-400 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
+              />
+            </div>
+
+            <p v-if="filteredProjectOptions.length === 0" class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
+              No projects found.
+            </p>
+            <button
+              v-for="project in filteredProjectOptions"
+              :key="project.id"
+              type="button"
+              class="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+              @click="onSelectProjectOption(project)"
+            >
+              <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ project.title }}</p>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -236,6 +263,10 @@ export default defineComponent({
       type: Array as PropType<ProjectOption[]>,
       default: () => [],
     },
+    projectRequired: {
+      type: Boolean,
+      default: true,
+    },
     selectedRecipient: {
       type: Object as PropType<RecipientOption | null>,
       default: null,
@@ -276,12 +307,40 @@ export default defineComponent({
   ],
   data() {
     return {
+      projectDropdownOpen: false,
+      projectSearchQuery: '',
       directDropdownOpen: false,
       groupDropdownOpen: false,
       groupSearchQuery: '',
     }
   },
   computed: {
+    projectLabelText(): string {
+      return this.projectRequired ? 'Project' : 'Project (optional)'
+    },
+    projectDropdownLabel(): string {
+      const selectedId = Number(this.selectedProjectId ?? 0)
+      if (!Number.isFinite(selectedId) || selectedId <= 0) {
+        return this.projectRequired ? 'Select project' : 'No project selected'
+      }
+
+      const selected = this.projectOptions.find((project) => project.id === selectedId)
+      if (!selected) {
+        return 'Select project'
+      }
+
+      return selected.title
+    },
+    filteredProjectOptions(): ProjectOption[] {
+      const q = this.projectSearchQuery.trim().toLowerCase()
+      if (!q) {
+        return this.projectOptions
+      }
+
+      return this.projectOptions.filter((project) =>
+        String(project.title ?? '').toLowerCase().includes(q),
+      )
+    },
     directDropdownLabel(): string {
       if (this.selectedRecipient?.id) {
         return `${this.selectedRecipient.name} (${this.selectedRecipient.email})`
@@ -326,6 +385,11 @@ export default defineComponent({
     },
   },
   methods: {
+    onSelectProjectOption(project: ProjectOption) {
+      this.$emit('update:selectedProjectId', project.id)
+      this.projectSearchQuery = ''
+      this.projectDropdownOpen = false
+    },
     onSelectDirectOption(option: RecipientOption) {
       this.$emit('update:directDropdownValue', option.id)
       this.$emit('selectRecipient', option)

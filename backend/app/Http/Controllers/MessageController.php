@@ -34,9 +34,11 @@ class MessageController extends Controller
         $query = trim((string) ($validated['q'] ?? ''));
         $limit = (int) ($validated['limit'] ?? 8);
         $projectId = isset($validated['project_id']) ? (int) $validated['project_id'] : 0;
-        $allowedRecipientIds = $projectId > 0
-            ? $this->allowedGroupParticipantIdsForProject($user, $projectId)
-            : $this->allowedDirectRecipientIds($user);
+        $allowedRecipientIds = $user->role === 'admin'
+            ? $this->allowedDirectRecipientIds($user)
+            : ($projectId > 0
+                ? $this->allowedGroupParticipantIdsForProject($user, $projectId)
+                : $this->allowedDirectRecipientIds($user));
 
         if ($projectId <= 0 && $query !== '' && mb_strlen($query) < 2) {
             return response()->json([
@@ -206,21 +208,29 @@ class MessageController extends Controller
     private function storeGroupConversation(User $user, array $validated): JsonResponse
     {
         $projectId = (int) ($validated['project_id'] ?? 0);
-        if ($projectId <= 0) {
+        $isAdmin = $user->role === 'admin';
+        $project = null;
+
+        if ($projectId > 0) {
+            $project = Project::query()->find($projectId);
+            if (! $project) {
+                return response()->json([
+                    'message' => 'Project not found.',
+                ], 404);
+            }
+        }
+
+        if (! $isAdmin && $projectId <= 0) {
             return response()->json([
                 'message' => 'Project is required for group conversation.',
             ], 422);
         }
 
-        $project = Project::query()->find($projectId);
-        if (! $project) {
-            return response()->json([
-                'message' => 'Project not found.',
-            ], 404);
-        }
+        $allowedParticipantIds = $isAdmin
+            ? $this->allowedDirectRecipientIds($user)
+            : $this->allowedGroupParticipantIdsForProject($user, $projectId);
 
-        $allowedParticipantIds = $this->allowedGroupParticipantIdsForProject($user, $projectId);
-        if ($allowedParticipantIds === []) {
+        if (! $isAdmin && $allowedParticipantIds === []) {
             return response()->json([
                 'message' => 'You are not allowed to create a group chat for this project.',
             ], 403);
@@ -242,7 +252,10 @@ class MessageController extends Controller
 
         $finalParticipantIds = collect($selectedParticipantIds)
             ->push((int) $user->id)
-            ->push((int) $project->company_user_id)
+            ->when(
+                ! $isAdmin && $project,
+                fn($collection) => $collection->push((int) $project->company_user_id)
+            )
             ->filter(fn(int $id) => $id > 0)
             ->unique()
             ->values()
@@ -256,13 +269,13 @@ class MessageController extends Controller
 
         $subject = trim((string) ($validated['subject'] ?? ''));
         if ($subject === '') {
-            $subject = trim((string) ($project->title ?? 'Project Group Chat'));
+            $subject = trim((string) ($project?->title ?? ($isAdmin ? 'Admin Group Chat' : 'Project Group Chat')));
         }
 
         $conversation = Conversation::query()->create([
             'type' => 'group',
             'subject' => $subject,
-            'project_id' => $project->id,
+            'project_id' => $project?->id,
         ]);
 
         foreach ($finalParticipantIds as $participantId) {
@@ -296,7 +309,7 @@ class MessageController extends Controller
             return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
         }
 
-        if ($conversation->type !== 'group' || ! $conversation->project_id) {
+        if ($conversation->type !== 'group') {
             return response()->json(['message' => 'Participants can be managed only on project group chats.'], 422);
         }
 
@@ -306,7 +319,9 @@ class MessageController extends Controller
 
         $targetUserId = (int) $validated['user_id'];
 
-        $allowedParticipantIds = $this->allowedGroupParticipantIdsForProject($user, (int) $conversation->project_id);
+        $allowedParticipantIds = ($user->role === 'admin' && ! $conversation->project_id)
+            ? $this->allowedDirectRecipientIds($user)
+            : $this->allowedGroupParticipantIdsForProject($user, (int) $conversation->project_id);
         if (! in_array($targetUserId, $allowedParticipantIds, true)) {
             return response()->json([
                 'message' => 'Selected user is not eligible for this project group chat.',
@@ -353,11 +368,13 @@ class MessageController extends Controller
             return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
         }
 
-        if ($conversation->type !== 'group' || ! $conversation->project_id) {
+        if ($conversation->type !== 'group') {
             return response()->json(['message' => 'Participants can be managed only on project group chats.'], 422);
         }
 
-        $project = Project::query()->find((int) $conversation->project_id);
+        $project = $conversation->project_id
+            ? Project::query()->find((int) $conversation->project_id)
+            : null;
         if ($project && (int) $participantUser->id === (int) $project->company_user_id) {
             return response()->json([
                 'message' => 'Company owner cannot be removed from project group chat.',
