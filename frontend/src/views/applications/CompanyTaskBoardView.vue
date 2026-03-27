@@ -108,7 +108,7 @@
                 <div v-if="canManageTasks" class="mt-3 relative inline-block">
                   <button
                     type="button"
-                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
                     @click.stop="toggleActionMenu(`status-empty-add:${status}`)"
                   >
                     <Plus class="h-3.5 w-3.5" />
@@ -116,12 +116,12 @@
 
                   <div
                     v-if="isActionMenuOpen(`status-empty-add:${status}`)"
-                    class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                    class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
                     @click.stop
                   >
                     <button
                       type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                       @click.stop="
                         startInlineFolderCreate(status, null);
                         closeActionMenu()
@@ -132,7 +132,7 @@
                     </button>
                     <button
                       type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                       @click.stop="openStatusQuickCreateTask(status)"
                     >
                       <Plus class="h-3.5 w-3.5" />
@@ -143,14 +143,14 @@
 
                 <div
                   v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === null"
-                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2"
+                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                 >
                   <div class="flex items-center gap-2">
                     <input
                       v-model="inlineFolderDraft.name"
                       type="text"
                       maxlength="120"
-                      class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                       placeholder="Folder name"
                       @keydown.enter.prevent="confirmInlineFolderCreate"
                       @keydown.esc.prevent="cancelInlineFolderCreate"
@@ -164,7 +164,7 @@
                     </button>
                     <button
                       type="button"
-                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                       @click="cancelInlineFolderCreate"
                     >
                       <X class="h-3.5 w-3.5" />
@@ -174,21 +174,21 @@
 
                 <div
                   v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === null"
-                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2"
+                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                 >
                   <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                     <input
                       v-model="inlineTaskDraft.title"
                       type="text"
                       maxlength="160"
-                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                       placeholder="Task title"
                       @keydown.enter.prevent="confirmInlineTaskCreate"
                       @keydown.esc.prevent="cancelInlineTaskCreate"
                     />
                     <select
                       v-model="inlineTaskDraft.applicationId"
-                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                     >
                       <option v-if="acceptedApplications.length === 0" :value="null" disabled>
                         No confirmed students
@@ -199,7 +199,7 @@
                     </select>
                     <select
                       v-model="inlineTaskDraft.priority"
-                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                      class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                     >
                       <option value="low">Low</option>
                       <option value="medium">Medium</option>
@@ -216,7 +216,7 @@
                       </button>
                       <button
                         type="button"
-                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                         @click="cancelInlineTaskCreate"
                       >
                         <X class="h-3.5 w-3.5" />
@@ -238,12 +238,12 @@
                   <div
                     v-if="!entry.folder.is_virtual"
                     :class="[
-                      'group flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-100/80',
+                      'group flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-100/80 dark:hover:bg-slate-700/60',
                       entry.depth === 0
-                        ? 'bg-white'
+                        ? 'bg-white dark:bg-slate-800/70'
                         : entry.depth === 1
-                          ? 'bg-slate-50/70'
-                          : 'bg-slate-100/70',
+                          ? 'bg-slate-50/70 dark:bg-slate-800/60'
+                          : 'bg-slate-100/70 dark:bg-slate-800/50',
                       isDropZoneActive(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')
                         ? 'bg-[#4e3aba]/10 ring-2 ring-[#4e3aba]/25'
                         : '',
@@ -272,7 +272,7 @@
                       <FolderOpen v-else class="h-4 w-4 text-[#4e3aba]" style="fill:#4e3aba;stroke:#4e3aba;stroke-width:1.7" />
                       <span
                         v-if="editingFolderId !== entry.folder.id"
-                        class="text-sm font-semibold text-slate-800"
+                        class="text-sm font-semibold text-slate-800 dark:text-slate-100"
                       >
                         {{ entry.folder.name }}
                       </span>
@@ -281,7 +281,7 @@
                           v-model="folderRenameDraft"
                           type="text"
                           maxlength="120"
-                          class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                          class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                           @keydown.enter.prevent="saveFolderRename(entry.folder.id)"
                           @keydown.esc.prevent="cancelFolderRename"
                         />
@@ -294,7 +294,7 @@
                         </button>
                         <button
                           type="button"
-                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                           @click.stop="cancelFolderRename"
                         >
                           <X class="h-3.5 w-3.5" />
@@ -309,7 +309,7 @@
                       >
                         <button
                           type="button"
-                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:bg-slate-700 dark:hover:text-indigo-300"
                           @click.stop="startFolderRename(entry.folder.id, entry.folder.name)"
                         >
                           <Pencil class="h-3.5 w-3.5" />
@@ -328,7 +328,7 @@
 
                   <div
                     v-if="entry.folder.is_virtual || isFolderOpen(status, entry.folder.id)"
-                    :class="entry.folder.is_virtual ? '' : 'border-l border-slate-300/80 pl-2.5'"
+                    :class="entry.folder.is_virtual ? '' : 'border-l border-slate-300/80 pl-2.5 dark:border-slate-700'"
                     :style="entry.folder.is_virtual ? undefined : { marginLeft: `${entry.depth * 18 + 30}px` }"
                   >
                     <div
@@ -343,10 +343,10 @@
                         :class="[
                           'group cursor-grab rounded-md border px-2.5 py-1.5 transition active:cursor-grabbing',
                           entry.depth === 0
-                            ? 'border-slate-200 bg-slate-50/40 hover:border-slate-300 hover:bg-white'
+                            ? 'border-slate-200 bg-slate-50/40 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/55 dark:hover:border-slate-600 dark:hover:bg-slate-800'
                             : entry.depth === 1
-                              ? 'border-slate-200/90 bg-slate-100/55 hover:border-slate-300 hover:bg-slate-50'
-                              : 'border-slate-300/80 bg-slate-100/80 hover:border-slate-400 hover:bg-slate-100',
+                              ? 'border-slate-200/90 bg-slate-100/55 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/65 dark:hover:border-slate-600 dark:hover:bg-slate-800/80'
+                              : 'border-slate-300/80 bg-slate-100/80 hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/75 dark:hover:border-slate-600 dark:hover:bg-slate-800/90',
                           isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
                         ]"
                         :draggable="true"
@@ -357,7 +357,7 @@
                           <div class="min-w-0">
                             <p
                               v-if="editingTaskId !== task.id"
-                              class="truncate text-sm font-medium text-slate-800 transition group-hover:text-[#4e3aba]"
+                              class="truncate text-sm font-medium text-slate-800 transition group-hover:text-[#4e3aba] dark:text-slate-100 dark:group-hover:text-indigo-300"
                             >
                               {{ task.title }}
                             </p>
@@ -366,7 +366,7 @@
                                 v-model="taskRenameDraft"
                                 type="text"
                                 maxlength="160"
-                                class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                                 @keydown.enter.prevent="
                                   saveTaskRename(task.application_id, task.id)
                                 "
@@ -381,7 +381,7 @@
                               </button>
                               <button
                                 type="button"
-                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                                 @click.stop="cancelTaskRename"
                               >
                                 <X class="h-3.5 w-3.5" />
@@ -390,7 +390,7 @@
                           </div>
 
                           <div class="min-w-0">
-                            <span class="truncate text-xs text-slate-700">
+                            <span class="truncate text-xs text-slate-700 dark:text-slate-300">
                               {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
                             </span>
                           </div>
@@ -410,7 +410,7 @@
                           <div class="flex justify-end gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto">
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:bg-slate-700 dark:hover:text-indigo-300"
                               @click.stop="startTaskRename(task.application_id, task.id, task.title)"
                             >
                               <Pencil class="h-3.5 w-3.5" />
@@ -442,8 +442,8 @@
                     >
                       <div
                         :class="[
-                          'group flex w-full items-center justify-between rounded-lg px-2 py-1 text-left transition hover:bg-slate-100/80',
-                          entry.depth > 0 ? 'bg-slate-50/80' : 'bg-slate-50/40',
+                          'group flex w-full items-center justify-between rounded-lg px-2 py-1 text-left transition hover:bg-slate-100/80 dark:hover:bg-slate-700/60',
+                          entry.depth > 0 ? 'bg-slate-50/80 dark:bg-slate-800/65' : 'bg-slate-50/40 dark:bg-slate-800/50',
                           isDropZoneActive(status, entry.folder.id, category.id, 'category')
                             ? 'bg-[#4e3aba]/10 ring-2 ring-[#4e3aba]/25'
                             : '',
@@ -472,7 +472,7 @@
                               v-model="categoryRenameDraft"
                               type="text"
                               maxlength="120"
-                              class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                              class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                               @keydown.enter.prevent="
                                 saveCategoryRename(entry.folder.id, category.id)
                               "
@@ -487,7 +487,7 @@
                             </button>
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                               @click.stop="cancelCategoryRename"
                             >
                               <X class="h-3.5 w-3.5" />
@@ -502,7 +502,7 @@
                           >
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:bg-slate-700 dark:hover:text-indigo-300"
                               @click.stop="startCategoryRename(entry.folder.id, category.id, category.name)"
                             >
                               <Pencil class="h-3.5 w-3.5" />
@@ -521,7 +521,7 @@
 
                       <div
                         v-if="isCategoryOpen(status, category.id)"
-                        class="ml-5 mt-1 space-y-1 border-l border-slate-300/80 pl-2.5"
+                        class="ml-5 mt-1 space-y-1 border-l border-slate-300/80 pl-2.5 dark:border-slate-700"
                         @dragover.prevent
                         @drop.prevent.stop="onCategoryDrop(status, entry.folder.id, category.id)"
                       >
@@ -531,10 +531,10 @@
                           :class="[
                               'group cursor-grab rounded-md border px-2.5 py-1.5 transition active:cursor-grabbing',
                               entry.depth === 0
-                                ? 'border-slate-200 bg-slate-50/35 hover:border-slate-300 hover:bg-white'
+                                ? 'border-slate-200 bg-slate-50/35 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/55 dark:hover:border-slate-600 dark:hover:bg-slate-800'
                                 : entry.depth === 1
-                                  ? 'border-slate-200/90 bg-slate-100/60 hover:border-slate-300 hover:bg-slate-50'
-                                  : 'border-slate-300/80 bg-slate-100/85 hover:border-slate-400 hover:bg-slate-100',
+                                  ? 'border-slate-200/90 bg-slate-100/60 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/65 dark:hover:border-slate-600 dark:hover:bg-slate-800/80'
+                                  : 'border-slate-300/80 bg-slate-100/85 hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/75 dark:hover:border-slate-600 dark:hover:bg-slate-800/90',
                             isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
                           ]"
                           :draggable="true"
@@ -547,7 +547,7 @@
                             <div class="min-w-0">
                               <p
                                 v-if="editingTaskId !== task.id"
-                                class="truncate text-sm font-medium text-slate-800 transition group-hover:text-[#4e3aba]"
+                                class="truncate text-sm font-medium text-slate-800 transition group-hover:text-[#4e3aba] dark:text-slate-100 dark:group-hover:text-indigo-300"
                               >
                                 {{ task.title }}
                               </p>
@@ -556,7 +556,7 @@
                                   v-model="taskRenameDraft"
                                   type="text"
                                   maxlength="160"
-                                  class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                  class="h-7 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                                   @keydown.enter.prevent="
                                     saveTaskRename(task.application_id, task.id)
                                   "
@@ -571,7 +571,7 @@
                                 </button>
                                 <button
                                   type="button"
-                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                                   @click.stop="cancelTaskRename"
                                 >
                                   <X class="h-3.5 w-3.5" />
@@ -580,7 +580,7 @@
                             </div>
 
                             <div class="min-w-0">
-                              <span class="truncate text-xs text-slate-700">
+                              <span class="truncate text-xs text-slate-700 dark:text-slate-300">
                                 {{ task.assignee.name || task.assignee.email || 'Unknown assignee' }}
                               </span>
                             </div>
@@ -600,7 +600,7 @@
                             <div class="flex justify-end gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto">
                               <button
                                 type="button"
-                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba]"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition hover:border-[#4e3aba]/35 hover:bg-slate-50 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:bg-slate-700 dark:hover:text-indigo-300"
                                 @click.stop="startTaskRename(task.application_id, task.id, task.title)"
                               >
                                 <Pencil class="h-3.5 w-3.5" />
@@ -628,7 +628,7 @@
                           <div class="relative inline-block">
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
                               @click.stop="toggleActionMenu(`category-add:${status}:${entry.folder.id}:${category.id}`)"
                             >
                               <Plus class="h-3.5 w-3.5" />
@@ -636,12 +636,12 @@
 
                             <div
                               v-if="isActionMenuOpen(`category-add:${status}:${entry.folder.id}:${category.id}`)"
-                              class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                              class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
                               @click.stop
                             >
                               <button
                                 type="button"
-                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                                 @click.stop="
                                   startInlineFolderCreate(status, entry.folder.id);
                                   closeActionMenu()
@@ -652,7 +652,7 @@
                               </button>
                               <button
                                 type="button"
-                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                                 @click.stop="
                                   startInlineTaskCreate(status, entry.folder.id, category.id);
                                   closeActionMenu()
@@ -666,21 +666,21 @@
 
                           <div
                             v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === entry.folder.id && inlineTaskDraft.categoryId === category.id"
-                            class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                            class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                           >
                             <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                               <input
                                 v-model="inlineTaskDraft.title"
                                 type="text"
                                 maxlength="160"
-                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                                 placeholder="Task title"
                                 @keydown.enter.prevent="confirmInlineTaskCreate"
                                 @keydown.esc.prevent="cancelInlineTaskCreate"
                               />
                               <select
                                 v-model="inlineTaskDraft.applicationId"
-                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                               >
                                 <option v-if="acceptedApplications.length === 0" :value="null" disabled>
                                   No confirmed students
@@ -691,7 +691,7 @@
                               </select>
                               <select
                                 v-model="inlineTaskDraft.priority"
-                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                                class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                               >
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
@@ -708,7 +708,7 @@
                                 </button>
                                 <button
                                   type="button"
-                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                                  class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                                   @click="cancelInlineTaskCreate"
                                 >
                                   <X class="h-3.5 w-3.5" />
@@ -724,7 +724,7 @@
                       <div class="relative inline-block">
                         <button
                           type="button"
-                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
                           @click.stop="toggleActionMenu(`folder-add:${status}:${entry.folder.id}`)"
                         >
                           <Plus class="h-3.5 w-3.5" />
@@ -732,12 +732,12 @@
 
                         <div
                           v-if="isActionMenuOpen(`folder-add:${status}:${entry.folder.id}`)"
-                          class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                          class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
                           @click.stop
                         >
                           <button
                             type="button"
-                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                             @click.stop="
                               startInlineFolderCreate(status, entry.folder.id);
                               closeActionMenu()
@@ -748,7 +748,7 @@
                           </button>
                           <button
                             type="button"
-                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                             @click.stop="
                               startInlineTaskCreate(status, entry.folder.id, null);
                               closeActionMenu()
@@ -762,14 +762,14 @@
 
                       <div
                         v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === entry.folder.id"
-                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                       >
                         <div class="flex items-center gap-2">
                           <input
                             v-model="inlineFolderDraft.name"
                             type="text"
                             maxlength="120"
-                            class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                            class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                             placeholder="Subfolder name"
                             @keydown.enter.prevent="confirmInlineFolderCreate"
                             @keydown.esc.prevent="cancelInlineFolderCreate"
@@ -783,7 +783,7 @@
                           </button>
                           <button
                             type="button"
-                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                             @click="cancelInlineFolderCreate"
                           >
                             <X class="h-3.5 w-3.5" />
@@ -793,21 +793,21 @@
 
                       <div
                         v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === entry.folder.id && inlineTaskDraft.categoryId === null"
-                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                       >
                         <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                           <input
                             v-model="inlineTaskDraft.title"
                             type="text"
                             maxlength="160"
-                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                             placeholder="Task title"
                             @keydown.enter.prevent="confirmInlineTaskCreate"
                             @keydown.esc.prevent="cancelInlineTaskCreate"
                           />
                           <select
                             v-model="inlineTaskDraft.applicationId"
-                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                           >
                             <option v-if="acceptedApplications.length === 0" :value="null" disabled>
                               No confirmed students
@@ -818,7 +818,7 @@
                           </select>
                           <select
                             v-model="inlineTaskDraft.priority"
-                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                           >
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
@@ -835,7 +835,7 @@
                             </button>
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                               @click="cancelInlineTaskCreate"
                             >
                               <X class="h-3.5 w-3.5" />
@@ -851,7 +851,7 @@
                   <div class="relative inline-block">
                     <button
                       type="button"
-                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
                       @click.stop="toggleActionMenu(`section-end-add:${status}`)"
                     >
                       <Plus class="h-3.5 w-3.5" />
@@ -859,12 +859,12 @@
 
                     <div
                       v-if="isActionMenuOpen(`section-end-add:${status}`)"
-                      class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+                      class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
                       @click.stop
                     >
                       <button
                         type="button"
-                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                         @click.stop="
                           startInlineFolderCreate(status, null);
                           closeActionMenu()
@@ -875,7 +875,7 @@
                       </button>
                       <button
                         type="button"
-                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
+                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                         @click.stop="openStatusQuickCreateTask(status)"
                       >
                         <Plus class="h-3.5 w-3.5" />
@@ -886,14 +886,14 @@
 
                   <div
                     v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === null"
-                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                   >
                     <div class="flex items-center gap-2">
                       <input
                         v-model="inlineFolderDraft.name"
                         type="text"
                         maxlength="120"
-                        class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                        class="h-8 flex-1 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                         placeholder="Folder name"
                         @keydown.enter.prevent="confirmInlineFolderCreate"
                         @keydown.esc.prevent="cancelInlineFolderCreate"
@@ -907,7 +907,7 @@
                       </button>
                       <button
                         type="button"
-                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                         @click="cancelInlineFolderCreate"
                       >
                         <X class="h-3.5 w-3.5" />
@@ -917,21 +917,21 @@
 
                   <div
                     v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === null"
-                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2"
+                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
                   >
                     <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                       <input
                         v-model="inlineTaskDraft.title"
                         type="text"
                         maxlength="160"
-                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                         placeholder="Task title"
                         @keydown.enter.prevent="confirmInlineTaskCreate"
                         @keydown.esc.prevent="cancelInlineTaskCreate"
                       />
                       <select
                         v-model="inlineTaskDraft.applicationId"
-                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                       >
                         <option v-if="acceptedApplications.length === 0" :value="null" disabled>
                           No confirmed students
@@ -942,7 +942,7 @@
                       </select>
                       <select
                         v-model="inlineTaskDraft.priority"
-                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
+                        class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-slate-500"
                       >
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
@@ -959,7 +959,7 @@
                         </button>
                         <button
                           type="button"
-                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                           @click="cancelInlineTaskCreate"
                         >
                           <X class="h-3.5 w-3.5" />
@@ -984,7 +984,7 @@
           <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create folder</h3>
           <select
             v-model="createFolderStatus"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
           >
             <option value="todo">TO DO</option>
             <option value="in_progress">IN PROGRESS</option>
@@ -994,7 +994,7 @@
             v-model="newFolderName"
             type="text"
             maxlength="120"
-            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
             placeholder="Folder name"
           />
           <div class="mt-4 flex justify-end gap-2">
@@ -1022,7 +1022,7 @@
 
           <select
             v-model="createCategoryStatus"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
           >
             <option value="todo">TO DO</option>
             <option value="in_progress">IN PROGRESS</option>
@@ -1032,7 +1032,7 @@
           <select
             v-if="!createCategoryFolderLocked"
             v-model="selectedFolderId"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
           >
             <option :value="null">Select folder</option>
             <option
@@ -1046,7 +1046,7 @@
 
           <div
             v-else
-            class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+            class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
           >
             {{ folderOptions.find((folder) => folder.id === selectedFolderId)?.name || 'Selected folder' }}
           </div>
@@ -1055,7 +1055,7 @@
             v-model="newCategoryName"
             type="text"
             maxlength="120"
-            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
             placeholder="Category name"
           />
 
@@ -1084,7 +1084,7 @@
 
           <select
             v-model="createTaskStatus"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
           >
             <option value="todo">TO DO</option>
             <option value="in_progress">IN PROGRESS</option>
@@ -1093,7 +1093,7 @@
 
           <select
             v-model="selectedTaskApplicationId"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
           >
             <option v-if="acceptedApplications.length === 0" :value="null" disabled>
               No confirmed students on this project
@@ -1107,13 +1107,13 @@
             v-model="newTaskTitle"
             type="text"
             maxlength="160"
-            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
             placeholder="Task title"
           />
 
           <select
             v-model="newTaskPriority"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>

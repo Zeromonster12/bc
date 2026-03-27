@@ -103,6 +103,7 @@
                 <BaseInput
                   v-model="form.first_name"
                   label="FIRST NAME"
+                  label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                   type="text"
                   placeholder="Eleanor"
                   autocomplete="given-name"
@@ -112,6 +113,7 @@
                 <BaseInput
                   v-model="form.last_name"
                   label="SURNAME"
+                  label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                   type="text"
                   placeholder="Vance"
                   autocomplete="family-name"
@@ -133,6 +135,7 @@
                 <BaseInput
                   v-model="form.password"
                   label="PASSWORD"
+                  label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                   type="password"
                   :allow-password-toggle="true"
                   autocomplete="new-password"
@@ -142,6 +145,7 @@
                 <BaseInput
                   v-model="form.password_confirmation"
                   label="CONFIRM"
+                  label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                   type="password"
                   :allow-password-toggle="true"
                   autocomplete="new-password"
@@ -155,6 +159,7 @@
               <BaseInput
                 v-model="form.business_name"
                 label="BUSINESS NAME"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 :error="errors.business_name"
                 required
@@ -162,6 +167,7 @@
               <BaseInput
                 v-model="form.billing_street"
                 label="BILLING STREET AND NUMBER"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 :error="errors.billing_street"
                 required
@@ -169,6 +175,7 @@
               <BaseInput
                 v-model="form.billing_city"
                 label="BILLING CITY"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 :error="errors.billing_city"
                 required
@@ -176,18 +183,20 @@
               <BaseInput
                 v-model="form.billing_postal_code"
                 label="BILLING POSTAL CODE"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 placeholder="821 01"
                 :error="errors.billing_postal_code"
                 required
               />
               <div class="grid gap-4 sm:grid-cols-2">
-                <BaseInput v-model="form.ico" label="ICO" type="text" placeholder="12345678" :error="errors.ico" required />
-                <BaseInput v-model="form.dic" label="DIC" type="text" placeholder="1234567890" :error="errors.dic" required />
+                <BaseInput v-model="form.ico" label="ICO" label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300" type="text" placeholder="12345678" :error="errors.ico" required />
+                <BaseInput v-model="form.dic" label="DIC" label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300" type="text" placeholder="1234567890" :error="errors.dic" required />
               </div>
               <BaseInput
                 v-model="form.ic_dph"
                 label="IC DPH (OPTIONAL)"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 placeholder="SK1234567890"
                 :error="errors.ic_dph"
@@ -198,6 +207,7 @@
               <BaseInput
                 v-model="form.contact_person_full_name"
                 label="CONTACT PERSON FULL NAME (DEFAULTS TO ACCOUNT NAME)"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 :error="errors.contact_person_full_name"
                 required
@@ -205,6 +215,7 @@
               <BaseInput
                 v-model="form.contact_email"
                 label="CONTACT EMAIL (CAN BE SAME AS LOGIN EMAIL)"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="email"
                 :error="errors.contact_email"
                 required
@@ -212,6 +223,7 @@
               <BaseInput
                 v-model="form.phone"
                 label="CONTACT PHONE"
+                label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
                 type="text"
                 placeholder="+421 900 123 456"
                 :error="errors.phone"

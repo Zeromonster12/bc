@@ -54,6 +54,7 @@
             <BaseInput
               v-model="form.password"
               label="PASSWORD"
+              label-class="text-[11px] font-bold tracking-[0.08em] text-[#2f334f] dark:text-slate-300"
               type="password"
               :allow-password-toggle="true"
               autocomplete="current-password"
