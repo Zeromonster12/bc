@@ -1,23 +1,14 @@
 <template>
   <AppLayout>
     <div class="space-y-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">
-        <span v-if="auth.isStudent">My Applications</span>
-        <span v-else>Project Applicants</span>
-      </h1>
-
-      <ApplicationStatusFilters
-        :active-status="activeStatus"
-        :options="statusOptions"
-        @change="setStatusFilter"
-      />
+      <h1 v-if="auth.isCompany" class="text-2xl font-bold text-gray-900 dark:text-slate-100">Project Applicants</h1>
 
       <div v-if="applicationStore.loading" class="space-y-3">
         <div v-for="n in 4" :key="n" class="h-28 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
 
       <template v-else>
-        <div v-if="auth.isCompany" class="grid gap-6 lg:grid-cols-[320px_1fr]">
+        <div v-if="auth.isCompany" class="grid items-stretch gap-6 lg:h-[calc(100vh-8rem)] lg:grid-cols-[320px_1fr]">
           <CompanyProjectList
             :projects="projectStore.projects"
             :selected-project-id="selectedProjectId"
@@ -35,7 +26,7 @@
 
         <div v-else>
           <StudentApplicationsList
-            :applications="filteredApplications"
+            :applications="applicationStore.applications"
             :withdrawing-id="withdrawingId"
             @withdraw="handleWithdraw"
           />
@@ -62,13 +53,11 @@ import {
   type AppPagination,
   type ApplicationListItem,
   type CompanyProject,
-  buildCompanyApplicationsParams,
   filterApplications,
   findProjectById,
   toPagination,
 } from '@/services/applications/ApplicationsViewService'
 import AppLayout from '@/layouts/AppLayout.vue'
-import ApplicationStatusFilters from '@/components/applications/ApplicationStatusFilters.vue'
 import CompanyProjectList from '@/components/applications/CompanyProjectList.vue'
 import CompanyApplicantsPanel from '@/components/applications/CompanyApplicantsPanel.vue'
 import StudentApplicationsList from '@/components/applications/StudentApplicationsList.vue'
@@ -78,7 +67,6 @@ export default defineComponent({
   name: 'ApplicationsView',
   components: {
     AppLayout,
-    ApplicationStatusFilters,
     CompanyProjectList,
     CompanyApplicantsPanel,
     StudentApplicationsList,
@@ -93,18 +81,10 @@ export default defineComponent({
   },
   data() {
     return {
-      activeStatus: 'all',
       selectedProjectId: null as number | null,
       withdrawingId: null as number | null,
       updatingId: null as number | null,
       updatingStatus: '',
-      statusOptions: [
-        { value: 'all', label: 'All' },
-        { value: 'pending', label: 'Pending' },
-        { value: 'accepted', label: 'Accepted' },
-        { value: 'rejected', label: 'Rejected' },
-        { value: 'withdrawn', label: 'Withdrawn' },
-      ],
     }
   },
   computed: {
@@ -117,7 +97,7 @@ export default defineComponent({
     filteredApplications(): ApplicationListItem[] {
       return filterApplications(
         this.applicationStore.applications as ApplicationListItem[],
-        this.activeStatus,
+        'all',
         this.selectedProjectId,
         this.auth.isCompany,
       )
@@ -131,6 +111,20 @@ export default defineComponent({
     await this.applicationStore.fetchApplications()
   },
   methods: {
+    ensureSelectedProject() {
+      if (!this.auth.isCompany) return
+
+      const projects = this.projectStore.projects as CompanyProject[]
+      if (!projects.length) {
+        this.selectedProjectId = null
+        return
+      }
+
+      const selectedExists = projects.some((project) => project.id === this.selectedProjectId)
+      if (!selectedExists) {
+        this.selectedProjectId = projects[0]?.id ?? null
+      }
+    },
     handlePanelUpdateStatus(payload: { id: number; status: 'accepted' | 'rejected' }) {
       return this.handleUpdateStatus(payload.id, payload.status)
     },
@@ -140,31 +134,17 @@ export default defineComponent({
         per_page: 100,
       })
 
-      const firstProject = this.projectStore.projects[0]
-      if (firstProject) {
-        this.selectedProjectId = firstProject.id
-        await this.fetchCompanyApplicationsForSelectedProject(1)
-      }
+      await this.applicationStore.fetchApplications({
+        per_page: 500,
+      })
+      this.ensureSelectedProject()
     },
-    async fetchCompanyApplicationsForSelectedProject(page: number) {
-      const params = buildCompanyApplicationsParams(this.selectedProjectId, this.activeStatus, page)
-      if (!params) return
-      await this.applicationStore.fetchApplications(params)
-    },
-    async selectProject(projectId: number) {
+    selectProject(projectId: number) {
       this.selectedProjectId = projectId
-      await this.fetchCompanyApplicationsForSelectedProject(1)
-    },
-    async setStatusFilter(status: string) {
-      this.activeStatus = status
-      if (this.auth.isCompany) {
-        await this.fetchCompanyApplicationsForSelectedProject(1)
-      }
     },
     async handlePageChange(page: number) {
       await this.applicationStore.fetchApplications({
         page,
-        status: this.activeStatus === 'all' ? undefined : this.activeStatus,
       })
     },
     async handleWithdraw(id: number) {
@@ -182,11 +162,11 @@ export default defineComponent({
       try {
         await this.applicationStore.updateStatus(id, status)
         if (this.auth.isCompany) {
-          await this.fetchCompanyApplicationsForSelectedProject(1)
           await this.projectStore.fetchProjects({
             company_id: Number(this.auth.user?.id),
             per_page: 100,
           })
+          this.ensureSelectedProject()
         }
       } finally {
         this.updatingId = null

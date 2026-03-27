@@ -3,7 +3,14 @@
     <div class="space-y-3 rounded-xl border border-gray-200 bg-white p-5 text-sm dark:border-slate-700/70 dark:bg-slate-900/90">
       <div class="flex justify-between">
         <span class="text-gray-500 dark:text-slate-400">Company</span>
-        <span class="font-medium text-gray-900 dark:text-slate-100">{{ project.company?.name }}</span>
+        <RouterLink
+          v-if="project.company?.user_id"
+          :to="`/companies/${project.company.user_id}/profile`"
+          class="font-medium text-gray-900 transition hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-300"
+        >
+          {{ project.company?.name }}
+        </RouterLink>
+        <span v-else class="font-medium text-gray-900 dark:text-slate-100">{{ project.company?.name }}</span>
       </div>
       <div class="flex justify-between">
         <span class="text-gray-500 dark:text-slate-400">Posted</span>
@@ -46,6 +53,7 @@ import { defineComponent, type PropType } from 'vue'
 
 interface ProjectDetailSidebarItem {
   company?: {
+    user_id?: number
     name?: string
   }
   location?: string | null

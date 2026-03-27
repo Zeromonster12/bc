@@ -5,6 +5,9 @@ export interface CreateProjectForm {
   description: string
   requirements: string
   location: string
+  location_strategy: 'remote' | 'onsite' | 'hybrid'
+  industry: string
+  internship_duration: string
   tech_stack: string[]
   status: string
   max_students: number
@@ -15,6 +18,9 @@ export const createDefaultProjectForm = (): CreateProjectForm => ({
   description: '',
   requirements: '',
   location: '',
+  location_strategy: 'remote',
+  industry: 'Technology & Software',
+  internship_duration: '3 Months (Summer)',
   tech_stack: [],
   status: 'draft',
   max_students: 1,

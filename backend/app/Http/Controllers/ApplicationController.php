@@ -47,7 +47,7 @@ class ApplicationController extends Controller
                 'project.companyUser:id,name',
                 'project.companyUser.companyProfile:id,user_id,profile_data',
                 'studentUser:id,name,email',
-                'studentUser.studentProfile:id,user_id,avatar_path',
+                'studentUser.studentProfile:id,user_id,avatar_path,profile_data',
                 'studentUser.githubAccount:id,user_id,provider,profile_data',
                 'tasks:id,application_id,project_id,task_folder_id,task_category_id,created_by_user_id,assignee_user_id,title,requirements,priority,status,position,student_note,due_at,completed_at,created_at',
                 'tasks.assignee:id,name,email',
@@ -90,16 +90,56 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'You can only apply to open projects.'], 422);
         }
 
+        if ($this->isProjectAtCapacity($project->id, $project->max_students)) {
+            return response()->json([
+                'message' => 'This project is already full. Applications are closed.',
+            ], 422);
+        }
+
         $validated = $request->validate([
             'cover_letter' => ['required', 'string', 'min:50', 'max:3000'],
         ]);
 
-        $alreadyApplied = Application::query()
+        $existingApplication = Application::query()
             ->where('project_id', $project->id)
             ->where('student_user_id', $user->id)
-            ->exists();
+            ->first();
 
-        if ($alreadyApplied) {
+        if ($existingApplication) {
+            if (in_array($existingApplication->status, ['pending', 'accepted'], true)) {
+                return response()->json(['message' => 'You already applied to this project.'], 422);
+            }
+
+            if (in_array($existingApplication->status, ['rejected', 'withdrawn'], true)) {
+                if ($existingApplication->tasks()->exists()) {
+                    $existingApplication->tasks()->delete();
+                }
+
+                $existingApplication->update([
+                    'cover_letter' => $validated['cover_letter'],
+                    'status' => 'pending',
+                    'reviewed_at' => null,
+                    'student_project_status' => null,
+                    'student_project_note' => null,
+                    'student_project_status_updated_at' => null,
+                ]);
+
+                $existingApplication->load([
+                    'project:id,company_user_id,title,status,location,created_at',
+                    'project.companyUser:id,name',
+                    'project.companyUser.companyProfile:id,user_id,profile_data',
+                    'studentUser:id,name,email',
+                    'studentUser.studentProfile:id,user_id,avatar_path,profile_data',
+                    'studentUser.githubAccount:id,user_id,provider,profile_data',
+                    'tasks:id,application_id,project_id,task_folder_id,task_category_id,created_by_user_id,assignee_user_id,title,requirements,priority,status,position,student_note,due_at,completed_at,created_at',
+                    'tasks.assignee:id,name,email',
+                ]);
+
+                return response()->json([
+                    'data' => $this->transformApplication($existingApplication),
+                ]);
+            }
+
             return response()->json(['message' => 'You already applied to this project.'], 422);
         }
 
@@ -115,7 +155,7 @@ class ApplicationController extends Controller
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
-            'studentUser.studentProfile:id,user_id,avatar_path',
+            'studentUser.studentProfile:id,user_id,avatar_path,profile_data',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
             'tasks:id,application_id,project_id,task_folder_id,task_category_id,created_by_user_id,assignee_user_id,title,requirements,priority,status,position,student_note,due_at,completed_at,created_at',
             'tasks.assignee:id,name,email',
@@ -147,6 +187,18 @@ class ApplicationController extends Controller
             'status' => ['required', 'in:accepted,rejected'],
         ]);
 
+        $application->loadMissing('project:id,company_user_id,max_students');
+
+        if (
+            $validated['status'] === 'accepted'
+            && $application->status !== 'accepted'
+            && $this->isProjectAtCapacity((int) $application->project_id, (int) ($application->project?->max_students ?? 1))
+        ) {
+            return response()->json([
+                'message' => 'This project already reached max students. You cannot accept more applicants.',
+            ], 422);
+        }
+
         $updatePayload = [
             'status' => $validated['status'],
             'reviewed_at' => now(),
@@ -163,7 +215,7 @@ class ApplicationController extends Controller
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
-            'studentUser.studentProfile:id,user_id,avatar_path',
+            'studentUser.studentProfile:id,user_id,avatar_path,profile_data',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
             'tasks:id,application_id,project_id,task_folder_id,task_category_id,created_by_user_id,assignee_user_id,title,requirements,priority,status,position,student_note,due_at,completed_at,created_at',
             'tasks.assignee:id,name,email',
@@ -206,7 +258,7 @@ class ApplicationController extends Controller
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
-            'studentUser.studentProfile:id,user_id,avatar_path',
+            'studentUser.studentProfile:id,user_id,avatar_path,profile_data',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
             'tasks:id,application_id,project_id,task_folder_id,task_category_id,created_by_user_id,assignee_user_id,title,requirements,priority,status,position,student_note,due_at,completed_at,created_at',
             'tasks.assignee:id,name,email',
@@ -315,7 +367,7 @@ class ApplicationController extends Controller
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
-            'studentUser.studentProfile:id,user_id,avatar_path',
+            'studentUser.studentProfile:id,user_id,avatar_path,profile_data',
             'studentUser.githubAccount:id,user_id,provider,profile_data',
             'tasks:id,application_id,project_id,task_folder_id,task_category_id,created_by_user_id,assignee_user_id,title,requirements,priority,status,position,student_note,due_at,completed_at,created_at',
             'tasks.assignee:id,name,email',
@@ -325,6 +377,16 @@ class ApplicationController extends Controller
             'data' => $this->transformTask($task),
             'application' => $this->transformApplication($application),
         ], 201);
+    }
+
+    private function isProjectAtCapacity(int $projectId, int $maxStudents): bool
+    {
+        $acceptedCount = Application::query()
+            ->where('project_id', $projectId)
+            ->where('status', 'accepted')
+            ->count();
+
+        return $acceptedCount >= max(1, $maxStudents);
     }
 
     public function updateTask(Request $request, Application $application, ApplicationTask $task): JsonResponse
@@ -351,13 +413,28 @@ class ApplicationController extends Controller
             $validated = $request->validate([
                 'status' => ['required', 'in:' . implode(',', self::TASK_STATUSES)],
                 'student_note' => ['nullable', 'string', 'max:1000'],
+                'task_folder_id' => ['nullable', 'integer', 'min:1'],
+                'task_category_id' => ['nullable', 'integer', 'min:1'],
+                'position' => ['nullable', 'integer', 'min:0'],
             ]);
 
-            $task->update([
+            $payload = [
                 'status' => $validated['status'],
                 'student_note' => $validated['student_note'] ?? $task->student_note,
                 'completed_at' => $validated['status'] === 'complete' ? now() : null,
-            ]);
+            ];
+
+            if (array_key_exists('task_folder_id', $validated) || array_key_exists('task_category_id', $validated)) {
+                [$folderId, $categoryId] = $this->resolveTaskGrouping((int) $application->project_id, $validated);
+                $payload['task_folder_id'] = $folderId;
+                $payload['task_category_id'] = $categoryId;
+            }
+
+            if (array_key_exists('position', $validated)) {
+                $payload['position'] = $validated['position'];
+            }
+
+            $task->update($payload);
 
             $task->load('assignee:id,name,email');
 
@@ -451,6 +528,9 @@ class ApplicationController extends Controller
     {
         $githubAccount = $application->studentUser?->githubAccount;
         $githubProfileData = is_array($githubAccount?->profile_data) ? $githubAccount->profile_data : [];
+        $studentProfileData = is_array($application->studentUser?->studentProfile?->profile_data)
+            ? $application->studentUser->studentProfile->profile_data
+            : [];
         $companyProfileData = is_array($application->project?->companyUser?->companyProfile?->profile_data)
             ? $application->project->companyUser->companyProfile->profile_data
             : [];
@@ -468,8 +548,11 @@ class ApplicationController extends Controller
                 'title' => $application->project?->title,
                 'status' => $application->project?->status,
                 'location' => $application->project?->location,
+                'requirements' => $application->project?->requirements,
+                'tech_stack' => is_array($application->project?->tech_stack) ? $application->project->tech_stack : [],
                 'posted_at' => optional($application->project?->created_at)?->toISOString(),
                 'company' => [
+                    'user_id' => $application->project?->company_user_id,
                     'name' => $companyName !== '' ? $companyName : null,
                 ],
             ],
@@ -481,6 +564,16 @@ class ApplicationController extends Controller
                 'github_connected' => (bool) $githubAccount,
                 'github_username' => (string) ($githubProfileData['nickname'] ?? ''),
                 'github_url' => (string) ($githubProfileData['html_url'] ?? ''),
+                'profile' => [
+                    'university' => (string) ($studentProfileData['university'] ?? ''),
+                    'degree' => (string) ($studentProfileData['degree'] ?? ''),
+                    'field_of_study' => (string) ($studentProfileData['field_of_study'] ?? ''),
+                    'skills' => is_array($studentProfileData['skills'] ?? null) ? $studentProfileData['skills'] : [],
+                    'interests' => is_array($studentProfileData['interests'] ?? null) ? $studentProfileData['interests'] : [],
+                    'projects' => is_array($studentProfileData['projects'] ?? null) ? $studentProfileData['projects'] : [],
+                    'bio' => (string) ($studentProfileData['bio'] ?? ''),
+                    'about_me' => (string) ($studentProfileData['about_me'] ?? ''),
+                ],
             ],
             'cover_letter' => $application->cover_letter,
             'status' => $application->status,

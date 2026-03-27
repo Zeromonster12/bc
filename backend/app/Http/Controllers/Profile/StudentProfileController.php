@@ -92,6 +92,59 @@ class StudentProfileController extends Controller
         return response()->json($this->transformProfile($profile->fresh(), $user->id));
     }
 
+    public function showForCompany(Request $request, User $user): JsonResponse
+    {
+        $actor = $request->user();
+
+        if (! $actor) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        if (! in_array($actor->role, ['company', 'admin'], true) && $actor->id !== $user->id) {
+            return response()->json([
+                'message' => 'You are not allowed to view this student profile.',
+            ], 403);
+        }
+
+        if ($user->role !== 'student') {
+            return response()->json([
+                'message' => 'Student profile not found.',
+            ], 404);
+        }
+
+        $user->load([
+            'studentProfile:id,user_id,profile_data,avatar_path',
+            'githubAccount:id,user_id,provider,profile_data',
+        ]);
+
+        $profileData = is_array($user->studentProfile?->profile_data)
+            ? $user->studentProfile->profile_data
+            : [];
+        $githubProfileData = is_array($user->githubAccount?->profile_data)
+            ? $user->githubAccount->profile_data
+            : [];
+
+        return response()->json([
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar_url' => $user->avatar_url,
+                ],
+                'github' => [
+                    'connected' => (bool) $user->githubAccount,
+                    'username' => (string) ($githubProfileData['nickname'] ?? ''),
+                    'profile_url' => (string) ($githubProfileData['html_url'] ?? ''),
+                    'avatar_url' => (string) ($githubProfileData['avatar_url'] ?? ''),
+                ],
+                'profile' => $profileData,
+            ],
+        ]);
+    }
+
     public function avatar(Request $request)
     {
         $user = $request->user();

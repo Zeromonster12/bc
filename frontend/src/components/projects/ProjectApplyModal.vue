@@ -1,5 +1,5 @@
 <template>
-  <BaseModal v-model="isOpen" title="Apply to this project">
+  <BaseModal v-model="isOpen" :title="title">
     <div class="space-y-4">
       <BaseAlert v-if="errorMessage" type="error" :message="errorMessage" />
       <div>
@@ -16,9 +16,7 @@
     </div>
     <template #footer>
       <BaseButton variant="secondary" @click="$emit('update:show', false)">Cancel</BaseButton>
-      <BaseButton variant="primary" :loading="submitting" @click="$emit('submit')"
-        >Submit application</BaseButton
-      >
+      <BaseButton variant="primary" :loading="submitting" @click="$emit('submit')">{{ submitLabel }}</BaseButton>
     </template>
   </BaseModal>
 </template>
@@ -48,6 +46,14 @@ export default defineComponent({
     errorMessage: {
       type: String,
       default: '',
+    },
+    title: {
+      type: String,
+      default: 'Apply to this project',
+    },
+    submitLabel: {
+      type: String,
+      default: 'Submit application',
     },
   },
   emits: ['update:show', 'update:coverLetter', 'submit'],

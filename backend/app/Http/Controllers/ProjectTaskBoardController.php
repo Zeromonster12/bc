@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use App\Models\ApplicationTask;
 use App\Models\ApplicationTaskCategory;
 use App\Models\ApplicationTaskFolder;
@@ -24,7 +25,7 @@ class ProjectTaskBoardController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        if (! $this->canManageProjectTasks($project, $user->id, $user->role)) {
+        if (! $this->canViewProjectTasks($project, $user->id, $user->role)) {
             return response()->json(['message' => 'You are not allowed to access this project board.'], 403);
         }
 
@@ -76,7 +77,7 @@ class ProjectTaskBoardController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        if (! $this->canManageProjectTasks($project, $user->id, $user->role)) {
+        if (! $this->canViewProjectTasks($project, $user->id, $user->role)) {
             return response()->json(['message' => 'You are not allowed to access folders for this project.'], 403);
         }
 
@@ -496,6 +497,23 @@ class ProjectTaskBoardController extends Controller
         }
 
         return $role === 'company' && (int) $project->company_user_id === $userId;
+    }
+
+    private function canViewProjectTasks(Project $project, int $userId, string $role): bool
+    {
+        if ($this->canManageProjectTasks($project, $userId, $role)) {
+            return true;
+        }
+
+        if ($role !== 'student') {
+            return false;
+        }
+
+        return Application::query()
+            ->where('project_id', $project->id)
+            ->where('student_user_id', $userId)
+            ->where('status', 'accepted')
+            ->exists();
     }
 
     private function wouldCreateFolderCycle(int $projectId, int $folderId, $newParentId): bool

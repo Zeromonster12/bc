@@ -46,7 +46,15 @@
                 {{ application.project?.title ?? 'Project' }}
               </h2>
               <p class="text-sm text-gray-600 dark:text-slate-300">
-                Company: {{ application.project?.company?.name ?? 'Unknown' }}
+                Company:
+                <RouterLink
+                  v-if="application.project?.company?.user_id"
+                  :to="`/companies/${application.project.company.user_id}/profile`"
+                  class="font-medium text-[#4f33d7] transition hover:underline dark:text-indigo-300"
+                >
+                  {{ application.project?.company?.name ?? 'Unknown' }}
+                </RouterLink>
+                <span v-else>{{ application.project?.company?.name ?? 'Unknown' }}</span>
               </p>
               <p v-if="application.project?.location" class="mt-1 text-xs text-gray-500 dark:text-slate-400">
                 Location: {{ application.project?.location }}
@@ -177,6 +185,7 @@ interface AcceptedApplicationItem {
     location?: string | null
     posted_at?: string | null
     company?: {
+      user_id?: number
       name?: string
     }
   }

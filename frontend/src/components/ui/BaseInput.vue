@@ -3,7 +3,7 @@
     <label
       v-if="label"
       :for="id"
-      :class="['mb-1 block text-[11px] font-bold tracking-[0.08em] text-gray-700 dark:text-slate-300', labelClass]"
+      :class="['mb-2 block text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300', labelClass]"
     >
       {{ label }}
       <span v-if="required" class="text-red-500 ml-0.5">*</span>
@@ -17,11 +17,11 @@
         :disabled="disabled"
         :autocomplete="autocomplete"
         :class="[
-          'block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition',
-          'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:focus:ring-indigo-400',
+          'block w-full rounded-lg border-0 px-3 py-2 text-sm transition',
+          'focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400',
           hasError
             ? 'border-red-400 bg-red-50 text-red-900 placeholder-red-300 dark:border-red-700 dark:bg-red-950/30 dark:text-red-300 dark:placeholder-red-500'
-            : 'border-gray-300 bg-white text-slate-900 placeholder-gray-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500',
+            : 'bg-[#f1edf8] text-slate-900 placeholder-gray-400 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500',
           disabled ? 'cursor-not-allowed bg-gray-50 opacity-50 dark:bg-slate-800' : '',
           showPasswordToggle ? 'pr-10' : '',
         ]"

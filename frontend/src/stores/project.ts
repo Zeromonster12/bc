@@ -8,6 +8,9 @@ interface Project {
   description: string
   requirements: string | null
   location?: string | null
+  location_strategy?: 'remote' | 'onsite' | 'hybrid'
+  industry?: string | null
+  internship_duration?: string | null
   tech_stack: string[]
   status: string
   max_students: number

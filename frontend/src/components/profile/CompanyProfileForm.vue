@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <section v-show="activeTab === 'identity'" class="surface-card !rounded-3xl space-y-5 p-6 sm:p-7">
+    <section v-show="activeTab === 'identity'" class="surface-card rounded-3xl! space-y-5 p-6 sm:p-7">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Identity</h2>
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -61,6 +61,12 @@
           @update:modelValue="emitField('name', $event)"
         />
         <BaseInput
+          :model-value="form.business_name"
+          label="Business name (legal)"
+          :error="errors.business_name"
+          @update:modelValue="emitField('business_name', $event)"
+        />
+        <BaseInput
           :model-value="form.tagline"
           label="Tagline"
           :error="errors.tagline"
@@ -86,6 +92,51 @@
           type="number"
           :error="errors.founded_year"
           @update:modelValue="emitField('founded_year', $event)"
+        />
+        <BaseInput
+          :model-value="form.contact_person_full_name"
+          label="Contact person full name"
+          :error="errors.contact_person_full_name"
+          @update:modelValue="emitField('contact_person_full_name', $event)"
+        />
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <BaseInput
+          :model-value="form.billing_street"
+          label="Billing street and number"
+          :error="errors.billing_street"
+          @update:modelValue="emitField('billing_street', $event)"
+        />
+        <BaseInput
+          :model-value="form.billing_city"
+          label="Billing city"
+          :error="errors.billing_city"
+          @update:modelValue="emitField('billing_city', $event)"
+        />
+        <BaseInput
+          :model-value="form.billing_postal_code"
+          label="Billing postal code"
+          :error="errors.billing_postal_code"
+          @update:modelValue="emitField('billing_postal_code', $event)"
+        />
+        <BaseInput
+          :model-value="form.ico"
+          label="ICO"
+          :error="errors.ico"
+          @update:modelValue="emitField('ico', $event)"
+        />
+        <BaseInput
+          :model-value="form.dic"
+          label="DIC"
+          :error="errors.dic"
+          @update:modelValue="emitField('dic', $event)"
+        />
+        <BaseInput
+          :model-value="form.ic_dph"
+          label="IC DPH"
+          :error="errors.ic_dph"
+          @update:modelValue="emitField('ic_dph', $event)"
         />
       </div>
     </section>
@@ -221,7 +272,7 @@
       </div>
     </section>
 
-    <div class="surface-card !rounded-3xl p-4 sm:p-5">
+    <div class="surface-card rounded-3xl! p-4 sm:p-5">
       <div class="flex justify-end">
         <BaseButton type="submit" variant="primary" :loading="saving" class="rounded-full px-6">
           {{ saveButtonLabel }}

@@ -79,8 +79,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
         ->middleware('throttle:15,1');
     Route::put('/profile/student', [StudentProfileController::class, 'update'])
         ->middleware('throttle:15,1');
+    Route::get('/students/{user}/profile', [StudentProfileController::class, 'showForCompany'])
+        ->middleware('throttle:30,1');
 
     Route::get('/profile/company', [CompanyProfileController::class, 'show'])
+        ->middleware('throttle:30,1');
+    Route::get('/companies/{user}/profile', [CompanyProfileController::class, 'showForViewer'])
         ->middleware('throttle:30,1');
     Route::put('/profile/company', [CompanyProfileController::class, 'update'])
         ->middleware('throttle:15,1');

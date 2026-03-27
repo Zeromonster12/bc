@@ -18,19 +18,24 @@
             {{ application.project?.title ?? 'Unknown Project' }}
           </h4>
           <p class="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
-            {{ application.project?.company?.name }}
+            <RouterLink
+              v-if="companyProfilePath"
+              :to="companyProfilePath"
+              class="font-medium transition hover:text-[#4f33d7]"
+            >
+              {{ application.project?.company?.name ?? 'Unknown company' }}
+            </RouterLink>
+            <span v-else>{{ application.project?.company?.name ?? 'Unknown company' }}</span>
           </p>
           <p v-if="application.student?.name" class="mt-1 text-xs text-gray-600 dark:text-slate-300">
             Applicant:
-            <a
-              v-if="applicantProfileUrl"
-              :href="applicantProfileUrl"
-              target="_blank"
-              rel="noopener noreferrer"
+            <RouterLink
+              v-if="studentProfilePath"
+              :to="studentProfilePath"
               class="font-medium text-teal-700 hover:text-teal-800 hover:underline dark:text-teal-300 dark:hover:text-teal-200"
             >
               {{ application.student.name }}
-            </a>
+            </RouterLink>
             <span v-else class="font-medium">
               {{ application.student.name }}
             </span>
@@ -82,6 +87,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import ApplicationStatusBadge from './ApplicationStatusBadge.vue'
 import { resolveAssetUrl } from '@/services/core/url'
 
@@ -97,6 +103,7 @@ interface ApplicationCardItem {
     created_at?: string
   }>
   student?: {
+    id?: number
     name?: string
     email?: string
     avatar_url?: string | null
@@ -107,6 +114,7 @@ interface ApplicationCardItem {
   project?: {
     title?: string
     company?: {
+      user_id?: number
       name?: string
     }
   }
@@ -115,6 +123,11 @@ interface ApplicationCardItem {
 export default defineComponent({
   name: 'ApplicationCard',
   components: { ApplicationStatusBadge },
+  setup() {
+    return {
+      auth: useAuthStore(),
+    }
+  },
   props: {
     application: {
       type: Object as PropType<ApplicationCardItem>,
@@ -134,8 +147,25 @@ export default defineComponent({
         .toUpperCase()
         .slice(0, 2)
     },
-    applicantProfileUrl(): string {
-      return this.application.student?.github_url ?? ''
+    studentProfilePath(): string {
+      if (!this.auth.isCompany && !this.auth.isAdmin) {
+        return ''
+      }
+
+      const studentId = Number(this.application.student?.id ?? 0)
+      if (!Number.isFinite(studentId) || studentId <= 0) {
+        return ''
+      }
+
+      return `/students/${studentId}/profile`
+    },
+    companyProfilePath(): string {
+      const companyUserId = Number(this.application.project?.company?.user_id ?? 0)
+      if (!Number.isFinite(companyUserId) || companyUserId <= 0) {
+        return ''
+      }
+
+      return `/companies/${companyUserId}/profile`
     },
     taskStats(): { total: number; todo: number; inProgress: number; complete: number } {
       const tasks = this.application.tasks ?? []

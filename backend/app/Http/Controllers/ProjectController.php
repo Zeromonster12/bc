@@ -13,7 +13,7 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'in:draft,open,closed'],
-            'location' => ['nullable', 'string', 'max:120'],
+            'location' => ['nullable', 'string', 'max:255'],
             'sort_date' => ['nullable', 'in:newest,oldest'],
             'tech_stack' => ['nullable', 'array'],
             'tech_stack.*' => ['string', 'max:50'],
@@ -29,6 +29,9 @@ class ProjectController extends Controller
                 'companyUser.companyProfile:id,user_id,profile_data',
             ])
             ->withCount('applications')
+            ->withCount([
+                'applications as accepted_applications_count' => fn($query) => $query->where('status', 'accepted'),
+            ])
             ->when($validated['search'] ?? null, function ($query, $search): void {
                 $query->where(function ($inner) use ($search): void {
                     $inner->where('title', 'like', '%' . $search . '%')
@@ -36,6 +39,7 @@ class ProjectController extends Controller
                 });
             })
             ->when($validated['status'] ?? null, fn($query, $status) => $query->where('status', $status))
+            ->when(! array_key_exists('status', $validated), fn($query) => $query->whereIn('status', ['open', 'closed']))
             ->when($validated['location'] ?? null, function ($query, $location): void {
                 $query->where('location', 'like', '%' . $location . '%');
             })
@@ -70,7 +74,10 @@ class ProjectController extends Controller
         $project->load([
             'companyUser:id,name',
             'companyUser.companyProfile:id,user_id,profile_data',
-        ])->loadCount('applications');
+        ])->loadCount([
+            'applications',
+            'applications as accepted_applications_count' => fn($query) => $query->where('status', 'accepted'),
+        ]);
 
         return response()->json([
             'data' => $this->transformProject($project),
@@ -95,7 +102,10 @@ class ProjectController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:10'],
             'requirements' => ['nullable', 'string'],
-            'location' => ['nullable', 'string', 'max:120'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'location_strategy' => ['required', 'in:remote,onsite,hybrid'],
+            'industry' => ['required', 'string', 'max:120'],
+            'internship_duration' => ['required', 'string', 'max:120'],
             'tech_stack' => ['nullable', 'array'],
             'tech_stack.*' => ['string', 'max:50'],
             'status' => ['required', 'in:draft,open,closed'],
@@ -110,7 +120,10 @@ class ProjectController extends Controller
         $project->load([
             'companyUser:id,name',
             'companyUser.companyProfile:id,user_id,profile_data',
-        ])->loadCount('applications');
+        ])->loadCount([
+            'applications',
+            'applications as accepted_applications_count' => fn($query) => $query->where('status', 'accepted'),
+        ]);
 
         return response()->json([
             'data' => $this->transformProject($project),
@@ -135,7 +148,10 @@ class ProjectController extends Controller
             'title' => ['sometimes', 'string', 'max:255'],
             'description' => ['sometimes', 'string', 'min:10'],
             'requirements' => ['nullable', 'string'],
-            'location' => ['nullable', 'string', 'max:120'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'location_strategy' => ['sometimes', 'in:remote,onsite,hybrid'],
+            'industry' => ['sometimes', 'string', 'max:120'],
+            'internship_duration' => ['sometimes', 'string', 'max:120'],
             'tech_stack' => ['nullable', 'array'],
             'tech_stack.*' => ['string', 'max:50'],
             'status' => ['sometimes', 'in:draft,open,closed'],
@@ -146,7 +162,10 @@ class ProjectController extends Controller
         $project->load([
             'companyUser:id,name',
             'companyUser.companyProfile:id,user_id,profile_data',
-        ])->loadCount('applications');
+        ])->loadCount([
+            'applications',
+            'applications as accepted_applications_count' => fn($query) => $query->where('status', 'accepted'),
+        ]);
 
         return response()->json([
             'data' => $this->transformProject($project),
@@ -188,11 +207,15 @@ class ProjectController extends Controller
             'description' => $project->description,
             'requirements' => $project->requirements,
             'location' => $project->location,
+            'location_strategy' => $project->location_strategy ?? 'remote',
+            'industry' => $project->industry,
+            'internship_duration' => $project->internship_duration,
             'tech_stack' => $project->tech_stack ?? [],
             'status' => $project->status,
             'max_students' => $project->max_students,
             'posted_at' => optional($project->created_at)?->toISOString(),
             'applications_count' => $project->applications_count ?? 0,
+            'accepted_applications_count' => $project->accepted_applications_count ?? 0,
             'created_at' => optional($project->created_at)?->toISOString(),
         ];
     }

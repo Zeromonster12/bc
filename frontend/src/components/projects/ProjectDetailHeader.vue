@@ -3,7 +3,14 @@
     <div>
       <div class="flex items-center gap-3 mb-2">
         <ProjectStatusBadge :status="project.status ?? 'draft'" />
-        <span class="text-sm text-gray-400 dark:text-slate-500">{{ project.company?.name }}</span>
+        <RouterLink
+          v-if="project.company?.user_id"
+          :to="`/companies/${project.company.user_id}/profile`"
+          class="text-sm text-gray-400 transition hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-300"
+        >
+          {{ project.company?.name }}
+        </RouterLink>
+        <span v-else class="text-sm text-gray-400 dark:text-slate-500">{{ project.company?.name }}</span>
       </div>
       <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ project.title }}</h1>
     </div>
@@ -37,6 +44,7 @@ interface ProjectDetailHeaderItem {
   title?: string
   status?: string
   company?: {
+    user_id?: number
     name?: string
   }
 }

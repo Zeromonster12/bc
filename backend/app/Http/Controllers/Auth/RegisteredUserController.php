@@ -45,8 +45,8 @@ class RegisteredUserController extends Controller
             'ico' => ['nullable', 'regex:/^\d{8}$/', 'required_if:role,company'],
             'dic' => ['nullable', 'regex:/^\d{10}$/', 'required_if:role,company'],
             'ic_dph' => ['nullable', 'regex:/^SK\d{10}$/i'],
-            'contact_person_full_name' => ['nullable', 'string', 'max:255', 'required_if:role,company'],
-            'contact_email' => ['nullable', 'email', 'max:255', 'different:email', 'required_if:role,company'],
+            'contact_person_full_name' => ['nullable', 'string', 'max:255'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:32', 'regex:/^\+?[0-9\s]{9,20}$/', 'required_if:role,company'],
         ]);
 
@@ -76,8 +76,10 @@ class RegisteredUserController extends Controller
             $ico = trim((string) $request->string('ico'));
             $dic = trim((string) $request->string('dic'));
             $icDph = strtoupper(str_replace(' ', '', trim((string) $request->string('ic_dph'))));
-            $contactPersonFullName = trim((string) $request->string('contact_person_full_name'));
-            $contactEmail = strtolower(trim((string) $request->string('contact_email')));
+            $contactPersonFullNameRaw = trim((string) $request->string('contact_person_full_name'));
+            $contactPersonFullName = $contactPersonFullNameRaw !== '' ? $contactPersonFullNameRaw : trim($firstName . ' ' . $lastName);
+            $contactEmailRaw = strtolower(trim((string) $request->string('contact_email')));
+            $contactEmail = $contactEmailRaw !== '' ? $contactEmailRaw : strtolower((string) $request->email);
             $contactPhone = preg_replace('/\s+/', ' ', trim((string) $request->string('phone'))) ?? '';
 
             CompanyProfile::query()->updateOrCreate(

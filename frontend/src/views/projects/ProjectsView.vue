@@ -2,7 +2,7 @@
   <AppLayout>
     <div class="space-y-5 pt-12 lg:space-y-6 lg:pt-0">
       <div class="flex items-center justify-between gap-3">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">Projects</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ pageTitle }}</h1>
       </div>
 
       <div class="grid items-stretch gap-6 lg:min-h-[calc(100vh-11rem)] lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
@@ -13,17 +13,6 @@
             :tech-options="availableTechOptions"
             @change="handleFilterChange"
           />
-
-          <div class="mt-auto rounded-3xl bg-linear-to-br from-[#4526c9] to-[#5b45f0] p-5 text-white shadow-[0_12px_30px_rgba(77,55,197,0.35)]">
-            <h3 class="text-xl font-bold tracking-tight">Need a stronger profile?</h3>
-            <p class="mt-2 text-sm text-white/85">Complete your student portfolio to stand out to companies.</p>
-            <RouterLink
-              to="/profile"
-              class="mt-4 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#4526c9] transition hover:bg-white/90"
-            >
-              Go to profile
-            </RouterLink>
-          </div>
         </aside>
 
         <section class="space-y-4">
@@ -142,6 +131,12 @@ export default defineComponent({
     }
   },
   computed: {
+    pageTitle(): string {
+      return this.isCompanyMyProjectsScope ? 'My Projects' : 'Projects'
+    },
+    isCompanyMyProjectsScope(): boolean {
+      return this.auth.isCompany && this.$route.query.company === 'me'
+    },
     availableTechOptions(): string[] {
       const fromProjects = this.projectStore.projects.flatMap((project) => project.tech_stack ?? [])
       const selected = Array.isArray(this.filters.tech_stack)
@@ -152,15 +147,33 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.projectStore.fetchProjects(buildProjectsListParams(this.filters, 1))
+    this.fetchWithCurrentScope(1)
+  },
+  watch: {
+    '$route.query.company'() {
+      this.fetchWithCurrentScope(1)
+    },
   },
   methods: {
+    scopedFilters(baseFilters: Record<string, unknown>): Record<string, unknown> {
+      if (!this.isCompanyMyProjectsScope) {
+        return { ...baseFilters }
+      }
+
+      return {
+        ...baseFilters,
+        company_id: this.auth.user?.id,
+      }
+    },
+    fetchWithCurrentScope(page: number) {
+      this.projectStore.fetchProjects(buildProjectsListParams(this.scopedFilters(this.filters), page))
+    },
     handleFilterChange(newFilters: Record<string, unknown>) {
       this.filters = newFilters
-      this.projectStore.fetchProjects(buildProjectsListParams(newFilters, 1))
+      this.fetchWithCurrentScope(1)
     },
     handlePageChange(page: number) {
-      this.projectStore.fetchProjects(buildProjectsListParams(this.filters, page))
+      this.fetchWithCurrentScope(page)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
   },

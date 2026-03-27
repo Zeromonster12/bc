@@ -197,14 +197,14 @@
             <div v-if="isCompanyFlow && currentStep === 3" class="space-y-4">
               <BaseInput
                 v-model="form.contact_person_full_name"
-                label="CONTACT PERSON FULL NAME"
+                label="CONTACT PERSON FULL NAME (DEFAULTS TO ACCOUNT NAME)"
                 type="text"
                 :error="errors.contact_person_full_name"
                 required
               />
               <BaseInput
                 v-model="form.contact_email"
-                label="CONTACT EMAIL"
+                label="CONTACT EMAIL (CAN BE SAME AS LOGIN EMAIL)"
                 type="email"
                 :error="errors.contact_email"
                 required
@@ -376,6 +376,17 @@ export default defineComponent({
     },
   },
   methods: {
+    ensureCompanyContactDefaults() {
+      const fullName = `${this.form.first_name} ${this.form.last_name}`.trim()
+      if (!this.form.contact_person_full_name.trim() && fullName) {
+        this.form.contact_person_full_name = fullName
+      }
+
+      if (!this.form.contact_email.trim() && this.form.email.trim()) {
+        this.form.contact_email = this.form.email.trim()
+      }
+    },
+
     goToPreviousStep() {
       this.errorMessage = ''
       this.turnstileError = ''
@@ -434,14 +445,6 @@ export default defineComponent({
         setRequiredError('contact_person_full_name', this.form.contact_person_full_name, 'Contact person full name')
         setRequiredError('contact_email', this.form.contact_email, 'Contact email')
         setRequiredError('phone', this.form.phone, 'Contact phone')
-
-        if (
-          this.form.contact_email
-          && this.form.email
-          && this.form.contact_email.trim().toLowerCase() === this.form.email.trim().toLowerCase()
-        ) {
-          nextErrors.contact_email = 'Contact email must be different from login email.'
-        }
       }
 
       this.errors = nextErrors
@@ -465,8 +468,16 @@ export default defineComponent({
           return
         }
 
+        if (this.currentStep === 2) {
+          this.ensureCompanyContactDefaults()
+        }
+
         this.currentStep += 1
         return
+      }
+
+      if (this.isCompanyFlow) {
+        this.ensureCompanyContactDefaults()
       }
 
       if (this.isCompanyFlow && !this.validateCurrentStep()) {

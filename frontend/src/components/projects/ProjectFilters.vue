@@ -270,8 +270,7 @@ export default defineComponent({
       techMenuOpen: false,
       sortMenuOpen: false,
       statusOptions: [
-        { value: '', label: 'All statuses' },
-        { value: 'draft', label: 'Draft' },
+        { value: '', label: 'All (Open + Closed)' },
         { value: 'open', label: 'Open' },
         { value: 'closed', label: 'Closed' },
       ] as Array<{ value: string; label: string }>,

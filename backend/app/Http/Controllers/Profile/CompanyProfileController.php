@@ -15,6 +15,42 @@ class CompanyProfileController extends Controller
 {
     private const LOGO_DISK = 'companyavatar';
 
+    public function showForViewer(Request $request, User $user): JsonResponse
+    {
+        $actor = $request->user();
+
+        if (! $actor) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        if (! in_array($actor->role, ['student', 'company', 'admin'], true) && $actor->id !== $user->id) {
+            return response()->json([
+                'message' => 'You are not allowed to view this company profile.',
+            ], 403);
+        }
+
+        if ($user->role !== 'company') {
+            return response()->json([
+                'message' => 'Company profile not found.',
+            ], 404);
+        }
+
+        $profile = CompanyProfile::query()->firstWhere('user_id', $user->id);
+
+        return response()->json([
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'profile' => $this->transformProfile($profile, $user->id),
+            ],
+        ]);
+    }
+
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -50,6 +86,23 @@ class CompanyProfileController extends Controller
         );
 
         $incomingProfileData = $request->except(['logo']);
+
+        $incomingName = trim((string) ($incomingProfileData['name'] ?? ''));
+        $incomingBusinessName = trim((string) ($incomingProfileData['business_name'] ?? ''));
+        $resolvedCompanyName = $incomingBusinessName !== '' ? $incomingBusinessName : $incomingName;
+        if ($resolvedCompanyName !== '') {
+            $incomingProfileData['name'] = $resolvedCompanyName;
+            $incomingProfileData['business_name'] = $resolvedCompanyName;
+        }
+
+        $incomingBillingCity = trim((string) ($incomingProfileData['billing_city'] ?? ''));
+        $incomingHeadquartersCity = trim((string) ($incomingProfileData['headquarters_city'] ?? ''));
+        $resolvedCity = $incomingBillingCity !== '' ? $incomingBillingCity : $incomingHeadquartersCity;
+        if ($resolvedCity !== '') {
+            $incomingProfileData['billing_city'] = $resolvedCity;
+            $incomingProfileData['headquarters_city'] = $resolvedCity;
+        }
+
         $existingProfileData = is_array($profile->profile_data) ? $profile->profile_data : [];
         $profileData = array_merge($existingProfileData, $incomingProfileData);
 

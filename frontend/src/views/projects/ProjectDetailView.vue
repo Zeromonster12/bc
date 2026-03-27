@@ -29,7 +29,14 @@
 
               <div class="flex flex-wrap items-center gap-3">
                 <ProjectStatusBadge :status="project.status ?? 'draft'" />
-                <span class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ project.company?.name ?? 'Unknown company' }}</span>
+                <RouterLink
+                  v-if="project.company?.user_id"
+                  :to="`/companies/${project.company.user_id}/profile`"
+                  class="text-sm font-medium text-slate-500 transition hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300"
+                >
+                  {{ project.company?.name ?? 'Unknown company' }}
+                </RouterLink>
+                <span v-else class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ project.company?.name ?? 'Unknown company' }}</span>
               </div>
 
               <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl lg:text-5xl">
@@ -50,8 +57,8 @@
                   <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ project.location || 'Not specified' }}</p>
                 </div>
                 <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
-                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Applications</p>
-                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ project.applications_count ?? 0 }}</p>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Work mode</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ locationStrategyLabel(project.location_strategy) }}</p>
                 </div>
               </div>
             </div>
@@ -70,10 +77,10 @@
                 <button
                   type="button"
                   class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
-                  @click="showApplyModal = true"
-                  :disabled="hasApplied"
+                  @click="openApplyModal"
+                  :disabled="hasActiveApplication || isProjectFull"
                 >
-                  {{ hasApplied ? 'Applied' : 'Apply now' }}
+                  {{ applyButtonLabel }}
                 </button>
               </template>
             </div>
@@ -156,7 +163,14 @@
               <div class="space-y-3 text-sm">
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-slate-500 dark:text-slate-400">Company</span>
-                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.company?.name ?? 'Unknown' }}</span>
+                  <RouterLink
+                    v-if="project.company?.user_id"
+                    :to="`/companies/${project.company.user_id}/profile`"
+                    class="text-right font-semibold text-slate-900 transition hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-300"
+                  >
+                    {{ project.company?.name ?? 'Unknown' }}
+                  </RouterLink>
+                  <span v-else class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.company?.name ?? 'Unknown' }}</span>
                 </div>
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-slate-500 dark:text-slate-400">Status</span>
@@ -169,6 +183,18 @@
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-slate-500 dark:text-slate-400">Location</span>
                   <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.location || 'Not specified' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Work mode</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ locationStrategyLabel(project.location_strategy) }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Industry</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.industry || 'Not specified' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-500 dark:text-slate-400">Duration</span>
+                  <span class="text-right font-semibold text-slate-900 dark:text-slate-100">{{ project.internship_duration || 'Not specified' }}</span>
                 </div>
                 <div class="flex items-center justify-between gap-4">
                   <span class="text-slate-500 dark:text-slate-400">Max students</span>
@@ -255,10 +281,10 @@
                 v-if="canStudentApply"
                 type="button"
                 class="mt-4 inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
-                @click="showApplyModal = true"
-                :disabled="hasApplied"
+                @click="openApplyModal"
+                :disabled="hasActiveApplication || isProjectFull"
               >
-                {{ hasApplied ? 'Applied' : 'Apply now' }}
+                {{ applyButtonLabel }}
               </button>
             </div>
           </aside>
@@ -268,6 +294,8 @@
       <ProjectApplyModal
         v-model:show="showApplyModal"
         v-model:cover-letter="coverLetter"
+        :title="applyModalTitle"
+        :submit-label="applySubmitLabel"
         :submitting="applying"
         :error-message="applyError"
         @submit="submitApplication"
@@ -300,10 +328,14 @@ interface ProjectDetail {
   description?: string
   requirements?: string
   location?: string | null
+  location_strategy?: 'remote' | 'onsite' | 'hybrid'
+  industry?: string | null
+  internship_duration?: string | null
   posted_at?: string
   created_at?: string
   max_students?: number
   applications_count?: number
+  accepted_applications_count?: number
   company?: ProjectOwnerCompany
   tech_stack?: string[]
 }
@@ -312,6 +344,7 @@ interface ProjectApplication {
   id: number
   project_id?: number
   status?: string
+  cover_letter?: string
 }
 
 export default defineComponent({
@@ -371,6 +404,42 @@ export default defineComponent({
         (a) => (a as ProjectApplication).project_id === this.project?.id,
       )
     },
+    currentStudentApplication(): ProjectApplication | null {
+      return (
+        (this.applicationStore.applications.find(
+          (a) => (a as ProjectApplication).project_id === this.project?.id,
+        ) as ProjectApplication | undefined) ?? null
+      )
+    },
+    hasActiveApplication(): boolean {
+      const status = this.currentStudentApplication?.status ?? ''
+      return status === 'pending' || status === 'accepted'
+    },
+    canReapply(): boolean {
+      const status = this.currentStudentApplication?.status ?? ''
+      return status === 'rejected' || status === 'withdrawn'
+    },
+    isProjectFull(): boolean {
+      const accepted = this.project?.accepted_applications_count ?? 0
+      const maxStudents = this.project?.max_students ?? 1
+      return accepted >= maxStudents
+    },
+    applyButtonLabel(): string {
+      if (this.isProjectFull) return 'Project full'
+      if (this.hasActiveApplication) return 'Applied'
+      if (this.currentStudentApplication?.status === 'rejected') return 'Update application'
+      if (this.currentStudentApplication?.status === 'withdrawn') return 'Apply again'
+      return 'Apply now'
+    },
+    applyModalTitle(): string {
+      if (this.currentStudentApplication?.status === 'rejected') return 'Appeal application'
+      if (this.currentStudentApplication?.status === 'withdrawn') return 'Apply again'
+      return 'Apply to this project'
+    },
+    applySubmitLabel(): string {
+      if (this.canReapply) return 'Send update'
+      return 'Submit application'
+    },
   },
   async mounted() {
     const id = Number(this.$route.params.id)
@@ -389,6 +458,18 @@ export default defineComponent({
     }
   },
   methods: {
+    locationStrategyLabel(strategy?: string): string {
+      if (strategy === 'onsite') return 'On-site'
+      if (strategy === 'hybrid') return 'Hybrid'
+      return 'Remote'
+    },
+    openApplyModal() {
+      this.applyError = ''
+      if (this.canReapply) {
+        this.coverLetter = this.currentStudentApplication?.cover_letter ?? ''
+      }
+      this.showApplyModal = true
+    },
     goBack() {
       if (window.history.length > 1) {
         this.$router.back()

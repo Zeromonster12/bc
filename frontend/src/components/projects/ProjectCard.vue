@@ -49,7 +49,15 @@
         <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-200">
           {{ companyInitials(project.company?.name) }}
         </span>
-        <span class="truncate font-medium">{{ project.company?.name ?? 'Unknown company' }}</span>
+        <RouterLink
+          v-if="companyProfilePath()"
+          :to="companyProfilePath()"
+          class="truncate font-medium transition hover:text-[#4f33d7]"
+          @click.stop
+        >
+          {{ project.company?.name ?? 'Unknown company' }}
+        </RouterLink>
+        <span v-else class="truncate font-medium">{{ project.company?.name ?? 'Unknown company' }}</span>
       </div>
 
       <span class="inline-flex w-full items-center justify-end gap-1 font-medium text-slate-500 dark:text-slate-400 sm:w-auto">
@@ -76,6 +84,7 @@ interface ProjectCardItem {
   posted_at?: string | null
   created_at?: string | null
   company?: {
+    user_id?: number
     name?: string
   }
 }
@@ -91,6 +100,14 @@ export default defineComponent({
   },
   emits: ['click'],
   methods: {
+    companyProfilePath(): string {
+      const companyUserId = Number(this.project.company?.user_id ?? 0)
+      if (!Number.isFinite(companyUserId) || companyUserId <= 0) {
+        return ''
+      }
+
+      return `/companies/${companyUserId}/profile`
+    },
     companyInitials(name?: string): string {
       if (!name) return 'CO'
       return name

@@ -62,6 +62,11 @@ const ProfileService = {
     return data
   },
 
+  async getStudentProfileById(userId: number) {
+    const { data } = await http.get(`/students/${userId}/profile`)
+    return data
+  },
+
   async updateStudentProfile(payload: FormData | Record<string, unknown>) {
     if (payload instanceof FormData) {
       if (!payload.has('_method')) {
@@ -81,6 +86,11 @@ const ProfileService = {
 
   async getCompanyProfile() {
     const { data } = await http.get('/profile/company')
+    return data
+  },
+
+  async getCompanyProfileById(userId: number) {
+    const { data } = await http.get(`/companies/${userId}/profile`)
     return data
   },
 

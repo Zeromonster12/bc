@@ -55,8 +55,15 @@ export const useApplicationStore = defineStore('application', {
       this.error = null
       try {
         const result = await ApplicationService.apply(projectId, { cover_letter: coverLetter })
-        this.applications.unshift(result.data)
-        return result.data as Application
+        const application = result.data as Application
+        const existingIndex = this.applications.findIndex((a) => a.id === application.id)
+        if (existingIndex !== -1) {
+          this.applications[existingIndex] = application
+        } else {
+          this.applications.unshift(application)
+        }
+
+        return application
       } catch (err: unknown) {
         this.error =
           (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??

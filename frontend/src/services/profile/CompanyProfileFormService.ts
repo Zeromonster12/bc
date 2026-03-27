@@ -1,5 +1,6 @@
 export interface CompanyProfileForm {
   name: string
+  business_name: string
   tagline: string
   description: string
   mission: string
@@ -13,6 +14,13 @@ export interface CompanyProfileForm {
   founded_year: string
   headquarters_city: string
   headquarters_country: string
+  billing_street: string
+  billing_city: string
+  billing_postal_code: string
+  ico: string
+  dic: string
+  ic_dph: string
+  contact_person_full_name: string
   contact_email: string
   contact_phone: string
   tech_stack: string
@@ -22,6 +30,7 @@ export interface CompanyProfileForm {
 
 export const createDefaultCompanyProfileForm = (): CompanyProfileForm => ({
   name: '',
+  business_name: '',
   tagline: '',
   description: '',
   mission: '',
@@ -35,6 +44,13 @@ export const createDefaultCompanyProfileForm = (): CompanyProfileForm => ({
   founded_year: '',
   headquarters_city: '',
   headquarters_country: '',
+  billing_street: '',
+  billing_city: '',
+  billing_postal_code: '',
+  ico: '',
+  dic: '',
+  ic_dph: '',
+  contact_person_full_name: '',
   contact_email: '',
   contact_phone: '',
   tech_stack: '',
@@ -43,7 +59,8 @@ export const createDefaultCompanyProfileForm = (): CompanyProfileForm => ({
 })
 
 export const hydrateCompanyProfileForm = (data: Record<string, unknown>): CompanyProfileForm => ({
-  name: String(data.name ?? ''),
+  name: String(data.name ?? data.business_name ?? ''),
+  business_name: String(data.business_name ?? data.name ?? ''),
   tagline: String(data.tagline ?? ''),
   description: String(data.description ?? ''),
   mission: String(data.mission ?? ''),
@@ -55,10 +72,17 @@ export const hydrateCompanyProfileForm = (data: Record<string, unknown>): Compan
   industry: String(data.industry ?? ''),
   company_size: String(data.company_size ?? ''),
   founded_year: String(data.founded_year ?? ''),
-  headquarters_city: String(data.headquarters_city ?? ''),
+  headquarters_city: String(data.headquarters_city ?? data.billing_city ?? ''),
   headquarters_country: String(data.headquarters_country ?? ''),
+  billing_street: String(data.billing_street ?? ''),
+  billing_city: String(data.billing_city ?? data.headquarters_city ?? ''),
+  billing_postal_code: String(data.billing_postal_code ?? ''),
+  ico: String(data.ico ?? ''),
+  dic: String(data.dic ?? ''),
+  ic_dph: String(data.ic_dph ?? ''),
+  contact_person_full_name: String(data.contact_person_full_name ?? ''),
   contact_email: String(data.contact_email ?? ''),
-  contact_phone: String(data.contact_phone ?? ''),
+  contact_phone: String(data.contact_phone ?? data.phone ?? ''),
   tech_stack: String(data.tech_stack ?? ''),
   hiring_focus: String(data.hiring_focus ?? ''),
   remote_policy: String(data.remote_policy ?? ''),

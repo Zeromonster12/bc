@@ -20,7 +20,16 @@
           </tr>
           <tr v-for="project in projects" :key="project.id" class="hover:bg-gray-50 dark:hover:bg-slate-800/70">
             <td class="px-4 py-3 font-medium text-gray-900 dark:text-slate-100">{{ project.title }}</td>
-            <td class="px-4 py-3 text-gray-600 dark:text-slate-300">{{ project.company?.name }}</td>
+            <td class="px-4 py-3 text-gray-600 dark:text-slate-300">
+              <RouterLink
+                v-if="project.company?.user_id"
+                :to="`/companies/${project.company.user_id}/profile`"
+                class="transition hover:text-indigo-600 dark:hover:text-indigo-300"
+              >
+                {{ project.company?.name }}
+              </RouterLink>
+              <span v-else>{{ project.company?.name }}</span>
+            </td>
             <td class="px-4 py-3"><ProjectStatusBadge :status="project.status ?? 'draft'" /></td>
             <td class="px-4 py-3 text-xs text-gray-400 dark:text-slate-500">{{ formatDate(project.created_at ?? '') }}</td>
             <td class="px-4 py-3">
@@ -63,6 +72,7 @@ interface AdminProjectRow {
   status?: string
   created_at?: string
   company?: {
+    user_id?: number
     name?: string
   }
 }

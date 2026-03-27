@@ -79,6 +79,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/projects/:id/edit',
+      name: 'projects.edit',
+      component: () => import('@/views/projects/EditProjectView.vue'),
+      meta: { requiresAuth: true, roles: ['company', 'admin'] },
+    },
+    {
       path: '/applications',
       name: 'applications',
       component: () => import('@/views/applications/ApplicationsView.vue'),
@@ -93,7 +99,7 @@ const router = createRouter({
     {
       path: '/applications/accepted',
       name: 'applications.accepted',
-      component: () => import('@/views/applications/AcceptedProjectsView.vue'),
+      component: () => import('@/views/applications/CompanyTaskBoardView.vue'),
       meta: { requiresAuth: true, roles: ['student'] },
     },
     {
@@ -107,6 +113,18 @@ const router = createRouter({
       name: 'profile.student.github.callback',
       component: () => import('@/views/profile/GitHubConnectCallbackView.vue'),
       meta: { requiresAuth: true, roles: ['student'] },
+    },
+    {
+      path: '/students/:id/profile',
+      name: 'students.profile',
+      component: () => import('@/views/profile/StudentPublicProfileView.vue'),
+      meta: { requiresAuth: true, roles: ['company', 'admin'] },
+    },
+    {
+      path: '/companies/:id/profile',
+      name: 'companies.profile',
+      component: () => import('@/views/profile/CompanyPublicProfileView.vue'),
+      meta: { requiresAuth: true, roles: ['student', 'company', 'admin'] },
     },
     {
       path: '/profile/company',

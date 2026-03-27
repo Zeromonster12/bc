@@ -2,7 +2,7 @@
   <nav
     @mouseleave="onSidebarLeave"
     :class="[
-      'h-full flex flex-col overflow-visible bg-white/95 backdrop-blur transition-all duration-200 dark:bg-slate-900/95',
+      'h-full flex flex-col overflow-x-hidden overflow-y-visible bg-white/95 backdrop-blur transition-all duration-200 dark:bg-slate-900/95',
       mobile
         ? 'w-72 max-w-[86vw] border-r border-slate-200/80 dark:border-slate-700/80'
         : collapsed
@@ -12,45 +12,90 @@
           : 'w-64 rounded-3xl border border-slate-200/80 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-slate-700/80 dark:shadow-[0_8px_24px_rgba(2,6,23,0.45)]',
     ]"
   >
-    <div class="flex-1 overflow-y-auto overflow-x-visible px-3 py-4 space-y-1">
+    <div
+      :class="[
+        'px-3 pt-4 pb-2',
+        collapsed && !mobile && !isHoverExpanded ? 'flex justify-center' : '',
+      ]"
+    >
       <RouterLink
-        v-for="link in filteredLinks"
-        :key="link.name"
-        :to="{ name: link.name }"
+        to="/projects"
         :class="[
-          'group relative flex items-center rounded-2xl text-sm font-medium transition-all duration-200',
-          collapsed && !mobile
-            ? isHoverExpanded
-              ? 'h-9 w-full justify-start px-3'
-              : 'mx-auto h-9 w-9 justify-center overflow-hidden p-0'
-            : 'gap-2.5 px-3 py-2',
-          isActive(link.name)
-            ? 'bg-[#4e3aba] text-white ring-1 ring-[#4e3aba]'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
+          'inline-flex items-center rounded-2xl border border-slate-200/80 bg-white/80 text-[#312a55] transition hover:bg-slate-50 dark:border-slate-700/80 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800',
+          collapsed && !mobile && !isHoverExpanded
+            ? 'h-9 w-9 justify-center text-xs font-extrabold tracking-wide'
+            : 'px-3 py-2 text-sm font-semibold tracking-tight',
         ]"
-        @mouseenter="onLinkEnter(link.name)"
+        @mouseenter="onLinkEnter('__brand__')"
         @mouseleave="onLinkLeave"
-        @click="mobile && $emit('navigate')"
       >
-        <span
-          class="inline-flex h-7 w-7 items-center justify-center"
-          :class="isActive(link.name) ? 'text-white' : 'text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]'"
-        >
-          <component :is="link.icon" class="h-4 w-4" />
-        </span>
-        <span
+        {{ collapsed && !mobile && !isHoverExpanded ? 'PL' : 'Project Linker' }}
+      </RouterLink>
+    </div>
+
+    <div class="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 space-y-1">
+      <div
+        v-for="group in groupedLinks"
+        :key="group.section"
+        class="space-y-1"
+      >
+        <div class="relative h-6 overflow-hidden px-2">
+          <p
+            class="absolute inset-0 pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500 transition-opacity duration-200 dark:text-slate-400"
+            :class="showSectionHeaders ? 'opacity-100' : 'pointer-events-none opacity-0'"
+          >
+            {{ group.section }}
+          </p>
+
+          <div
+            class="absolute inset-0 flex items-center justify-center transition-opacity duration-200"
+            :class="showSectionHeaders ? 'pointer-events-none opacity-0' : 'opacity-100'"
+          >
+            <span class="rounded-full border border-slate-200/80 bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:border-slate-700/80 dark:bg-slate-800 dark:text-slate-400">
+              {{ compactSectionLabel(group.section) }}
+            </span>
+          </div>
+        </div>
+
+        <RouterLink
+          v-for="link in group.links"
+          :key="link.name"
+          :to="link.to ?? { name: link.name }"
           :class="[
-            'truncate whitespace-nowrap transition-all duration-200',
+            'group relative flex items-center rounded-2xl text-sm font-medium transition-all duration-200',
             collapsed && !mobile
               ? isHoverExpanded
-                ? 'ml-2 max-w-42 opacity-100'
-                : 'max-w-0 opacity-0'
-              : '',
+                ? 'h-9 w-full justify-start px-3'
+                : 'mx-auto h-9 w-9 justify-center overflow-hidden p-0'
+              : 'gap-2.5 px-3 py-2',
+            isActive(link.name)
+              ? 'bg-[#4e3aba] text-white ring-1 ring-[#4e3aba]'
+              : 'text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
           ]"
+          @mouseenter="onLinkEnter(link.name)"
+          @mouseleave="onLinkLeave"
+          @click="mobile && $emit('navigate')"
         >
-          {{ link.label }}
-        </span>
-      </RouterLink>
+          <span
+            class="inline-flex h-7 w-7 items-center justify-center"
+            :class="isActive(link.name) ? 'text-white' : 'text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]'"
+          >
+            <component :is="link.icon" class="h-4 w-4" />
+          </span>
+          <span
+            :class="[
+              'truncate whitespace-nowrap transition-all duration-200',
+              collapsed && !mobile
+                ? isHoverExpanded
+                  ? 'ml-2 max-w-42 opacity-100'
+                  : 'max-w-0 opacity-0'
+                : '',
+            ]"
+          >
+            {{ link.label }}
+          </span>
+        </RouterLink>
+      </div>
 
     </div>
 
@@ -165,6 +210,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 import {
   BriefcaseBusiness,
   Building2,
@@ -187,6 +233,8 @@ interface NavLink {
   label: string
   icon: string
   roles: string[]
+  section: string
+  to?: RouteLocationRaw
 }
 
 export default defineComponent({
@@ -243,46 +291,79 @@ export default defineComponent({
           label: 'Dashboard',
           icon: 'LayoutDashboard',
           roles: ['student', 'company', 'admin'],
+          section: 'Overview',
         },
         {
           name: 'projects',
           label: 'Projects',
           icon: 'FolderKanban',
-          roles: ['student', 'company', 'admin'],
+          roles: ['student', 'admin'],
+          section: 'Overview',
         },
         {
           name: 'projects.create',
-          label: 'Post Project',
+          label: 'Create project',
           icon: 'BriefcaseBusiness',
           roles: ['company'],
+          section: 'Work',
+        },
+        {
+          name: 'projects',
+          label: 'My projects',
+          icon: 'FolderKanban',
+          roles: ['company'],
+          section: 'Work',
+          to: { name: 'projects', query: { company: 'me' } },
         },
         {
           name: 'applications',
           label: 'Applications',
           icon: 'Building2',
           roles: ['student', 'company'],
+          section: 'Work',
         },
         {
           name: 'applications.accepted',
           label: 'Accepted Projects',
           icon: 'CheckCircle2',
           roles: ['student'],
+          section: 'Work',
         },
         {
           name: 'applications.company-board',
           label: 'Task Board',
           icon: 'KanbanSquare',
           roles: ['company'],
+          section: 'Work',
         },
-        { name: 'profile.student', label: 'My Profile', icon: 'User', roles: ['student'] },
-        { name: 'profile.company', label: 'Company Profile', icon: 'User', roles: ['company'] },
+        {
+          name: 'profile.student',
+          label: 'My Profile',
+          icon: 'User',
+          roles: ['student'],
+          section: 'Account',
+        },
+        {
+          name: 'profile.company',
+          label: 'Company Profile',
+          icon: 'User',
+          roles: ['company'],
+          section: 'Account',
+        },
         {
           name: 'messages',
           label: 'Messages',
           icon: 'MessageSquare',
           roles: ['student', 'company'],
+          section: 'Account',
         },
-        { name: 'admin', label: 'Admin Panel', icon: 'Shield', roles: ['admin'] },
+        {
+          name: 'admin',
+          label: 'Admin Panel',
+          icon: 'Shield',
+          roles: ['admin'],
+          section: 'Administration',
+        },
       ],
     }
   },
@@ -293,6 +374,25 @@ export default defineComponent({
     },
     isHoverExpanded(): boolean {
       return !this.mobile && this.collapsed && this.hoveredLink !== null
+    },
+    showSectionHeaders(): boolean {
+      return this.mobile || !this.collapsed || this.isHoverExpanded
+    },
+    groupedLinks(): Array<{ section: string; links: NavLink[] }> {
+      const grouped = this.filteredLinks.reduce(
+        (acc, link) => {
+          const sectionLinks = acc[link.section] ?? []
+          sectionLinks.push(link)
+          acc[link.section] = sectionLinks
+          return acc
+        },
+        {} as Record<string, NavLink[]>,
+      )
+
+      const sectionOrder = ['Overview', 'Work', 'Account', 'Administration']
+      return sectionOrder
+        .filter((section) => (grouped[section] ?? []).length > 0)
+        .map((section) => ({ section, links: grouped[section] ?? [] }))
     },
     initials(): string {
       return (this.auth.user?.name ?? 'U')
@@ -373,6 +473,16 @@ export default defineComponent({
       if (el && !el.contains(e.target as Node)) {
         this.profileMenuOpen = false
       }
+    },
+    compactSectionLabel(section: string): string {
+      const labels: Record<string, string> = {
+        Overview: 'OV',
+        Work: 'WK',
+        Account: 'AC',
+        Administration: 'AD',
+      }
+
+      return labels[section] ?? section.slice(0, 2).toUpperCase()
     },
   },
   mounted() {

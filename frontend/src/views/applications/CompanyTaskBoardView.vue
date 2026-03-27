@@ -5,10 +5,13 @@
         class="grid h-full min-h-0 items-stretch gap-2 xl:grid-cols-[260px_minmax(0,1fr)]"
       >
         <aside
-          class="flex h-full flex-col rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-[0_8px_24px_rgba(2,6,23,0.45)]"
+          class="flex h-full flex-col overflow-hidden rounded-3xl border border-[#ddd7ea] bg-[#efedf5] shadow-[0_10px_24px_rgba(77,55,197,0.08)] backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-[0_10px_24px_rgba(2,6,23,0.45)]"
         >
-          <div class="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-            <h2 class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">Company Projects</h2>
+          <div class="border-b border-[#dfd9ee] px-4 py-3 dark:border-slate-700/70">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#77718f] dark:text-slate-400">Task board</p>
+            <h2 class="mt-1 text-sm font-semibold text-[#343047] dark:text-slate-100">
+              {{ auth.isStudent ? 'My accepted projects' : 'Company projects' }}
+            </h2>
           </div>
           <div class="flex-1 space-y-1 overflow-auto p-2">
             <button
@@ -16,20 +19,20 @@
               :key="project.id"
               type="button"
               :class="[
-                'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition',
+                'flex w-full items-center justify-between rounded-2xl border px-3 py-2.5 text-left transition',
                 selectedProjectId === project.id
-                  ? 'bg-slate-900 text-white shadow-sm dark:bg-[#4e3aba]'
-                  : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+                  ? 'border-[#5a42e5] bg-white text-[#2f2952] shadow-[0_8px_18px_rgba(77,55,197,0.18)] dark:border-indigo-400 dark:bg-slate-800 dark:text-slate-100'
+                  : 'border-[#ddd7ea] bg-white/90 text-[#3f3a56] hover:border-[#cfc7e4] hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-500',
               ]"
               @click="selectProject(project.id)"
               ;
             >
-              <span class="truncate text-xs font-medium">{{ project.title }}</span>
+              <span class="truncate text-xs font-semibold">{{ project.title }}</span>
               <span
                 :class="[
                   'ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-semibold',
                   selectedProjectId === project.id
-                    ? 'bg-white/20 text-white'
+                    ? 'bg-[#ede8ff] text-[#4526c9] dark:bg-indigo-500/20 dark:text-indigo-300'
                     : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
                 ]"
               >
@@ -95,14 +98,14 @@
                 <span>Assignee</span>
                 <span>Priority</span>
                 <span>Status</span>
-                <span class="text-right">Actions</span>
+                <span v-if="canManageTasks" class="text-right">Actions</span>
               </div>
 
               <div
                 v-if="flattenedFoldersForStatus(status).length === 0"
                 class="px-4 py-4"
               >
-                <div class="mt-3 relative inline-block">
+                <div v-if="canManageTasks" class="mt-3 relative inline-block">
                   <button
                     type="button"
                     class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba]"
@@ -187,7 +190,9 @@
                       v-model="inlineTaskDraft.applicationId"
                       class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
                     >
-                      <option :value="null">Student</option>
+                      <option v-if="acceptedApplications.length === 0" :value="null" disabled>
+                        No confirmed students
+                      </option>
                       <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
                         {{ app.student_name }}
                       </option>
@@ -299,7 +304,7 @@
                     <span class="flex items-center gap-2">
                       <span class="text-xs text-slate-500">{{ folderTaskCount(entry.folder) }}</span>
                       <span
-                        v-if="editingFolderId !== entry.folder.id && !entry.folder.is_virtual"
+                        v-if="canManageTasks && editingFolderId !== entry.folder.id && !entry.folder.is_virtual"
                         class="flex items-center gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto"
                       >
                         <button
@@ -310,6 +315,7 @@
                           <Pencil class="h-3.5 w-3.5" />
                         </button>
                         <button
+                          v-if="canManageTasks"
                           type="button"
                           class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
                           @click.stop="deleteFolder(entry.folder.id, entry.folder.name)"
@@ -410,6 +416,7 @@
                               <Pencil class="h-3.5 w-3.5" />
                             </button>
                             <button
+                              v-if="canManageTasks"
                               type="button"
                               class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
                               @click.stop="deleteTask(task.application_id, task.id, task.title)"
@@ -490,7 +497,7 @@
                         <span class="flex items-center gap-2">
                           <span class="text-xs text-slate-500">{{ category.tasks.length }}</span>
                           <span
-                            v-if="editingCategoryId !== category.id"
+                            v-if="canManageTasks && editingCategoryId !== category.id"
                             class="flex items-center gap-1 opacity-0 pointer-events-none transition group-hover:opacity-100 group-hover:pointer-events-auto"
                           >
                             <button
@@ -501,6 +508,7 @@
                               <Pencil class="h-3.5 w-3.5" />
                             </button>
                             <button
+                              v-if="canManageTasks"
                               type="button"
                               class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
                               @click.stop="deleteCategory(entry.folder.id, category.id, category.name)"
@@ -598,6 +606,7 @@
                                 <Pencil class="h-3.5 w-3.5" />
                               </button>
                               <button
+                                v-if="canManageTasks"
                                 type="button"
                                 class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-rose-200 bg-white text-rose-600 transition hover:bg-rose-50"
                                 @click.stop="deleteTask(task.application_id, task.id, task.title)"
@@ -615,7 +624,7 @@
                           Empty category
                         </p>
 
-                        <div class="pt-1">
+                        <div v-if="canManageTasks" class="pt-1">
                           <div class="relative inline-block">
                             <button
                               type="button"
@@ -673,7 +682,9 @@
                                 v-model="inlineTaskDraft.applicationId"
                                 class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
                               >
-                                <option :value="null">Student</option>
+                                <option v-if="acceptedApplications.length === 0" :value="null" disabled>
+                                  No confirmed students
+                                </option>
                                 <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
                                   {{ app.student_name }}
                                 </option>
@@ -709,7 +720,7 @@
                       </div>
                     </div>
 
-                    <div v-if="!entry.folder.is_virtual" class="pt-1">
+                    <div v-if="canManageTasks && !entry.folder.is_virtual" class="pt-1">
                       <div class="relative inline-block">
                         <button
                           type="button"
@@ -798,7 +809,9 @@
                             v-model="inlineTaskDraft.applicationId"
                             class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
                           >
-                            <option :value="null">Student</option>
+                            <option v-if="acceptedApplications.length === 0" :value="null" disabled>
+                              No confirmed students
+                            </option>
                             <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
                               {{ app.student_name }}
                             </option>
@@ -834,7 +847,7 @@
                   </div>
                 </div>
 
-                <div class="pt-1.5">
+                <div v-if="canManageTasks" class="pt-1.5">
                   <div class="relative inline-block">
                     <button
                       type="button"
@@ -920,7 +933,9 @@
                         v-model="inlineTaskDraft.applicationId"
                         class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 outline-none focus:border-slate-400"
                       >
-                        <option :value="null">Student</option>
+                        <option v-if="acceptedApplications.length === 0" :value="null" disabled>
+                          No confirmed students
+                        </option>
                         <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
                           {{ app.student_name }}
                         </option>
@@ -962,7 +977,7 @@
       </div>
 
       <div
-        v-if="openCreateFolder"
+        v-if="canManageTasks && openCreateFolder"
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
       >
         <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
@@ -999,7 +1014,7 @@
       </div>
 
       <div
-        v-if="openCreateCategory"
+        v-if="canManageTasks && openCreateCategory"
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
       >
         <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
@@ -1061,7 +1076,7 @@
       </div>
 
       <div
-        v-if="openCreateTask"
+        v-if="canManageTasks && openCreateTask"
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
       >
         <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
@@ -1080,7 +1095,9 @@
             v-model="selectedTaskApplicationId"
             class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
           >
-            <option :value="null">Select student application</option>
+            <option v-if="acceptedApplications.length === 0" :value="null" disabled>
+              No confirmed students on this project
+            </option>
             <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
               {{ app.student_name }}
             </option>
@@ -1284,11 +1301,19 @@ export default defineComponent({
       taskRenameDraft: '',
       inlineFolderDraft: null as InlineFolderDraft | null,
       inlineTaskDraft: null as InlineTaskDraft | null,
+      studentProjects: [] as Array<{ id: number; title: string }>,
       boardStatuses: ['todo', 'in_progress', 'complete'] as ApplicationTaskStatus[],
     }
   },
   computed: {
+    canManageTasks(): boolean {
+      return !this.auth.isStudent
+    },
     companyProjects() {
+      if (this.auth.isStudent) {
+        return this.studentProjects
+      }
+
       return this.projectStore.projects
     },
     availableFoldersForCreateCategory(): FolderOption[] {
@@ -1304,10 +1329,31 @@ export default defineComponent({
 
     this.loading = true
     try {
-      await this.projectStore.fetchProjects({
-        company_id: Number(this.auth.user?.id),
-        per_page: 100,
-      })
+      if (this.auth.isStudent) {
+        const response = await ApplicationService.getAll({ status: 'accepted', per_page: 100 })
+        const items = Array.isArray(response?.data) ? response.data : []
+        const seenProjectIds = new Set<number>()
+
+        this.studentProjects = items
+          .map((item: any): { id: number; title: string } => ({
+            id: Number(item?.project?.id ?? 0),
+            title: String(item?.project?.title ?? '').trim(),
+          }))
+          .filter((item: { id: number; title: string }) => item.id > 0 && item.title !== '')
+          .filter((item: { id: number; title: string }) => {
+            if (seenProjectIds.has(item.id)) {
+              return false
+            }
+            seenProjectIds.add(item.id)
+            return true
+          })
+      } else {
+        await this.projectStore.fetchProjects({
+          company_id: Number(this.auth.user?.id),
+          per_page: 100,
+        })
+      }
+
       const firstProject = this.companyProjects[0]
       if (firstProject) {
         this.selectedProjectId = firstProject.id
@@ -1379,14 +1425,27 @@ export default defineComponent({
           ? response.data.data
           : []
 
-      this.acceptedApplications = rawItems.map((item: any) => ({
-        id: Number(item?.id ?? 0),
-        student_name: String(item?.student?.name ?? `Application #${item?.id ?? ''}`).trim(),
-      }))
+      this.acceptedApplications = rawItems
+        .filter((item: any) => Number(item?.id ?? 0) > 0)
+        .map((item: any) => ({
+          id: Number(item?.id ?? 0),
+          student_name: String(item?.student?.name ?? `Application #${item?.id ?? ''}`).trim(),
+        }))
 
-      if (!this.selectedTaskApplicationId && this.acceptedApplications.length > 0) {
-        this.selectedTaskApplicationId = this.acceptedApplications[0]!.id
+      if (this.acceptedApplications.length === 0) {
+        this.selectedTaskApplicationId = null
+        return
       }
+
+      const normalizedSelectedId = this.selectedTaskApplicationId !== null
+        ? Number(this.selectedTaskApplicationId)
+        : null
+      const selectedStillValid = normalizedSelectedId !== null
+        && this.acceptedApplications.some((application) => application.id === normalizedSelectedId)
+
+      this.selectedTaskApplicationId = selectedStillValid
+        ? normalizedSelectedId
+        : this.acceptedApplications[0]!.id
     },
     async loadFolders(projectId: number) {
       const response = await ApplicationService.listTaskFolders(projectId)
@@ -1776,6 +1835,11 @@ export default defineComponent({
       const firstTask = this.findFirstTaskInLocation(status, folderId, categoryId)
       return firstTask?.application_id ?? this.acceptedApplications[0]?.id ?? null
     },
+    isAcceptedApplicationId(applicationId: number | null): boolean {
+      if (applicationId === null) return false
+      const normalized = Number(applicationId)
+      return this.acceptedApplications.some((application) => application.id === normalized)
+    },
     startInlineTaskCreate(
       status: ApplicationTaskStatus,
       folderId: number | null,
@@ -1798,6 +1862,7 @@ export default defineComponent({
       this.inlineTaskDraft = null
     },
     async confirmInlineFolderCreate() {
+      if (!this.canManageTasks) return
       if (!this.inlineFolderDraft || !this.selectedProjectId) return
 
       const { status, parentFolderId } = this.inlineFolderDraft
@@ -1896,16 +1961,18 @@ export default defineComponent({
       }
     },
     async confirmInlineTaskCreate() {
+      if (!this.canManageTasks) return
       if (!this.inlineTaskDraft) return
 
       const { status, folderId, categoryId, priority } = this.inlineTaskDraft
       const applicationId = this.inlineTaskDraft.applicationId
       const title = this.inlineTaskDraft.title.trim()
 
-      if (!applicationId) {
-        this.errorMessage = 'Select student application.'
+      if (!this.isAcceptedApplicationId(applicationId)) {
+        this.errorMessage = 'You can assign task only to a confirmed student on this project.'
         return
       }
+      const normalizedApplicationId = Number(applicationId)
       if (!title) {
         this.errorMessage = 'Task title is required.'
         return
@@ -1914,7 +1981,7 @@ export default defineComponent({
       this.submitting = true
       this.errorMessage = ''
       try {
-        const createdResponse = await ApplicationService.createTask(applicationId, {
+        const createdResponse = await ApplicationService.createTask(normalizedApplicationId, {
           title,
           priority,
           task_folder_id: folderId ?? undefined,
@@ -1934,7 +2001,7 @@ export default defineComponent({
 
         if (status !== 'todo') {
           const targetPosition = this.nextTaskPosition(status, folderId, categoryId)
-          const updatedResponse = await ApplicationService.updateTask(applicationId, createdTask.id, {
+          const updatedResponse = await ApplicationService.updateTask(normalizedApplicationId, createdTask.id, {
             status,
             task_folder_id: folderId,
             task_category_id: categoryId,
@@ -2379,6 +2446,7 @@ export default defineComponent({
       targetCategory.tasks = [...targetCategory.tasks, task].sort((a, b) => a.position - b.position)
     },
     async deleteFolder(folderId: number, _folderName: string) {
+      if (!this.canManageTasks) return
       if (!this.selectedProjectId) return
 
       this.submitting = true
@@ -2418,6 +2486,7 @@ export default defineComponent({
       }
     },
     async deleteCategory(folderId: number, categoryId: number, _categoryName: string) {
+      if (!this.canManageTasks) return
       if (!this.selectedProjectId) return
 
       this.submitting = true
@@ -2447,6 +2516,7 @@ export default defineComponent({
       }
     },
     async deleteTask(applicationId: number, taskId: number, _taskTitle: string) {
+      if (!this.canManageTasks) return
       this.submitting = true
       this.errorMessage = ''
       try {
@@ -2460,6 +2530,7 @@ export default defineComponent({
       }
     },
     async createFolder() {
+      if (!this.canManageTasks) return
       if (!this.selectedProjectId) return
       const name = this.newFolderName.trim()
       if (!name) {
@@ -2519,6 +2590,7 @@ export default defineComponent({
       }
     },
     async createCategory() {
+      if (!this.canManageTasks) return
       if (!this.selectedProjectId || !this.selectedFolderId) return
       const availableFolderIds = new Set(
         this.availableFoldersForCreateCategory.map((folder) => folder.id),
@@ -2583,11 +2655,13 @@ export default defineComponent({
       }
     },
     async createTask() {
+      if (!this.canManageTasks) return
       if (!this.selectedProjectId) return
-      if (!this.selectedTaskApplicationId) {
-        this.errorMessage = 'Select student application.'
+      if (!this.isAcceptedApplicationId(this.selectedTaskApplicationId)) {
+        this.errorMessage = 'You can assign task only to a confirmed student on this project.'
         return
       }
+      const normalizedApplicationId = Number(this.selectedTaskApplicationId)
 
       const title = this.newTaskTitle.trim()
       if (!title) {
@@ -2604,7 +2678,7 @@ export default defineComponent({
       this.errorMessage = ''
       try {
         const createdResponse = await ApplicationService.createTask(
-          this.selectedTaskApplicationId,
+          normalizedApplicationId,
           {
             title,
             priority: this.newTaskPriority,
@@ -2635,7 +2709,7 @@ export default defineComponent({
             this.createTaskCategoryId,
           )
           const updatedResponse = await ApplicationService.updateTask(
-            this.selectedTaskApplicationId,
+            normalizedApplicationId,
             createdTask.id,
             {
               status: this.createTaskStatus,

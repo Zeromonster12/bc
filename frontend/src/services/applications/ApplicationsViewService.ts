@@ -33,7 +33,8 @@ export const findProjectById = (
   selectedProjectId: number | null,
 ): CompanyProject | null => {
   if (!selectedProjectId) return null
-  return projects.find((project) => project.id === selectedProjectId) ?? null
+  const selectedId = Number(selectedProjectId)
+  return projects.find((project) => Number(project.id) === selectedId) ?? null
 }
 
 export const filterApplications = (
@@ -44,7 +45,8 @@ export const filterApplications = (
 ): ApplicationListItem[] => {
   let list = applications
   if (isCompany && selectedProjectId) {
-    list = list.filter((application) => application.project_id === selectedProjectId)
+    const selectedId = Number(selectedProjectId)
+    list = list.filter((application) => Number(application.project_id) === selectedId)
   }
   if (activeStatus !== 'all') {
     list = list.filter((application) => application.status === activeStatus)
