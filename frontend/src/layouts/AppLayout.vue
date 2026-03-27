@@ -1,15 +1,30 @@
 <template>
   <div class="min-h-screen bg-transparent">
-    <button
-      type="button"
-      class="fixed left-4 top-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur lg:hidden dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-300"
-      @click="sidebarOpen = !sidebarOpen"
-      aria-label="Open menu"
-    >
-      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
-      </svg>
-    </button>
+    <header class="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur lg:hidden dark:border-slate-700/80 dark:bg-slate-900/95">
+      <div class="flex h-14 items-center justify-between px-4">
+        <RouterLink
+          to="/projects"
+          class="inline-flex items-center rounded-xl border border-slate-200/80 bg-white px-3 py-1.5 text-sm font-semibold tracking-tight text-[#312a55] dark:border-slate-700/80 dark:bg-slate-900 dark:text-slate-100"
+        >
+          Project Linker
+        </RouterLink>
+
+        <button
+          type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          @click="sidebarOpen = !sidebarOpen"
+          :aria-label="sidebarOpen ? 'Close menu' : 'Open menu'"
+          :aria-expanded="sidebarOpen"
+        >
+          <svg v-if="!sidebarOpen" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+          <svg v-else viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </div>
+    </header>
 
     <div class="flex min-h-screen">
       <aside class="hidden self-start p-4 lg:sticky lg:top-0 lg:block lg:h-screen">
@@ -39,13 +54,13 @@
         leave-from-class="translate-x-0"
         leave-to-class="-translate-x-full"
       >
-        <aside v-if="sidebarOpen" class="fixed left-0 top-0 z-50 h-full lg:hidden">
+        <aside v-if="sidebarOpen" class="fixed left-0 top-14 z-60 h-[calc(100%-3.5rem)] lg:hidden">
           <Sidebar mobile @navigate="sidebarOpen = false" />
         </aside>
       </Transition>
 
       <div class="flex-1 flex flex-col">
-        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+        <main class="flex-1 p-4 pt-18 sm:p-6 sm:pt-20 lg:p-8 lg:pt-8">
           <slot />
         </main>
       </div>
@@ -64,6 +79,14 @@ export default defineComponent({
     return {
       sidebarOpen: false,
     }
+  },
+  watch: {
+    sidebarOpen(isOpen: boolean) {
+      document.body.classList.toggle('overflow-hidden', isOpen)
+    },
+  },
+  beforeUnmount() {
+    document.body.classList.remove('overflow-hidden')
   },
 })
 </script>

@@ -4,7 +4,8 @@
       <div v-if="loading" class="space-y-2 p-4">
         <div v-for="n in 5" :key="n" class="h-12 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
-      <table v-else class="w-full text-sm">
+      <div v-else class="overflow-x-auto">
+        <table class="min-w-170 w-full text-sm">
         <thead class="bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-500 dark:bg-slate-800 dark:text-slate-400">
           <tr>
             <th class="px-4 py-3 text-left">Title</th>
@@ -42,7 +43,8 @@
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
 
     <BasePagination

@@ -57,7 +57,8 @@
       v-else
       class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-slate-700/70 dark:bg-slate-900/90"
     >
-      <table class="w-full text-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-190 w-full text-sm">
         <thead class="bg-gray-50 text-xs font-medium uppercase tracking-wide text-gray-500 dark:bg-slate-800 dark:text-slate-400">
           <tr>
             <th class="px-4 py-3 text-left">Name</th>
@@ -154,7 +155,8 @@
             </td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
 
     <BasePagination

@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="-m-6 h-[calc(100vh-4rem)] bg-slate-100 dark:bg-slate-950 md:p-5">
+    <div class="h-[calc(100svh-5.5rem)] rounded-2xl bg-slate-100 p-2 dark:bg-slate-950 sm:h-[calc(100svh-6rem)] sm:p-3 md:h-[calc(100vh-6rem)] md:p-4 lg:h-[calc(100vh-4rem)] lg:p-5">
       <div class="grid h-full gap-3 md:grid-cols-[22rem_minmax(0,1fr)]">
         <div
           :class="[
