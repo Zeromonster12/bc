@@ -411,60 +411,46 @@ export default defineComponent({
       if (!skills.length) return 'Skills not specified'
       return skills.slice(0, 3).join(', ')
     },
-    tokenize(value: string): string[] {
-      return value
-        .toLowerCase()
-        .split(/[^a-z0-9+#.]+/)
-        .map((token) => token.trim())
-        .filter((token) => token.length >= 2)
-    },
-    studentKeywordTokens(application: ApplicationListItem): Set<string> {
-      const profile = application.student?.profile
-      const directSkills = [
-        ...(profile?.skills ?? []),
-        ...(profile?.interests ?? []),
-      ]
-      const projectTech = (profile?.projects ?? [])
-        .map((project) => project?.tech ?? '')
-        .join(' ')
-
-      const textBlock = [
-        application.student?.name ?? '',
-        profile?.university ?? '',
-        profile?.degree ?? '',
-        profile?.field_of_study ?? '',
-        profile?.bio ?? '',
-        profile?.about_me ?? '',
-        ...directSkills,
-        projectTech,
-      ]
-        .join(' ')
+    normalizeChip(value: string): string {
+      return String(value ?? '')
         .trim()
-
-      return new Set(this.tokenize(textBlock))
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/[^a-z0-9+#]/g, '')
     },
-    projectKeywordTokens(application: ApplicationListItem): Set<string> {
-      const requirements = application.project?.requirements ?? ''
-      const technologies = (application.project?.tech_stack ?? []).join(' ')
-      return new Set(this.tokenize(`${requirements} ${technologies}`))
+    studentSkillChips(application: ApplicationListItem): Set<string> {
+      const chips = application.student?.profile?.skills ?? []
+      return new Set(
+        chips
+          .map((chip) => this.normalizeChip(chip))
+          .filter((chip) => chip.length > 0),
+      )
+    },
+    projectTechChips(application: ApplicationListItem): Set<string> {
+      const chips = application.project?.tech_stack ?? []
+      return new Set(
+        chips
+          .map((chip) => this.normalizeChip(chip))
+          .filter((chip) => chip.length > 0),
+      )
     },
     matchScore(application: ApplicationListItem): number {
-      const projectTokens = this.projectKeywordTokens(application)
-      const studentTokens = this.studentKeywordTokens(application)
+      const projectChips = this.projectTechChips(application)
+      const studentChips = this.studentSkillChips(application)
 
-      if (!projectTokens.size) {
-        return 50
+      if (!projectChips.size) {
+        return 0
       }
 
       let overlap = 0
-      projectTokens.forEach((token) => {
-        if (studentTokens.has(token)) {
+      projectChips.forEach((chip) => {
+        if (studentChips.has(chip)) {
           overlap += 1
         }
       })
 
-      const ratio = overlap / projectTokens.size
-      const score = Math.round(Math.max(10, Math.min(99, ratio * 100)))
+      const ratio = overlap / projectChips.size
+      const score = Math.round(Math.max(0, Math.min(100, ratio * 100)))
       return score
     },
     taskStatsFor(application: ApplicationListItem): {
