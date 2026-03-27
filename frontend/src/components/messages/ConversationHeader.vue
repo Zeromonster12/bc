@@ -13,7 +13,10 @@
     </div>
     <div class="min-w-0">
       <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-        {{ participantNames || 'Conversation' }}
+        {{ title || participantNames || 'Conversation' }}
+      </p>
+      <p v-if="subtitle" class="truncate text-xs text-slate-500 dark:text-slate-400">
+        {{ subtitle }}
       </p>
     </div>
   </div>
@@ -25,6 +28,14 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'ConversationHeader',
   props: {
+    title: {
+      type: String,
+      default: '',
+    },
+    subtitle: {
+      type: String,
+      default: '',
+    },
     participantNames: {
       type: String,
       default: '',

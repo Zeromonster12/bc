@@ -29,3 +29,45 @@ export const validateNewConversation = (recipientUserId: number | null): string 
 export const toNewConversationPayload = (recipientUserId: number): Record<string, number> => ({
   recipient_user_id: recipientUserId,
 })
+
+export const validateNewGroupConversation = (
+  projectId: number | null,
+  subject: string,
+  participantUserIds: number[],
+): string => {
+  const normalizedProjectId = Number(projectId ?? 0)
+  if (!Number.isFinite(normalizedProjectId) || normalizedProjectId <= 0) {
+    return 'Project is required.'
+  }
+
+  const cleanSubject = String(subject ?? '').trim()
+  if (cleanSubject.length < 3) {
+    return 'Group name must have at least 3 characters.'
+  }
+
+  if (!Array.isArray(participantUserIds) || participantUserIds.length < 1) {
+    return 'Select at least one participant.'
+  }
+
+  return ''
+}
+
+export const toNewGroupConversationPayload = (
+  projectId: number,
+  subject: string,
+  participantUserIds: number[],
+): {
+  project_id: number
+  subject: string
+  participant_user_ids: number[]
+} => ({
+  project_id: projectId,
+  subject: subject.trim(),
+  participant_user_ids: Array.from(
+    new Set(
+      participantUserIds
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id) && id > 0),
+    ),
+  ),
+})

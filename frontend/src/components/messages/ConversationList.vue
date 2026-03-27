@@ -67,6 +67,7 @@ import { defineComponent, type PropType } from 'vue'
 
 interface ConversationItem {
   id: number
+  type?: 'direct' | 'group'
   subject?: string
   participants?: Array<{ id?: number; name?: string }>
   unread_count?: number
@@ -108,6 +109,10 @@ export default defineComponent({
   emits: ['select'],
   methods: {
     conversationTitle(conversation: ConversationItem): string {
+      if (conversation.type === 'group' && String(conversation.subject ?? '').trim()) {
+        return String(conversation.subject ?? '').trim()
+      }
+
       const participantNames = (conversation.participants ?? [])
         .filter((participant) => Number(participant.id ?? 0) !== this.currentUserId)
         .map((participant) => String(participant.name ?? '').trim())

@@ -37,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/conversation-users', [MessageController::class, 'searchableUsers']);
     Route::get('/conversations', [MessageController::class, 'indexConversations']);
     Route::post('/conversations', [MessageController::class, 'storeConversation']);
+    Route::post('/conversations/{conversation}/participants', [MessageController::class, 'addParticipant']);
+    Route::delete('/conversations/{conversation}/participants/{participantUser}', [MessageController::class, 'removeParticipant']);
     Route::get('/conversations/{conversation}', [MessageController::class, 'showConversation']);
     Route::get('/conversations/{conversation}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);

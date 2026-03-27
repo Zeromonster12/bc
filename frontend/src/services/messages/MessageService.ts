@@ -11,13 +11,44 @@ const MessageService = {
     return data
   },
 
-  async searchConversationUsers(query: string, limit = 8) {
+  async searchConversationUsers(query: string, limit = 8, projectId?: number | null) {
+    const params: Record<string, unknown> = {
+      q: query,
+      limit,
+    }
+
+    const normalizedProjectId = Number(projectId ?? 0)
+    if (Number.isFinite(normalizedProjectId) && normalizedProjectId > 0) {
+      params.project_id = normalizedProjectId
+    }
+
     const { data } = await http.get('/conversation-users', {
-      params: {
-        q: query,
-        limit,
-      },
+      params,
     })
+    return data
+  },
+
+  async createGroupConversation(payload: {
+    project_id: number
+    subject: string
+    participant_user_ids: number[]
+  }) {
+    const { data } = await http.post('/conversations', {
+      ...payload,
+      type: 'group',
+    })
+    return data
+  },
+
+  async addConversationParticipant(conversationId: number, userId: number) {
+    const { data } = await http.post(`/conversations/${conversationId}/participants`, {
+      user_id: userId,
+    })
+    return data
+  },
+
+  async removeConversationParticipant(conversationId: number, userId: number) {
+    const { data } = await http.delete(`/conversations/${conversationId}/participants/${userId}`)
     return data
   },
 

@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\Message;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -26,18 +27,22 @@ class MessageController extends Controller
 
         $validated = $request->validate([
             'q' => ['nullable', 'string', 'max:255'],
-            'limit' => ['nullable', 'integer', 'min:1', 'max:20'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'project_id' => ['nullable', 'integer', 'exists:projects,id'],
         ]);
 
         $query = trim((string) ($validated['q'] ?? ''));
-        if ($query === '' || mb_strlen($query) < 2) {
+        $limit = (int) ($validated['limit'] ?? 8);
+        $projectId = isset($validated['project_id']) ? (int) $validated['project_id'] : 0;
+        $allowedRecipientIds = $projectId > 0
+            ? $this->allowedGroupParticipantIdsForProject($user, $projectId)
+            : $this->allowedDirectRecipientIds($user);
+
+        if ($projectId <= 0 && $query !== '' && mb_strlen($query) < 2) {
             return response()->json([
                 'data' => [],
             ]);
         }
-
-        $limit = (int) ($validated['limit'] ?? 8);
-        $allowedRecipientIds = $this->allowedDirectRecipientIds($user);
 
         if ($allowedRecipientIds === []) {
             return response()->json([
@@ -48,9 +53,11 @@ class MessageController extends Controller
         $users = User::query()
             ->where('id', '!=', $user->id)
             ->whereIn('id', $allowedRecipientIds)
-            ->where(function ($q) use ($query): void {
-                $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('email', 'like', '%' . $query . '%');
+            ->when($query !== '', function ($queryBuilder) use ($query): void {
+                $queryBuilder->where(function ($q) use ($query): void {
+                    $q->where('name', 'like', '%' . $query . '%')
+                        ->orWhere('email', 'like', '%' . $query . '%');
+                });
             })
             ->orderBy('name')
             ->orderBy('id')
@@ -98,9 +105,19 @@ class MessageController extends Controller
         }
 
         $validated = $request->validate([
+            'type' => ['nullable', 'in:direct,group'],
+            'subject' => ['nullable', 'string', 'min:3', 'max:160'],
+            'project_id' => ['nullable', 'integer', 'exists:projects,id'],
+            'participant_user_ids' => ['nullable', 'array', 'min:1'],
+            'participant_user_ids.*' => ['integer', 'distinct', 'exists:users,id'],
             'recipient_user_id' => ['nullable', 'integer', 'exists:users,id', 'required_without:recipient_email'],
             'recipient_email' => ['nullable', 'string', 'email', 'max:255', 'required_without:recipient_user_id'],
         ]);
+
+        $conversationType = (string) ($validated['type'] ?? 'direct');
+        if ($conversationType === 'group') {
+            return $this->storeGroupConversation($user, $validated);
+        }
 
         $recipient = null;
         $recipientUserId = isset($validated['recipient_user_id'])
@@ -181,6 +198,196 @@ class MessageController extends Controller
         return response()->json([
             'data' => $this->transformConversation($conversation, $user->id),
         ], 201);
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    private function storeGroupConversation(User $user, array $validated): JsonResponse
+    {
+        $projectId = (int) ($validated['project_id'] ?? 0);
+        if ($projectId <= 0) {
+            return response()->json([
+                'message' => 'Project is required for group conversation.',
+            ], 422);
+        }
+
+        $project = Project::query()->find($projectId);
+        if (! $project) {
+            return response()->json([
+                'message' => 'Project not found.',
+            ], 404);
+        }
+
+        $allowedParticipantIds = $this->allowedGroupParticipantIdsForProject($user, $projectId);
+        if ($allowedParticipantIds === []) {
+            return response()->json([
+                'message' => 'You are not allowed to create a group chat for this project.',
+            ], 403);
+        }
+
+        $selectedParticipantIds = collect($validated['participant_user_ids'] ?? [])
+            ->map(fn($id) => (int) $id)
+            ->filter(fn(int $id) => $id > 0 && $id !== (int) $user->id)
+            ->unique()
+            ->values()
+            ->all();
+
+        $invalidParticipantIds = array_values(array_diff($selectedParticipantIds, $allowedParticipantIds));
+        if ($invalidParticipantIds !== []) {
+            return response()->json([
+                'message' => 'One or more selected participants are not allowed for this project.',
+            ], 422);
+        }
+
+        $finalParticipantIds = collect($selectedParticipantIds)
+            ->push((int) $user->id)
+            ->push((int) $project->company_user_id)
+            ->filter(fn(int $id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+
+        if (count($finalParticipantIds) < 2) {
+            return response()->json([
+                'message' => 'Group conversation must contain at least 2 participants.',
+            ], 422);
+        }
+
+        $subject = trim((string) ($validated['subject'] ?? ''));
+        if ($subject === '') {
+            $subject = trim((string) ($project->title ?? 'Project Group Chat'));
+        }
+
+        $conversation = Conversation::query()->create([
+            'type' => 'group',
+            'subject' => $subject,
+            'project_id' => $project->id,
+        ]);
+
+        foreach ($finalParticipantIds as $participantId) {
+            ConversationParticipant::query()->create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $participantId,
+            ]);
+        }
+
+        $conversation->load([
+            'project:id,title',
+            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords.user:id,name,email',
+            'messages:id,conversation_id,sender_user_id,body,created_at',
+            'messages.senderUser:id,name,email',
+        ]);
+
+        return response()->json([
+            'data' => $this->transformConversation($conversation, $user->id),
+        ], 201);
+    }
+
+    public function addParticipant(Request $request, Conversation $conversation): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (! $this->canManageGroupParticipants($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
+        }
+
+        if ($conversation->type !== 'group' || ! $conversation->project_id) {
+            return response()->json(['message' => 'Participants can be managed only on project group chats.'], 422);
+        }
+
+        $validated = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
+
+        $targetUserId = (int) $validated['user_id'];
+
+        $allowedParticipantIds = $this->allowedGroupParticipantIdsForProject($user, (int) $conversation->project_id);
+        if (! in_array($targetUserId, $allowedParticipantIds, true)) {
+            return response()->json([
+                'message' => 'Selected user is not eligible for this project group chat.',
+            ], 422);
+        }
+
+        $exists = ConversationParticipant::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('user_id', $targetUserId)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'message' => 'User is already a participant in this conversation.',
+            ], 422);
+        }
+
+        ConversationParticipant::query()->create([
+            'conversation_id' => $conversation->id,
+            'user_id' => $targetUserId,
+        ]);
+
+        $conversation->load([
+            'project:id,title',
+            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords.user:id,name,email',
+            'messages:id,conversation_id,sender_user_id,body,created_at',
+            'messages.senderUser:id,name,email',
+        ]);
+
+        return response()->json([
+            'data' => $this->transformConversation($conversation, $user->id),
+        ]);
+    }
+
+    public function removeParticipant(Request $request, Conversation $conversation, User $participantUser): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (! $this->canManageGroupParticipants($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
+        }
+
+        if ($conversation->type !== 'group' || ! $conversation->project_id) {
+            return response()->json(['message' => 'Participants can be managed only on project group chats.'], 422);
+        }
+
+        $project = Project::query()->find((int) $conversation->project_id);
+        if ($project && (int) $participantUser->id === (int) $project->company_user_id) {
+            return response()->json([
+                'message' => 'Company owner cannot be removed from project group chat.',
+            ], 422);
+        }
+
+        $participantRecord = ConversationParticipant::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('user_id', $participantUser->id)
+            ->first();
+
+        if (! $participantRecord) {
+            return response()->json([
+                'message' => 'Participant not found in this conversation.',
+            ], 404);
+        }
+
+        $participantRecord->delete();
+
+        $conversation->load([
+            'project:id,title',
+            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords.user:id,name,email',
+            'messages:id,conversation_id,sender_user_id,body,created_at',
+            'messages.senderUser:id,name,email',
+        ]);
+
+        return response()->json([
+            'data' => $this->transformConversation($conversation, $user->id),
+        ]);
     }
 
     public function showConversation(Request $request, Conversation $conversation): JsonResponse
@@ -396,6 +603,10 @@ class MessageController extends Controller
 
     private function canUseConversation(User $user, Conversation $conversation): bool
     {
+        if (! $this->isParticipant($conversation, (int) $user->id)) {
+            return false;
+        }
+
         if ($conversation->type !== 'direct') {
             return true;
         }
@@ -435,6 +646,29 @@ class MessageController extends Controller
         $allowedRecipientIds = $this->allowedDirectRecipientIds($sender);
 
         return in_array((int) $recipient->id, $allowedRecipientIds, true);
+    }
+
+    private function canManageGroupParticipants(User $user, Conversation $conversation): bool
+    {
+        if ($conversation->type !== 'group') {
+            return false;
+        }
+
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        $projectId = (int) ($conversation->project_id ?? 0);
+        if ($projectId <= 0) {
+            return false;
+        }
+
+        $project = Project::query()->find($projectId);
+        if (! $project) {
+            return false;
+        }
+
+        return $user->role === 'company' && (int) $project->company_user_id === (int) $user->id;
     }
 
     /**
@@ -496,6 +730,66 @@ class MessageController extends Controller
         return $adminIds;
     }
 
+    /**
+     * @return array<int>
+     */
+    private function allowedGroupParticipantIdsForProject(User $user, int $projectId): array
+    {
+        $project = Project::query()->find($projectId);
+        if (! $project) {
+            return [];
+        }
+
+        $acceptedStudentIds = Application::query()
+            ->where('project_id', $projectId)
+            ->where('status', 'accepted')
+            ->pluck('student_user_id')
+            ->map(fn($studentUserId) => (int) $studentUserId)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($user->role === 'admin') {
+            return collect(array_merge($acceptedStudentIds, [(int) $project->company_user_id]))
+                ->filter(fn(int $id) => $id > 0 && $id !== (int) $user->id)
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        if ($user->role === 'company') {
+            if ((int) $project->company_user_id !== (int) $user->id) {
+                return [];
+            }
+
+            return collect(array_merge($acceptedStudentIds, [(int) $project->company_user_id]))
+                ->filter(fn(int $id) => $id > 0 && $id !== (int) $user->id)
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        if ($user->role === 'student') {
+            $studentAccepted = Application::query()
+                ->where('project_id', $projectId)
+                ->where('student_user_id', $user->id)
+                ->where('status', 'accepted')
+                ->exists();
+
+            if (! $studentAccepted) {
+                return [];
+            }
+
+            return collect(array_merge($acceptedStudentIds, [(int) $project->company_user_id]))
+                ->filter(fn(int $id) => $id > 0 && $id !== (int) $user->id)
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        return [];
+    }
+
     private function transformConversation(Conversation $conversation, int $currentUserId): array
     {
         $participantRecords = $conversation->participantRecords;
@@ -519,6 +813,7 @@ class MessageController extends Controller
 
         return [
             'id' => $conversation->id,
+            'type' => $conversation->type,
             'subject' => $conversation->subject,
             'project' => $conversation->project
                 ? [

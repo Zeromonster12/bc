@@ -12,7 +12,7 @@
               <div class="flex items-center justify-between">
                 <h2 class="font-semibold text-slate-900 dark:text-slate-100">Messages</h2>
                 <button
-                  @click="showNewConversation = !showNewConversation"
+                  @click="toggleNewConversationForm"
                   class="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
                 >
                   New chat
@@ -29,14 +29,28 @@
 
             <NewConversationForm
               :visible="showNewConversation"
+              :mode="conversationMode"
               :recipient-query="newParticipantQuery"
+              :group-subject="groupSubject"
+              :selected-project-id="selectedProjectId"
+              :direct-dropdown-value="directRecipientDropdownId"
+              :participant-dropdown-value="groupParticipantDropdownId"
+              :project-options="projectOptions"
               :selected-recipient="selectedRecipient"
+              :selected-participants="selectedParticipants"
               :recipient-options="recipientOptions"
               :searching-users="searchingUsers"
               :error-message="newConvError"
               :creating="creating"
               @update:recipient-query="onRecipientQueryChange"
+              @update:mode="onConversationModeChange"
+              @update:group-subject="groupSubject = String($event ?? '')"
+              @update:selected-project-id="onProjectChange"
+              @update:direct-dropdown-value="directRecipientDropdownId = $event"
+              @update:participant-dropdown-value="groupParticipantDropdownId = $event"
+              @add-participant-from-dropdown="addParticipantFromDropdown"
               @select-recipient="selectRecipient"
+              @remove-participant="removeSelectedParticipant"
               @clear-recipient="clearSelectedRecipient"
               @submit="startConversation"
             />
@@ -68,7 +82,12 @@
             </div>
 
             <template v-else>
-              <ConversationHeader :participant-names="participantNames" @back="backToList" />
+              <ConversationHeader
+                :title="currentConversationTitle"
+                :subtitle="currentConversationSubtitle"
+                :participant-names="participantNames"
+                @back="backToList"
+              />
               <ChatComponent
                 :conversation-id="currentConversation.id"
                 @message-sent-local="onLocalMessageSent"
@@ -86,9 +105,13 @@ import { useAuthStore } from '@/stores/auth'
 import { useMessageStore } from '@/stores/message'
 import { getEcho } from '@/services/core/echo'
 import MessageService from '@/services/messages/MessageService'
+import ApplicationService from '@/services/applications/ApplicationService'
+import ProjectService from '@/services/projects/ProjectService'
 import {
   buildParticipantNames,
+  toNewGroupConversationPayload,
   toNewConversationPayload,
+  validateNewGroupConversation,
   validateNewConversation,
 } from '@/services/messages/MessagesViewService'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -99,6 +122,7 @@ import ChatComponent from '@/components/messages/ChatComponent.vue'
 
 interface MessageConversation {
   id: number
+  type?: 'direct' | 'group'
   subject?: string
   participants?: Array<{ id?: number; name?: string }>
   unread_count?: number
@@ -134,6 +158,11 @@ interface RecipientOption {
   email: string
 }
 
+interface ProjectOption {
+  id: number
+  title: string
+}
+
 export default defineComponent({
   name: 'MessagesView',
   components: {
@@ -152,10 +181,18 @@ export default defineComponent({
   data() {
     return {
       showNewConversation: false,
+      conversationMode: 'direct' as 'direct' | 'group',
       newParticipantQuery: '',
+      groupSubject: '',
+      selectedProjectId: null as number | null,
+      directRecipientDropdownId: null as number | null,
+      groupParticipantDropdownId: null as number | null,
       selectedRecipient: null as RecipientOption | null,
+      selectedParticipants: [] as RecipientOption[],
       recipientOptions: [] as RecipientOption[],
+      projectOptions: [] as ProjectOption[],
       searchingUsers: false,
+      loadingProjectOptions: false,
       newConvError: '',
       creating: false,
       searchQuery: '',
@@ -170,6 +207,21 @@ export default defineComponent({
     },
     participantNames(): string {
       return buildParticipantNames(this.currentConversation, this.auth.user?.id)
+    },
+    currentConversationTitle(): string {
+      if (this.currentConversation?.type === 'group' && String(this.currentConversation?.subject ?? '').trim()) {
+        return String(this.currentConversation.subject ?? '').trim()
+      }
+
+      return this.participantNames || 'Conversation'
+    },
+    currentConversationSubtitle(): string {
+      if (this.currentConversation?.type !== 'group') {
+        return ''
+      }
+
+      const projectTitle = String((this.currentConversation?.project as { title?: string } | null)?.title ?? '').trim()
+      return projectTitle ? `Project: ${projectTitle}` : 'Group conversation'
     },
     filteredConversations(): MessageConversation[] {
       const q = this.searchQuery.trim().toLowerCase()
@@ -199,6 +251,7 @@ export default defineComponent({
     },
   },
   async mounted() {
+    await this.loadGroupProjectOptions()
     await this.messageStore.fetchConversations()
     this.refreshRealtimeSubscriptions()
   },
@@ -213,7 +266,9 @@ export default defineComponent({
   methods: {
     onRecipientQueryChange(value: string) {
       this.newParticipantQuery = value
-      this.selectedRecipient = null
+      if (this.conversationMode === 'direct') {
+        this.selectedRecipient = null
+      }
       this.newConvError = ''
 
       if (this.recipientSearchTimerId) {
@@ -225,20 +280,155 @@ export default defineComponent({
       }, 220)
     },
     selectRecipient(option: RecipientOption) {
+      if (this.conversationMode === 'group') {
+        const exists = this.selectedParticipants.some((participant) => participant.id === option.id)
+        if (!exists) {
+          this.selectedParticipants.push(option)
+        }
+
+        this.newParticipantQuery = ''
+        this.recipientOptions = []
+        this.newConvError = ''
+        return
+      }
+
       this.selectedRecipient = option
+      this.directRecipientDropdownId = option.id
       this.newParticipantQuery = `${option.name} (${option.email})`
-      this.recipientOptions = []
       this.newConvError = ''
+    },
+    removeSelectedParticipant(userId: number) {
+      this.selectedParticipants = this.selectedParticipants.filter((participant) => participant.id !== userId)
+    },
+    addParticipantFromDropdown() {
+      const selectedId = Number(this.groupParticipantDropdownId ?? 0)
+      if (!Number.isFinite(selectedId) || selectedId <= 0) {
+        this.newConvError = 'Select participant first.'
+        return
+      }
+
+      const option = this.recipientOptions.find((candidate) => candidate.id === selectedId)
+      if (!option) {
+        this.newConvError = 'Selected participant is no longer available.'
+        return
+      }
+
+      this.selectRecipient(option)
+      this.groupParticipantDropdownId = null
     },
     clearSelectedRecipient() {
       this.selectedRecipient = null
+      this.directRecipientDropdownId = null
+      this.newParticipantQuery = ''
+      void this.searchRecipients('')
+    },
+    onConversationModeChange(mode: 'direct' | 'group') {
+      this.conversationMode = mode
+      this.newConvError = ''
       this.newParticipantQuery = ''
       this.recipientOptions = []
+      this.directRecipientDropdownId = null
+      this.groupParticipantDropdownId = null
+
+      if (mode === 'direct') {
+        this.groupSubject = ''
+        this.selectedProjectId = null
+        this.selectedParticipants = []
+        void this.searchRecipients('')
+        return
+      }
+
+      this.selectedRecipient = null
+    },
+    onProjectChange(projectId: number | null) {
+      this.selectedProjectId = projectId
+      this.selectedParticipants = []
+      this.groupParticipantDropdownId = null
+      this.newParticipantQuery = ''
+      this.recipientOptions = []
+      this.newConvError = ''
+
+      void this.loadGroupParticipantOptions(projectId)
+    },
+    async loadGroupParticipantOptions(projectId: number | null) {
+      const normalizedProjectId = Number(projectId ?? 0)
+      if (!Number.isFinite(normalizedProjectId) || normalizedProjectId <= 0) {
+        this.recipientOptions = []
+        return
+      }
+
+      this.searchingUsers = true
+      try {
+        const response = await MessageService.searchConversationUsers('', 20, normalizedProjectId)
+        const options = Array.isArray(response?.data) ? response.data : []
+
+        this.recipientOptions = options
+          .map((item: Partial<RecipientOption>) => ({
+            id: Number(item.id ?? 0),
+            name: String(item.name ?? ''),
+            email: String(item.email ?? ''),
+          }))
+          .filter((item: RecipientOption) => item.id > 0 && item.name && item.email)
+      } catch {
+        this.recipientOptions = []
+      } finally {
+        this.searchingUsers = false
+      }
+    },
+    async loadGroupProjectOptions() {
+      this.loadingProjectOptions = true
+      try {
+        if (this.auth.isCompany) {
+          const response = await ProjectService.getAll({
+            company_id: Number(this.auth.user?.id ?? 0),
+            per_page: 100,
+          })
+
+          const projects = Array.isArray(response?.data) ? response.data : []
+          this.projectOptions = projects
+            .map((project: { id?: number; title?: string }) => ({
+              id: Number(project.id ?? 0),
+              title: String(project.title ?? '').trim(),
+            }))
+            .filter((project: ProjectOption) => project.id > 0 && project.title.length > 0)
+          return
+        }
+
+        if (this.auth.isStudent) {
+          const response = await ApplicationService.getAll({
+            status: 'accepted',
+            per_page: 200,
+          })
+
+          const applications = Array.isArray(response?.data) ? response.data : []
+          const uniqueByProject = new Map<number, ProjectOption>()
+
+          applications.forEach((application: { project?: { id?: number; title?: string } }) => {
+            const projectId = Number(application.project?.id ?? 0)
+            const projectTitle = String(application.project?.title ?? '').trim()
+            if (projectId > 0 && projectTitle) {
+              uniqueByProject.set(projectId, { id: projectId, title: projectTitle })
+            }
+          })
+
+          this.projectOptions = Array.from(uniqueByProject.values())
+          return
+        }
+
+        this.projectOptions = []
+      } catch {
+        this.projectOptions = []
+      } finally {
+        this.loadingProjectOptions = false
+      }
     },
     async searchRecipients(rawQuery: string) {
+      if (this.conversationMode !== 'direct') {
+        return
+      }
+
       const query = rawQuery.trim()
-      if (query.length < 2) {
-        this.recipientOptions = []
+      if (query.length > 0 && query.length < 2) {
         this.searchingUsers = false
         return
       }
@@ -247,7 +437,8 @@ export default defineComponent({
       this.searchingUsers = true
 
       try {
-        const response = await MessageService.searchConversationUsers(query)
+        const projectId = this.conversationMode === 'group' ? this.selectedProjectId : null
+        const response = await MessageService.searchConversationUsers(query, 8, projectId)
         if (nonce !== this.latestRecipientSearchNonce) {
           return
         }
@@ -260,14 +451,30 @@ export default defineComponent({
             email: String(item.email ?? ''),
           }))
           .filter((item: RecipientOption) => item.id > 0 && item.name && item.email)
+
+        if (
+          this.directRecipientDropdownId &&
+          !this.recipientOptions.some((item: RecipientOption) => item.id === this.directRecipientDropdownId)
+        ) {
+          this.directRecipientDropdownId = null
+        }
       } catch {
         if (nonce === this.latestRecipientSearchNonce) {
           this.recipientOptions = []
+          this.directRecipientDropdownId = null
         }
       } finally {
         if (nonce === this.latestRecipientSearchNonce) {
           this.searchingUsers = false
         }
+      }
+    },
+    toggleNewConversationForm() {
+      this.showNewConversation = !this.showNewConversation
+
+      if (this.showNewConversation && this.conversationMode === 'direct') {
+        this.newConvError = ''
+        void this.searchRecipients('')
       }
     },
     refreshRealtimeSubscriptions() {
@@ -395,6 +602,53 @@ export default defineComponent({
       this.messageStore.currentConversation = null
     },
     async startConversation() {
+      if (this.conversationMode === 'group') {
+        const participantIds = this.selectedParticipants.map((participant) => participant.id)
+        const validationError = validateNewGroupConversation(
+          this.selectedProjectId,
+          this.groupSubject,
+          participantIds,
+        )
+
+        if (validationError) {
+          this.newConvError = validationError
+          return
+        }
+
+        this.newConvError = ''
+        this.creating = true
+
+        try {
+          const payload = toNewGroupConversationPayload(
+            Number(this.selectedProjectId),
+            this.groupSubject,
+            participantIds,
+          )
+
+          await this.messageStore.startConversation({
+            ...payload,
+            type: 'group',
+          })
+
+          await this.messageStore.fetchConversations()
+          this.refreshRealtimeSubscriptions()
+          this.showNewConversation = false
+          this.newParticipantQuery = ''
+          this.selectedParticipants = []
+          this.groupParticipantDropdownId = null
+          this.groupSubject = ''
+          this.selectedProjectId = null
+          this.recipientOptions = []
+          return
+        } catch (e: unknown) {
+          const err = e as { response?: { data?: { message?: string } } }
+          this.newConvError = err?.response?.data?.message ?? 'Failed to create group conversation.'
+          return
+        } finally {
+          this.creating = false
+        }
+      }
+
       const validationError = validateNewConversation(this.selectedRecipient?.id ?? null)
       if (validationError) {
         this.newConvError = validationError
@@ -411,6 +665,7 @@ export default defineComponent({
         this.showNewConversation = false
         this.newParticipantQuery = ''
         this.selectedRecipient = null
+        this.directRecipientDropdownId = null
         this.recipientOptions = []
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } } }
