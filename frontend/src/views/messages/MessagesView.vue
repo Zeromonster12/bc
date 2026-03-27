@@ -650,12 +650,14 @@ export default defineComponent({
       }
 
       const normalizedRecipientId = Number(this.selectedRecipient?.id ?? this.directRecipientDropdownId ?? 0)
-      const validationError = validateNewConversation(
-        Number.isFinite(normalizedRecipientId) && normalizedRecipientId > 0
-          ? normalizedRecipientId
-          : null,
-      )
-      if (validationError) {
+      const hasRecipientId = Number.isFinite(normalizedRecipientId) && normalizedRecipientId > 0
+      const emailMatch = String(this.newParticipantQuery ?? '')
+        .match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)
+      const recipientEmail = String(emailMatch?.[0] ?? '').trim()
+      const hasRecipientEmail = recipientEmail.length > 0
+
+      if (!hasRecipientId && !hasRecipientEmail) {
+        const validationError = validateNewConversation(null)
         this.newConvError = validationError
         return
       }
@@ -664,7 +666,9 @@ export default defineComponent({
       this.creating = true
 
       try {
-        const payload = toNewConversationPayload(normalizedRecipientId)
+        const payload = hasRecipientId
+          ? toNewConversationPayload(normalizedRecipientId)
+          : { recipient_email: recipientEmail }
         await this.messageStore.startConversation(payload)
         this.refreshRealtimeSubscriptions()
         this.showNewConversation = false
