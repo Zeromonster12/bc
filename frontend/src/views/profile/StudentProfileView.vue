@@ -24,6 +24,59 @@
         @dismiss="errorMessage = ''"
       />
 
+      <div v-if="!loading" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section class="surface-card p-6 sm:p-7">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Recent Activity</h2>
+            <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+              Profile
+            </span>
+          </div>
+
+          <div class="mt-4 space-y-2.5">
+            <div
+              v-for="activity in recentProfileActivities"
+              :key="activity.id"
+              class="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
+            >
+              <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
+              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="surface-card p-6 sm:p-7">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Next Steps</h2>
+            <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+              {{ pendingProfileStepsCount }} pending
+            </span>
+          </div>
+
+          <ul class="mt-4 space-y-2.5">
+            <li
+              v-for="item in profileNextSteps"
+              :key="item.key"
+              class="flex items-start gap-3 rounded-xl border px-3 py-2.5"
+              :class="item.done
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
+                : 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200'"
+            >
+              <span
+                class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[11px] font-black"
+                :class="item.done ? 'bg-emerald-600 text-white dark:bg-emerald-500' : 'bg-slate-300 text-slate-700 dark:bg-slate-600 dark:text-slate-100'"
+              >
+                {{ item.done ? '✓' : '•' }}
+              </span>
+              <div>
+                <p class="text-sm font-semibold">{{ item.label }}</p>
+                <p class="text-xs opacity-80">{{ item.note }}</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </div>
+
       <div v-if="loading" class="space-y-4">
         <div v-for="n in 8" :key="n" class="h-16 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
       </div>
@@ -574,7 +627,7 @@
                 variant="primary"
                 size="lg"
                 :loading="saving"
-                class="!rounded-full px-6"
+                class="rounded-full! px-6"
               >
                 {{ saveButtonLabel }}
               </BaseButton>
@@ -708,6 +761,75 @@ export default defineComponent({
       if (this.activeTab === 'portfolio') return 'Save portfolio'
       return 'Save profile'
     },
+    recentProfileActivities(): Array<{ id: string; title: string; meta: string }> {
+      const latestCv = this.cvFiles[0]
+
+      return [
+        {
+          id: 'completion',
+          title: 'Profile completion updated',
+          meta: `${this.completionRate}% complete`,
+        },
+        this.githubConnected
+          ? {
+              id: 'github-connected',
+              title: `GitHub connected${this.githubConnection?.username ? ` as @${this.githubConnection.username}` : ''}`,
+              meta: this.formatRelativeTime(this.githubConnection?.connected_at ?? null),
+            }
+          : {
+              id: 'github-missing',
+              title: 'GitHub account not connected yet',
+              meta: 'Connect it in Skills & Links for better profile trust.',
+            },
+        latestCv
+          ? {
+              id: 'cv-uploaded',
+              title: `CV ready: ${latestCv.original_filename}`,
+              meta: `Uploaded ${this.formatRelativeTime(latestCv.uploaded_at)}`,
+            }
+          : {
+              id: 'cv-missing',
+              title: 'No CV uploaded yet',
+              meta: 'Add a CV in Documents so companies can review your profile faster.',
+            },
+      ]
+    },
+    profileNextSteps(): Array<{ key: string; label: string; note: string; done: boolean }> {
+      const hasHeadline = this.form.headline.trim().length > 0
+      const hasSkills = this.form.skills.length >= 3
+      const hasCv = this.cvFiles.length > 0
+      const hasGitHub = this.githubConnected
+
+      return [
+        {
+          key: 'headline',
+          label: 'Set a professional headline',
+          note: hasHeadline ? 'Headline is set.' : 'Add a short headline in Personal Information.',
+          done: hasHeadline,
+        },
+        {
+          key: 'skills',
+          label: 'Add at least 3 skills',
+          note: hasSkills ? `${this.form.skills.length} skills added.` : 'List your strongest technical skills.',
+          done: hasSkills,
+        },
+        {
+          key: 'github',
+          label: 'Connect GitHub account',
+          note: hasGitHub ? 'GitHub connection active.' : 'Connect GitHub in Skills & Links tab.',
+          done: hasGitHub,
+        },
+        {
+          key: 'cv',
+          label: 'Upload your CV document',
+          note: hasCv ? `${this.cvFiles.length} CV file(s) uploaded.` : 'Upload CV in Documents tab.',
+          done: hasCv,
+        },
+      ]
+    },
+    pendingProfileStepsCount(): number {
+      return this.profileNextSteps.filter((step) => !step.done).length
+    },
   },
   async mounted() {
     if (this.$route.query.github === 'connected') {
@@ -813,6 +935,27 @@ export default defineComponent({
         hour: '2-digit',
         minute: '2-digit',
       })
+    },
+    formatRelativeTime(value: string | null): string {
+      if (!value) return 'recently'
+
+      const parsed = new Date(value)
+      if (Number.isNaN(parsed.getTime())) return 'recently'
+
+      const diffMs = Date.now() - parsed.getTime()
+      if (diffMs < 60 * 1000) return 'just now'
+
+      const diffMinutes = Math.floor(diffMs / (60 * 1000))
+      if (diffMinutes < 60) return `${diffMinutes}m ago`
+
+      const diffHours = Math.floor(diffMinutes / 60)
+      if (diffHours < 24) return `${diffHours}h ago`
+
+      const diffDays = Math.floor(diffHours / 24)
+      if (diffDays < 7) return `${diffDays}d ago`
+
+      const diffWeeks = Math.floor(diffDays / 7)
+      return `${diffWeeks}w ago`
     },
     shortSha(sha: string): string {
       if (!sha) return 'unknown'

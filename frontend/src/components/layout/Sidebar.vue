@@ -443,7 +443,11 @@ export default defineComponent({
 
       try {
         const response = await ProfileService.getCompanyProfile()
-        const logoCandidate = response?.data?.logo_url
+        const logoCandidate =
+          (response as Record<string, unknown> | undefined)?.logo_url ??
+          (response as { data?: { logo_url?: unknown } } | undefined)?.data?.logo_url ??
+          (response as { data?: { profile?: { logo_url?: unknown } } } | undefined)?.data?.profile
+            ?.logo_url
         this.companyLogoUrl = typeof logoCandidate === 'string' ? logoCandidate : ''
       } catch {
         this.companyLogoUrl = ''

@@ -116,12 +116,16 @@
           </section>
 
           <aside class="space-y-6">
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <section class="space-y-4">
               <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Recent Activity</h2>
-                <RouterLink to="/applications" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">View</RouterLink>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Recent Activity</h2>
+                <RouterLink to="/applications" class="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                  View
+                </RouterLink>
               </div>
-              <div class="mt-4 space-y-3">
+
+              <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <div class="space-y-3">
                 <div
                   v-for="activity in recentActivities"
                   :key="activity.id"
@@ -130,44 +134,47 @@
                   <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
                   <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
                 </div>
+                </div>
               </div>
             </section>
 
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <section class="space-y-4">
               <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Next Steps</h2>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Next Steps</h2>
                 <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
                   {{ pendingChecklistCount }} pending
                 </span>
               </div>
 
-              <ul class="mt-4 space-y-2.5">
-                <li
-                  v-for="item in checklistItems"
-                  :key="item.key"
-                  class="flex items-start gap-3 rounded-xl border px-3 py-2.5"
-                  :class="item.done
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
-                    : 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200'"
-                >
-                  <span class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[11px] font-black"
-                    :class="item.done ? 'bg-emerald-600 text-white dark:bg-emerald-500' : 'bg-slate-300 text-slate-700 dark:bg-slate-600 dark:text-slate-100'"
+              <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <ul class="space-y-2.5">
+                  <li
+                    v-for="item in checklistItems"
+                    :key="item.key"
+                    class="flex items-start gap-3 rounded-xl border px-3 py-2.5"
+                    :class="item.done
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
+                      : 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200'"
                   >
-                    {{ item.done ? '✓' : '•' }}
-                  </span>
-                  <div>
-                    <p class="text-sm font-semibold">{{ item.label }}</p>
-                    <p class="text-xs opacity-80">{{ item.note }}</p>
-                  </div>
-                </li>
-              </ul>
+                    <span class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[11px] font-black"
+                      :class="item.done ? 'bg-emerald-600 text-white dark:bg-emerald-500' : 'bg-slate-300 text-slate-700 dark:bg-slate-600 dark:text-slate-100'"
+                    >
+                      {{ item.done ? '✓' : '•' }}
+                    </span>
+                    <div>
+                      <p class="text-sm font-semibold">{{ item.label }}</p>
+                      <p class="text-xs opacity-80">{{ item.note }}</p>
+                    </div>
+                  </li>
+                </ul>
 
-              <RouterLink
-                to="/profile/student"
-                class="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-              >
-                Manage Profile
-              </RouterLink>
+                <RouterLink
+                  to="/profile/student"
+                  class="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  Manage Profile
+                </RouterLink>
+              </div>
             </section>
           </aside>
         </div>
@@ -255,31 +262,36 @@
             </div>
           </section>
 
-          <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Application Pipeline</h2>
-            <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div class="rounded-xl bg-amber-50 p-2.5 dark:bg-amber-900/20">
-                <p class="text-xl font-black text-amber-700 dark:text-amber-300">{{ companyPendingApplications }}</p>
-                <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-700/80 dark:text-amber-300/80">Pending</p>
-              </div>
-              <div class="rounded-xl bg-emerald-50 p-2.5 dark:bg-emerald-900/20">
-                <p class="text-xl font-black text-emerald-700 dark:text-emerald-300">{{ companyAcceptedApplications }}</p>
-                <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-700/80 dark:text-emerald-300/80">Accepted</p>
-              </div>
-              <div class="rounded-xl bg-rose-50 p-2.5 dark:bg-rose-900/20">
-                <p class="text-xl font-black text-rose-700 dark:text-rose-300">{{ companyRejectedApplications }}</p>
-                <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-rose-700/80 dark:text-rose-300/80">Rejected</p>
-              </div>
+          <section>
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Application Pipeline</h2>
             </div>
 
-            <div class="mt-5 space-y-2.5">
-              <div
-                v-for="item in companyRecentApplications"
-                :key="item.id"
-                class="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
-              >
-                <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ item.title }}</p>
-                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ item.meta }}</p>
+            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="rounded-xl bg-amber-50 p-2.5 dark:bg-amber-900/20">
+                  <p class="text-xl font-black text-amber-700 dark:text-amber-300">{{ companyPendingApplications }}</p>
+                  <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-amber-700/80 dark:text-amber-300/80">Pending</p>
+                </div>
+                <div class="rounded-xl bg-emerald-50 p-2.5 dark:bg-emerald-900/20">
+                  <p class="text-xl font-black text-emerald-700 dark:text-emerald-300">{{ companyAcceptedApplications }}</p>
+                  <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-700/80 dark:text-emerald-300/80">Accepted</p>
+                </div>
+                <div class="rounded-xl bg-rose-50 p-2.5 dark:bg-rose-900/20">
+                  <p class="text-xl font-black text-rose-700 dark:text-rose-300">{{ companyRejectedApplications }}</p>
+                  <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-rose-700/80 dark:text-rose-300/80">Rejected</p>
+                </div>
+              </div>
+
+              <div class="mt-5 space-y-2.5">
+                <div
+                  v-for="item in companyRecentApplications"
+                  :key="item.id"
+                  class="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
+                >
+                  <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ item.title }}</p>
+                  <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ item.meta }}</p>
+                </div>
               </div>
             </div>
           </section>
