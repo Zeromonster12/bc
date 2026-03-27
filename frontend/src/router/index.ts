@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
+const APP_DISPLAY_NAME = (import.meta.env.VITE_APP_NAME as string | undefined)?.trim() || 'ProjectLinker'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -217,7 +219,10 @@ router.onError((error, to) => {
   sessionStorage.removeItem(DYNAMIC_IMPORT_RELOAD_KEY)
 })
 
-router.afterEach(() => {
+router.afterEach((to) => {
+  const pageTitle = typeof to.meta.title === 'string' ? to.meta.title.trim() : ''
+  document.title = pageTitle !== '' ? `${pageTitle} | ${APP_DISPLAY_NAME}` : APP_DISPLAY_NAME
+
   sessionStorage.removeItem(DYNAMIC_IMPORT_RELOAD_KEY)
 })
 
