@@ -225,6 +225,7 @@ import {
   User,
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import ProfileService from '@/services/profile/ProfileService'
 import { resolveAssetUrl } from '@/services/core/url'
 import { useThemeStore } from '@/stores/theme'
 
@@ -277,6 +278,8 @@ export default defineComponent({
     profileMenuOpen: boolean
     avatarRefreshAttempted: boolean
     avatarLoadFailed: boolean
+    companyLogoUrl: string
+    companyLogoLoadedForUserId: number | null
   } {
     return {
       hoveredLink: null,
@@ -285,6 +288,8 @@ export default defineComponent({
       profileMenuOpen: false,
       avatarRefreshAttempted: false,
       avatarLoadFailed: false,
+      companyLogoUrl: '',
+      companyLogoLoadedForUserId: null,
       links: [
         {
           name: 'dashboard',
@@ -404,7 +409,14 @@ export default defineComponent({
     },
     avatarUrl(): string {
       if (this.avatarLoadFailed) return ''
-      return resolveAssetUrl(this.auth.user?.avatar_url)
+      const userAvatar = resolveAssetUrl(this.auth.user?.avatar_url)
+      if (userAvatar) return userAvatar
+
+      if (this.auth.isCompany && this.companyLogoUrl) {
+        return resolveAssetUrl(this.companyLogoUrl)
+      }
+
+      return ''
     },
     profileRoute(): string {
       if (this.auth.isStudent) return '/profile/student'
@@ -413,6 +425,32 @@ export default defineComponent({
     },
   },
   methods: {
+    async loadCompanyLogo(): Promise<void> {
+      if (!this.auth.isCompany) {
+        this.companyLogoUrl = ''
+        this.companyLogoLoadedForUserId = null
+        return
+      }
+
+      const userId = Number(this.auth.user?.id ?? 0)
+      if (!Number.isFinite(userId) || userId <= 0) {
+        return
+      }
+
+      if (this.companyLogoLoadedForUserId === userId) {
+        return
+      }
+
+      try {
+        const response = await ProfileService.getCompanyProfile()
+        const logoCandidate = response?.data?.logo_url
+        this.companyLogoUrl = typeof logoCandidate === 'string' ? logoCandidate : ''
+      } catch {
+        this.companyLogoUrl = ''
+      } finally {
+        this.companyLogoLoadedForUserId = userId
+      }
+    },
     async handleAvatarError(): Promise<void> {
       if (this.avatarRefreshAttempted) {
         this.avatarLoadFailed = true
@@ -487,8 +525,17 @@ export default defineComponent({
   },
   mounted() {
     document.addEventListener('click', this.handleOutsideClick)
+    void this.loadCompanyLogo()
   },
   watch: {
+    'auth.user.id'() {
+      this.companyLogoLoadedForUserId = null
+      void this.loadCompanyLogo()
+    },
+    'auth.user.role'() {
+      this.companyLogoLoadedForUserId = null
+      void this.loadCompanyLogo()
+    },
     'auth.user.avatar_url'() {
       this.avatarRefreshAttempted = false
       this.avatarLoadFailed = false
