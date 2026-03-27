@@ -39,7 +39,16 @@ class ProjectController extends Controller
                 });
             })
             ->when($validated['status'] ?? null, fn($query, $status) => $query->where('status', $status))
-            ->when(! array_key_exists('status', $validated), fn($query) => $query->whereIn('status', ['open', 'closed']))
+            ->when(! array_key_exists('status', $validated), function ($query) use ($validated, $request): void {
+                $requestedCompanyId = (int) ($validated['company_id'] ?? 0);
+                $viewer = $request->user();
+                $isOwnCompanyScope = $viewer && $requestedCompanyId > 0 && $requestedCompanyId === (int) $viewer->id;
+                $canSeeDraftsInScope = $isOwnCompanyScope || ($viewer?->role === 'admin' && $requestedCompanyId > 0);
+
+                if (! $canSeeDraftsInScope) {
+                    $query->whereIn('status', ['open', 'closed']);
+                }
+            })
             ->when($validated['location'] ?? null, function ($query, $location): void {
                 $query->where('location', 'like', '%' . $location . '%');
             })
