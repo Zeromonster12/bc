@@ -174,7 +174,7 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        $application->loadMissing('project:id,company_user_id');
+        $application->loadMissing('project:id,company_user_id,max_students');
 
         $isOwnerCompany = $application->project?->company_user_id === $user->id;
         $isAdmin = $user->role === 'admin';
@@ -186,8 +186,6 @@ class ApplicationController extends Controller
         $validated = $request->validate([
             'status' => ['required', 'in:accepted,rejected'],
         ]);
-
-        $application->loadMissing('project:id,company_user_id,max_students');
 
         if (
             $validated['status'] === 'accepted'
