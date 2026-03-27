@@ -370,7 +370,7 @@ interface AdminUserLite {
   name: string
   email: string
   role: string
-  approval_status?: string | null
+  company_verification_status?: string | null
   created_at?: string | null
   [key: string]: unknown
 }
@@ -511,7 +511,9 @@ export default defineComponent({
     },
     pendingCompaniesCount(): number {
       return this.adminUsers.filter(
-        (user) => user.role === 'company' && String(user.approval_status ?? '') === 'pending',
+        (user) =>
+          user.role === 'company' &&
+          String(user.company_verification_status ?? '') === 'pending',
       ).length
     },
     adminLatestUsers(): AdminUserLite[] {
@@ -550,11 +552,11 @@ export default defineComponent({
         this.messageStore.fetchConversations(),
       ])
 
-      this.adminUsers = (usersRes.data?.data ?? []) as AdminUserLite[]
-      this.adminProjects = (projectsRes.data?.data ?? []) as DashboardProject[]
+      this.adminUsers = (usersRes.data ?? []) as AdminUserLite[]
+      this.adminProjects = (projectsRes.data ?? []) as DashboardProject[]
 
-      this.stats.totalUsers = Number(usersRes.data?.meta?.total ?? this.adminUsers.length)
-      this.stats.totalProjects = Number(projectsRes.data?.meta?.total ?? this.adminProjects.length)
+      this.stats.totalUsers = Number(usersRes.meta?.total ?? this.adminUsers.length)
+      this.stats.totalProjects = Number(projectsRes.meta?.total ?? this.adminProjects.length)
       this.stats.openProjects = Number(this.projectStore.pagination?.total ?? 0)
     }
   },
