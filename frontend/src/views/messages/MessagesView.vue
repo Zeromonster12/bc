@@ -287,7 +287,6 @@ export default defineComponent({
         }
 
         this.newParticipantQuery = ''
-        this.recipientOptions = []
         this.newConvError = ''
         return
       }
@@ -300,8 +299,8 @@ export default defineComponent({
     removeSelectedParticipant(userId: number) {
       this.selectedParticipants = this.selectedParticipants.filter((participant) => participant.id !== userId)
     },
-    addParticipantFromDropdown() {
-      const selectedId = Number(this.groupParticipantDropdownId ?? 0)
+    addParticipantFromDropdown(selectedUserId?: number) {
+      const selectedId = Number(selectedUserId ?? this.groupParticipantDropdownId ?? 0)
       if (!Number.isFinite(selectedId) || selectedId <= 0) {
         this.newConvError = 'Select participant first.'
         return
@@ -315,6 +314,7 @@ export default defineComponent({
 
       this.selectRecipient(option)
       this.groupParticipantDropdownId = null
+      void this.loadGroupParticipantOptions(this.selectedProjectId)
     },
     clearSelectedRecipient() {
       this.selectedRecipient = null

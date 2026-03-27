@@ -94,27 +94,45 @@
 
     <div v-if="mode === 'group'" class="space-y-2">
       <label class="mb-1 block text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300">Participants</label>
-      <div class="flex items-center gap-2">
-        <select
-          :value="participantDropdownValue ?? ''"
-          class="block w-full rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400"
-          @change="$emit('update:participantDropdownValue', Number(($event.target as HTMLSelectElement).value) || null)"
-        >
-          <option value="">Select participant</option>
-          <option v-for="option in recipientOptions" :key="option.id" :value="option.id">
-            {{ option.name }} ({{ option.email }})
-          </option>
-        </select>
-
+      <div class="relative">
         <button
           type="button"
-          class="inline-flex shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
-          @click="$emit('addParticipantFromDropdown')"
+          class="flex w-full items-center justify-between rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ece6f7] focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400"
+          @click="groupDropdownOpen = !groupDropdownOpen"
         >
-          Add
+          <span class="truncate">{{ groupDropdownLabel }}</span>
+          <span class="ml-2 text-xs text-slate-500 dark:text-slate-400">v</span>
         </button>
+
+        <div
+          v-if="groupDropdownOpen"
+          class="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+        >
+          <div class="sticky top-0 z-10 border-b border-slate-100 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+            <input
+              v-model="groupSearchQuery"
+              type="text"
+              placeholder="Search project member"
+              class="w-full rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-indigo-400 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
+            />
+          </div>
+
+          <p v-if="searchingUsers" class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">Loading project members...</p>
+          <p v-else-if="groupFilteredRecipientOptions.length === 0" class="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
+            No users found.
+          </p>
+          <button
+            v-for="option in groupFilteredRecipientOptions"
+            :key="option.id"
+            type="button"
+            class="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            @click="onSelectGroupOption(option)"
+          >
+            <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ option.name }}</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">{{ option.email }}</p>
+          </button>
+        </div>
       </div>
-      <p v-if="searchingUsers" class="text-xs text-slate-500 dark:text-slate-400">Loading project members...</p>
     </div>
 
     <p
@@ -259,6 +277,8 @@ export default defineComponent({
   data() {
     return {
       directDropdownOpen: false,
+      groupDropdownOpen: false,
+      groupSearchQuery: '',
     }
   },
   computed: {
@@ -279,12 +299,43 @@ export default defineComponent({
 
       return `${selected.name} (${selected.email})`
     },
+    groupDropdownLabel(): string {
+      const selectedId = Number(this.participantDropdownValue ?? 0)
+      if (!Number.isFinite(selectedId) || selectedId <= 0) {
+        return 'Add participant'
+      }
+
+      const selected = this.recipientOptions.find((option) => option.id === selectedId)
+      if (!selected) {
+        return 'Add participant'
+      }
+
+      return `${selected.name} (${selected.email})`
+    },
+    groupFilteredRecipientOptions(): RecipientOption[] {
+      const q = this.groupSearchQuery.trim().toLowerCase()
+      if (!q) {
+        return this.recipientOptions
+      }
+
+      return this.recipientOptions.filter((option) => {
+        const name = String(option.name ?? '').toLowerCase()
+        const email = String(option.email ?? '').toLowerCase()
+        return name.includes(q) || email.includes(q)
+      })
+    },
   },
   methods: {
     onSelectDirectOption(option: RecipientOption) {
       this.$emit('update:directDropdownValue', option.id)
       this.$emit('selectRecipient', option)
       this.directDropdownOpen = false
+    },
+    onSelectGroupOption(option: RecipientOption) {
+      this.$emit('update:participantDropdownValue', option.id)
+      this.$emit('addParticipantFromDropdown', option.id)
+      this.groupSearchQuery = ''
+      this.groupDropdownOpen = false
     },
   },
 })
