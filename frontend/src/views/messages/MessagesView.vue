@@ -649,7 +649,12 @@ export default defineComponent({
         }
       }
 
-      const validationError = validateNewConversation(this.selectedRecipient?.id ?? null)
+      const normalizedRecipientId = Number(this.selectedRecipient?.id ?? this.directRecipientDropdownId ?? 0)
+      const validationError = validateNewConversation(
+        Number.isFinite(normalizedRecipientId) && normalizedRecipientId > 0
+          ? normalizedRecipientId
+          : null,
+      )
       if (validationError) {
         this.newConvError = validationError
         return
@@ -659,7 +664,7 @@ export default defineComponent({
       this.creating = true
 
       try {
-        const payload = toNewConversationPayload(this.selectedRecipient?.id ?? 0)
+        const payload = toNewConversationPayload(normalizedRecipientId)
         await this.messageStore.startConversation(payload)
         this.refreshRealtimeSubscriptions()
         this.showNewConversation = false
