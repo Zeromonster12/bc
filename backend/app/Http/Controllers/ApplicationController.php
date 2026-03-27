@@ -43,7 +43,7 @@ class ApplicationController extends Controller
 
         $query = Application::query()
             ->with([
-                'project:id,company_user_id,title,status,location,created_at',
+                'project:id,company_user_id,title,status,location,requirements,tech_stack,created_at',
                 'project.companyUser:id,name',
                 'project.companyUser.companyProfile:id,user_id,profile_data',
                 'studentUser:id,name,email',
@@ -125,7 +125,7 @@ class ApplicationController extends Controller
                 ]);
 
                 $existingApplication->load([
-                    'project:id,company_user_id,title,status,location,created_at',
+                    'project:id,company_user_id,title,status,location,requirements,tech_stack,created_at',
                     'project.companyUser:id,name',
                     'project.companyUser.companyProfile:id,user_id,profile_data',
                     'studentUser:id,name,email',
@@ -151,7 +151,7 @@ class ApplicationController extends Controller
         ]);
 
         $application->load([
-            'project:id,company_user_id,title,status,location,created_at',
+            'project:id,company_user_id,title,status,location,requirements,tech_stack,created_at',
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
@@ -211,7 +211,7 @@ class ApplicationController extends Controller
         $application->update($updatePayload);
 
         $application->load([
-            'project:id,company_user_id,title,status,location,created_at',
+            'project:id,company_user_id,title,status,location,requirements,tech_stack,created_at',
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
@@ -254,7 +254,7 @@ class ApplicationController extends Controller
         }
 
         $application->load([
-            'project:id,company_user_id,title,status,location,created_at',
+            'project:id,company_user_id,title,status,location,requirements,tech_stack,created_at',
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
@@ -363,7 +363,7 @@ class ApplicationController extends Controller
 
         $task->load('assignee:id,name,email');
         $application->load([
-            'project:id,company_user_id,title,status,location,created_at',
+            'project:id,company_user_id,title,status,location,requirements,tech_stack,created_at',
             'project.companyUser:id,name',
             'project.companyUser.companyProfile:id,user_id,profile_data',
             'studentUser:id,name,email',
