@@ -22,6 +22,8 @@ class EmailVerificationNotificationController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $genericMessage = 'If the email exists and is not yet verified, a new code has been sent.';
+
         if (! $this->turnstileVerifier->verify((string) $request->input('turnstile_token'), $request->ip())) {
             throw ValidationException::withMessages([
                 'turnstile_token' => ['Captcha verification failed. Please try again.'],
@@ -36,13 +38,13 @@ class EmailVerificationNotificationController extends Controller
 
         if (! $user) {
             return response()->json([
-                'message' => 'If the email exists, a new code has been sent.',
+                'message' => $genericMessage,
             ]);
         }
 
         if ($user->hasVerifiedEmail()) {
             return response()->json([
-                'message' => 'Email is already verified.',
+                'message' => $genericMessage,
             ]);
         }
 
@@ -63,7 +65,7 @@ class EmailVerificationNotificationController extends Controller
         $user->notify(new EmailVerificationCodeNotification($code));
 
         return response()->json([
-            'message' => 'Verification code sent.',
+            'message' => $genericMessage,
         ]);
     }
 }

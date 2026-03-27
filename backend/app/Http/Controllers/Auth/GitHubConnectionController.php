@@ -220,7 +220,7 @@ class GitHubConnectionController extends Controller
             ]);
         }
 
-        $verifySsl = (bool) config('services.github.verify_ssl', true);
+        $verifySsl = $this->shouldVerifyTlsForGithub();
 
         $reposResponse = Http::acceptJson()
             ->withHeaders(['User-Agent' => 'BC-Platform'])
@@ -312,7 +312,7 @@ class GitHubConnectionController extends Controller
         $provider->scopes(['read:user', 'user:email']);
 
         $provider->setHttpClient(new Client([
-            'verify' => (bool) config('services.github.verify_ssl', true),
+            'verify' => $this->shouldVerifyTlsForGithub(),
         ]));
 
         return $provider;
@@ -331,5 +331,14 @@ class GitHubConnectionController extends Controller
         }
 
         return null;
+    }
+
+    private function shouldVerifyTlsForGithub(): bool
+    {
+        if (! app()->environment(['local', 'testing'])) {
+            return true;
+        }
+
+        return (bool) config('services.github.verify_ssl', true);
     }
 }

@@ -15,7 +15,7 @@ class TurnstileVerifier
 
         $secret = (string) config('services.turnstile.secret_key');
         $verifyUrl = (string) config('services.turnstile.siteverify_url');
-        $verifySsl = (bool) config('services.turnstile.verify_ssl', true);
+        $verifySsl = $this->shouldVerifyTlsForTurnstile();
 
         if ($secret === '' || ! $token) {
             return false;
@@ -39,5 +39,14 @@ class TurnstileVerifier
         }
 
         return (bool) $response->json('success');
+    }
+
+    private function shouldVerifyTlsForTurnstile(): bool
+    {
+        if (! app()->environment(['local', 'testing'])) {
+            return true;
+        }
+
+        return (bool) config('services.turnstile.verify_ssl', true);
     }
 }

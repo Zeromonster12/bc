@@ -137,9 +137,18 @@ class GoogleOAuthController extends Controller
         $provider = Socialite::driver('google');
 
         $provider->setHttpClient(new Client([
-            'verify' => (bool) config('services.google.verify_ssl', true),
+            'verify' => $this->shouldVerifyTlsForGoogle(),
         ]));
 
         return $provider;
+    }
+
+    private function shouldVerifyTlsForGoogle(): bool
+    {
+        if (! app()->environment(['local', 'testing'])) {
+            return true;
+        }
+
+        return (bool) config('services.google.verify_ssl', true);
     }
 }
