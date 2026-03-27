@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 });
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    // Shared authenticated endpoints (authorization still enforced in controllers where needed).
     Route::get('/conversation-users', [MessageController::class, 'searchableUsers']);
     Route::get('/conversations', [MessageController::class, 'indexConversations']);
     Route::post('/conversations', [MessageController::class, 'storeConversation']);
@@ -46,49 +47,41 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/conversations/{conversation}/typing', [MessageController::class, 'typing']);
 
     Route::get('/applications', [ApplicationController::class, 'index']);
-    Route::post('/projects/{project}/apply', [ApplicationController::class, 'store']);
-    Route::patch('/applications/{application}', [ApplicationController::class, 'update']);
     Route::get('/applications/{application}/tasks', [ApplicationController::class, 'listTasks']);
-    Route::post('/applications/{application}/tasks', [ApplicationController::class, 'storeTask']);
     Route::patch('/applications/{application}/tasks/{task}', [ApplicationController::class, 'updateTask']);
-    Route::delete('/applications/{application}/tasks/{task}', [ApplicationController::class, 'destroyTask']);
-    Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
 
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::get('/projects/{project}', [ProjectController::class, 'show']);
-    Route::post('/projects', [ProjectController::class, 'store']);
-    Route::put('/projects/{project}', [ProjectController::class, 'update']);
-    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
 
     Route::get('/projects/{project}/task-board', [ProjectTaskBoardController::class, 'show']);
     Route::get('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'listFolders']);
-    Route::post('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'storeFolder']);
-    Route::patch('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'updateFolder']);
-    Route::delete('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'destroyFolder']);
-    Route::post('/projects/{project}/task-folders/{folder}/categories', [ProjectTaskBoardController::class, 'storeCategory']);
-    Route::patch('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'updateCategory']);
-    Route::delete('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'destroyCategory']);
+
+    Route::get('/users/{user}/avatar', [StudentProfileController::class, 'userAvatar'])
+        ->middleware('throttle:60,1')
+        ->name('users.avatar.show');
+
+    Route::get('/students/{user}/profile', [StudentProfileController::class, 'showForCompany'])
+        ->middleware('throttle:30,1');
+
+    Route::get('/companies/{user}/profile', [CompanyProfileController::class, 'showForViewer'])
+        ->middleware('throttle:30,1');
+
+    Route::get('/profile/student/cv/{cvFile}/download', [StudentCvController::class, 'download'])
+        ->middleware('throttle:30,1')
+        ->name('profile.student.cv.download');
+});
+
+Route::middleware(['auth:sanctum', 'role:student'])->group(function (): void {
+    Route::post('/projects/{project}/apply', [ApplicationController::class, 'store']);
 
     Route::get('/profile/student', [StudentProfileController::class, 'show'])
         ->middleware('throttle:30,1');
     Route::get('/profile/student/avatar', [StudentProfileController::class, 'avatar'])
         ->middleware('throttle:60,1')
         ->name('profile.student.avatar.show');
-    Route::get('/users/{user}/avatar', [StudentProfileController::class, 'userAvatar'])
-        ->middleware('throttle:60,1')
-        ->name('users.avatar.show');
     Route::post('/profile/student', [StudentProfileController::class, 'update'])
         ->middleware('throttle:15,1');
     Route::put('/profile/student', [StudentProfileController::class, 'update'])
-        ->middleware('throttle:15,1');
-    Route::get('/students/{user}/profile', [StudentProfileController::class, 'showForCompany'])
-        ->middleware('throttle:30,1');
-
-    Route::get('/profile/company', [CompanyProfileController::class, 'show'])
-        ->middleware('throttle:30,1');
-    Route::get('/companies/{user}/profile', [CompanyProfileController::class, 'showForViewer'])
-        ->middleware('throttle:30,1');
-    Route::put('/profile/company', [CompanyProfileController::class, 'update'])
         ->middleware('throttle:15,1');
 
     Route::get('/profile/student/cv', [StudentCvController::class, 'index'])
@@ -97,12 +90,35 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/profile/student/cv', [StudentCvController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('profile.student.cv.store');
-    Route::get('/profile/student/cv/{cvFile}/download', [StudentCvController::class, 'download'])
-        ->middleware('throttle:30,1')
-        ->name('profile.student.cv.download');
     Route::delete('/profile/student/cv/{cvFile}', [StudentCvController::class, 'destroy'])
         ->middleware('throttle:20,1')
         ->name('profile.student.cv.destroy');
+});
+
+Route::middleware(['auth:sanctum', 'role:student,admin'])->group(function (): void {
+    Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'role:company,admin'])->group(function (): void {
+    Route::patch('/applications/{application}', [ApplicationController::class, 'update']);
+    Route::post('/applications/{application}/tasks', [ApplicationController::class, 'storeTask']);
+    Route::delete('/applications/{application}/tasks/{task}', [ApplicationController::class, 'destroyTask']);
+
+    Route::post('/projects', [ProjectController::class, 'store']);
+    Route::put('/projects/{project}', [ProjectController::class, 'update']);
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+
+    Route::post('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'storeFolder']);
+    Route::patch('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'updateFolder']);
+    Route::delete('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'destroyFolder']);
+    Route::post('/projects/{project}/task-folders/{folder}/categories', [ProjectTaskBoardController::class, 'storeCategory']);
+    Route::patch('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'updateCategory']);
+    Route::delete('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'destroyCategory']);
+
+    Route::get('/profile/company', [CompanyProfileController::class, 'show'])
+        ->middleware('throttle:30,1');
+    Route::put('/profile/company', [CompanyProfileController::class, 'update'])
+        ->middleware('throttle:15,1');
 });
 
 Route::get('/users/{user}/avatar/signed', [StudentProfileController::class, 'signedUserAvatar'])

@@ -19,7 +19,7 @@ Route::get('/google/callback', [GoogleOAuthController::class, 'callback'])
     ->middleware('throttle:20,1')
     ->name('oauth.google.callback');
 
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware(['auth:sanctum', 'role:student'])->group(function (): void {
     Route::get('/github/connect/status', [GitHubConnectionController::class, 'status'])
         ->middleware('throttle:30,1')
         ->name('oauth.github.connect.status');

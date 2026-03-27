@@ -27,7 +27,7 @@ class StudentCvUploadTest extends TestCase
 
     public function test_student_can_upload_and_list_cv_files(): void
     {
-        Storage::fake('local');
+        Storage::fake('usercv');
 
         $student = User::factory()->create(['role' => 'student']);
         Sanctum::actingAs($student);
@@ -50,7 +50,7 @@ class StudentCvUploadTest extends TestCase
 
     public function test_non_student_cannot_upload_cv(): void
     {
-        Storage::fake('local');
+        Storage::fake('usercv');
 
         $company = User::factory()->create(['role' => 'company']);
         Sanctum::actingAs($company);
@@ -67,7 +67,7 @@ class StudentCvUploadTest extends TestCase
 
     public function test_student_can_delete_own_cv_file(): void
     {
-        Storage::fake('local');
+        Storage::fake('usercv');
 
         $student = User::factory()->create(['role' => 'student']);
         Sanctum::actingAs($student);
@@ -85,7 +85,7 @@ class StudentCvUploadTest extends TestCase
             'uploaded_at' => now(),
         ]);
 
-        Storage::disk('local')->put($cv->storage_path, 'dummy');
+        Storage::disk('usercv')->put($cv->storage_path, 'dummy');
 
         $response = $this->deleteJson('/api/profile/student/cv/' . $cv->id);
 

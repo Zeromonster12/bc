@@ -17,7 +17,7 @@ class StudentProfileApiTest extends TestCase
 
     public function test_student_profile_can_be_created_and_fetched(): void
     {
-        Storage::fake('public');
+        Storage::fake('userpfp');
 
         $student = User::factory()->create(['role' => 'student']);
         Sanctum::actingAs($student);
@@ -52,7 +52,7 @@ class StudentProfileApiTest extends TestCase
 
     public function test_student_profile_avatar_can_be_uploaded_via_post_multipart(): void
     {
-        Storage::fake('public');
+        Storage::fake('userpfp');
 
         $student = User::factory()->create(['role' => 'student']);
         Sanctum::actingAs($student);
@@ -69,9 +69,9 @@ class StudentProfileApiTest extends TestCase
         $response->assertOk();
         $response->assertJsonStructure(['avatar_url']);
         $avatarUrl = (string) $response->json('avatar_url', '');
-        $this->assertStringStartsWith('/storage/student-avatars/' . $student->id . '/', $avatarUrl);
+        $this->assertStringContainsString('/api/users/' . $student->id . '/avatar/signed', $avatarUrl);
 
-        $storedFiles = Storage::disk('public')->allFiles('student-avatars/' . $student->id);
+        $storedFiles = Storage::disk('userpfp')->allFiles('student-avatars/' . $student->id);
         $this->assertNotEmpty($storedFiles);
     }
 

@@ -458,17 +458,19 @@ class ProjectTaskBoardController extends Controller
             ];
         })->values();
 
-        $sectionFolders = collect([[
-            'id' => 0,
-            'name' => 'No folder',
-            'position' => -1,
-            'parent_folder_id' => null,
-            'is_virtual' => true,
-            'uncategorized_tasks' => $standaloneTasks
-                ->map(fn(ApplicationTask $task) => $this->transformBoardTask($task))
-                ->values(),
-            'categories' => [],
-        ]])->concat($sectionFolders)->values();
+        if ($standaloneTasks->isNotEmpty()) {
+            $sectionFolders = collect([[
+                'id' => 0,
+                'name' => 'No folder',
+                'position' => -1,
+                'parent_folder_id' => null,
+                'is_virtual' => true,
+                'uncategorized_tasks' => $standaloneTasks
+                    ->map(fn(ApplicationTask $task) => $this->transformBoardTask($task))
+                    ->values(),
+                'categories' => [],
+            ]])->concat($sectionFolders)->values();
+        }
 
         return $sectionFolders->all();
     }
