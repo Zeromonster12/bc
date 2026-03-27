@@ -203,6 +203,19 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
+import {
+  applicantEducationLine,
+  applicantMatchScore,
+  applicantStatusDotClass,
+  applicantStatusLabel,
+  applicantStatusPillClass,
+  applicantStatusTabClass,
+  applicantTopSkillsLine,
+  calculateReviewedPercent,
+  filterCompanyApplicants,
+  type ApplicantQuickStatus,
+  type CompanyApplicantListItem,
+} from '@/services/applications/ApplicationsViewService'
 import { resolveAssetUrl } from '@/services/core/url'
 
 interface CompanyProject {
@@ -210,19 +223,17 @@ interface CompanyProject {
   title: string
 }
 
-interface ApplicationListItem {
-  id: number
+interface ApplicationListItem extends CompanyApplicantListItem {
   cover_letter?: string
-  created_at?: string
-  status?: string
+  [key: string]: unknown
   tasks?: Array<{
     id?: number
     status?: 'todo' | 'in_progress' | 'complete' | null
   }>
   student?: {
-    id?: number
     name?: string
     email?: string
+    id?: number
     github_url?: string
     avatar_url?: string | null
     profile?: {
@@ -231,16 +242,15 @@ interface ApplicationListItem {
       field_of_study?: string
       skills?: string[]
       interests?: string[]
-      projects?: Array<{ tech?: string }>
       bio?: string
       about_me?: string
+      projects?: Array<{ tech?: string }>
     }
   }
   project?: {
-    requirements?: string
     tech_stack?: string[]
+    requirements?: string
   }
-  [key: string]: unknown
 }
 
 export default defineComponent({
@@ -258,16 +268,12 @@ export default defineComponent({
       type: Number as PropType<number | null>,
       default: null,
     },
-    updatingStatus: {
-      type: String,
-      default: '',
-    },
   },
   emits: ['update-status'],
   data() {
     return {
       searchQuery: '',
-      activeQuickStatus: 'all' as 'all' | 'pending' | 'accepted' | 'rejected',
+      activeQuickStatus: 'all' as ApplicantQuickStatus,
       currentPage: 1,
       pageSize: 6,
       quickStatusOptions: [
@@ -275,43 +281,15 @@ export default defineComponent({
         { value: 'accepted', label: 'Approved' },
         { value: 'pending', label: 'Pending' },
         { value: 'rejected', label: 'Rejected' },
-      ] as Array<{ value: 'all' | 'pending' | 'accepted' | 'rejected'; label: string }>,
+      ] as Array<{ value: ApplicantQuickStatus; label: string }>,
     }
   },
   computed: {
     visibleApplications(): ApplicationListItem[] {
-      const query = this.searchQuery.toLowerCase()
-
-      return this.applications.filter((application) => {
-        const status = (application.status ?? 'pending') as 'pending' | 'accepted' | 'rejected' | 'withdrawn'
-        if (this.activeQuickStatus !== 'all' && status !== this.activeQuickStatus) {
-          return false
-        }
-
-        if (!query) return true
-
-        const haystack = [
-          application.student?.name,
-          application.student?.email,
-          application.student?.profile?.university,
-          application.student?.profile?.degree,
-          application.student?.profile?.field_of_study,
-          ...(application.student?.profile?.skills ?? []),
-          ...(application.student?.profile?.interests ?? []),
-          application.student?.profile?.bio,
-          application.student?.profile?.about_me,
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-
-        return haystack.includes(query)
-      })
+      return filterCompanyApplicants(this.applications, this.activeQuickStatus, this.searchQuery)
     },
     reviewedPercent(): number {
-      if (!this.applications.length) return 0
-      const reviewed = this.applications.filter((app) => app.status === 'accepted' || app.status === 'rejected').length
-      return Math.round((reviewed / this.applications.length) * 100)
+      return calculateReviewedPercent(this.applications)
     },
     fullCircle(): number {
       return Number((2 * Math.PI * 40).toFixed(1))
@@ -376,96 +354,25 @@ export default defineComponent({
       })
     },
     statusLabel(status?: string): string {
-      if (status === 'accepted') return 'Approved'
-      if (status === 'rejected') return 'Rejected'
-      if (status === 'withdrawn') return 'Withdrawn'
-      return 'Pending'
+      return applicantStatusLabel(status)
     },
-    statusTabClass(status: 'all' | 'pending' | 'accepted' | 'rejected'): string {
-      if (this.activeQuickStatus === status) {
-        return 'bg-[#d8cdff] text-[#3f1ccc] dark:bg-indigo-500/25 dark:text-indigo-300'
-      }
-
-      return 'bg-white text-slate-600 hover:bg-[#ece6fb] dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
+    statusTabClass(status: ApplicantQuickStatus): string {
+      return applicantStatusTabClass(this.activeQuickStatus, status)
     },
     statusPillClass(status?: string): string {
-      if (status === 'accepted') return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-      if (status === 'rejected') return 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
-      if (status === 'withdrawn') return 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+      return applicantStatusPillClass(status)
     },
     statusDotClass(status?: string): string {
-      if (status === 'accepted') return 'bg-emerald-500'
-      if (status === 'rejected') return 'bg-rose-500'
-      if (status === 'withdrawn') return 'bg-slate-500'
-      return 'bg-amber-500'
+      return applicantStatusDotClass(status)
     },
     educationLine(application: ApplicationListItem): string {
-      const degree = application.student?.profile?.degree?.trim() ?? ''
-      const field = application.student?.profile?.field_of_study?.trim() ?? ''
-      const pieces = [degree, field].filter(Boolean)
-      return pieces.length ? pieces.join(' - ') : 'Education not specified'
+      return applicantEducationLine(application)
     },
     topSkillsLine(application: ApplicationListItem): string {
-      const skills = application.student?.profile?.skills ?? []
-      if (!skills.length) return 'Skills not specified'
-      return skills.slice(0, 3).join(', ')
-    },
-    normalizeChip(value: string): string {
-      return String(value ?? '')
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '')
-        .replace(/[^a-z0-9+#]/g, '')
-    },
-    studentSkillChips(application: ApplicationListItem): Set<string> {
-      const chips = application.student?.profile?.skills ?? []
-      return new Set(
-        chips
-          .map((chip) => this.normalizeChip(chip))
-          .filter((chip) => chip.length > 0),
-      )
-    },
-    projectTechChips(application: ApplicationListItem): Set<string> {
-      const chips = application.project?.tech_stack ?? []
-      return new Set(
-        chips
-          .map((chip) => this.normalizeChip(chip))
-          .filter((chip) => chip.length > 0),
-      )
+      return applicantTopSkillsLine(application)
     },
     matchScore(application: ApplicationListItem): number {
-      const projectChips = this.projectTechChips(application)
-      const studentChips = this.studentSkillChips(application)
-
-      if (!projectChips.size) {
-        return 0
-      }
-
-      let overlap = 0
-      projectChips.forEach((chip) => {
-        if (studentChips.has(chip)) {
-          overlap += 1
-        }
-      })
-
-      const ratio = overlap / projectChips.size
-      const score = Math.round(Math.max(0, Math.min(100, ratio * 100)))
-      return score
-    },
-    taskStatsFor(application: ApplicationListItem): {
-      total: number
-      todo: number
-      inProgress: number
-      complete: number
-    } {
-      const tasks = application.tasks ?? []
-      return {
-        total: tasks.length,
-        todo: tasks.filter((task) => task.status === 'todo').length,
-        inProgress: tasks.filter((task) => task.status === 'in_progress').length,
-        complete: tasks.filter((task) => task.status === 'complete').length,
-      }
+      return applicantMatchScore(application)
     },
   },
 })

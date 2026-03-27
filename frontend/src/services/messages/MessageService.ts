@@ -1,4 +1,41 @@
 import http from '@/services/core/http'
+import { getEcho } from '@/services/core/echo'
+
+export interface RealtimeMessagePayload {
+  conversation_id?: number
+  message?: {
+    id?: number | string
+    body?: string
+    created_at?: string
+    read_at?: string | null
+    sender?: {
+      id?: number
+      name?: string
+      email?: string
+    }
+  }
+}
+
+export interface RealtimeReadPayload {
+  conversation_id?: number
+  reader_user_id?: number
+  last_read_message_id?: number
+  read_at?: string
+}
+
+export interface RealtimeTypingPayload {
+  user?: {
+    id?: number
+    name?: string
+  }
+  is_typing?: boolean
+}
+
+interface ConversationRealtimeHandlers {
+  onMessageSent?: (payload: RealtimeMessagePayload) => void | Promise<void>
+  onMessageRead?: (payload: RealtimeReadPayload) => void | Promise<void>
+  onUserTyping?: (payload: RealtimeTypingPayload) => void | Promise<void>
+}
 
 const MessageService = {
   async getConversations() {
@@ -82,6 +119,35 @@ const MessageService = {
       is_typing: isTyping,
     })
     return data
+  },
+
+  subscribeToConversationRealtime(
+    token: string,
+    conversationId: number,
+    handlers: ConversationRealtimeHandlers,
+  ) {
+    if (!token) return
+
+    const echo = getEcho(token)
+    const channel = echo.private(`conversations.${conversationId}`)
+
+    if (handlers.onMessageSent) {
+      channel.listen('.message.sent', handlers.onMessageSent)
+    }
+
+    if (handlers.onMessageRead) {
+      channel.listen('.message.read', handlers.onMessageRead)
+    }
+
+    if (handlers.onUserTyping) {
+      channel.listen('.user.typing', handlers.onUserTyping)
+    }
+  },
+
+  unsubscribeFromConversationRealtime(token: string, conversationId: number) {
+    if (!token) return
+    const echo = getEcho(token)
+    echo.leave(`private-conversations.${conversationId}`)
   },
 }
 

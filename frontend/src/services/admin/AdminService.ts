@@ -1,12 +1,12 @@
 import http from '@/services/core/http'
 
 const AdminService = {
-  async getUsers(params: { page?: number; search?: string; role?: string; company_status?: string }) {
+  async getUsers(params: { page?: number; per_page?: number; search?: string; role?: string; company_status?: string }) {
     const { data } = await http.get('/admin/users', { params })
     return data
   },
 
-  async getProjects(params: { page?: number }) {
+  async getProjects(params: { page?: number; per_page?: number }) {
     const { data } = await http.get('/admin/projects', { params })
     return data
   },

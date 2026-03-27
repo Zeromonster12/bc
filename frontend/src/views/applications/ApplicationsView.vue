@@ -19,7 +19,6 @@
             :selected-project="selectedProject"
             :applications="filteredApplications"
             :updating-id="updatingId"
-            :updating-status="updatingStatus"
             @update-status="handlePanelUpdateStatus"
           />
         </div>
@@ -84,7 +83,6 @@ export default defineComponent({
       selectedProjectId: null as number | null,
       withdrawingId: null as number | null,
       updatingId: null as number | null,
-      updatingStatus: '',
     }
   },
   computed: {
@@ -158,7 +156,6 @@ export default defineComponent({
     },
     async handleUpdateStatus(id: number, status: 'accepted' | 'rejected') {
       this.updatingId = id
-      this.updatingStatus = status
       try {
         await this.applicationStore.updateStatus(id, status)
         if (this.auth.isCompany) {
@@ -170,7 +167,6 @@ export default defineComponent({
         }
       } finally {
         this.updatingId = null
-        this.updatingStatus = ''
       }
     },
   },

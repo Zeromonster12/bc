@@ -290,7 +290,9 @@ export default defineComponent({
     },
     selectedTechLabel(): string {
       if (!this.localFilters.tech_stack.length) return 'All technologies'
-      if (this.localFilters.tech_stack.length === 1) return this.localFilters.tech_stack[0]
+      if (this.localFilters.tech_stack.length === 1) {
+        return this.localFilters.tech_stack[0] ?? 'All technologies'
+      }
       return `${this.localFilters.tech_stack.length} selected`
     },
     selectedSortLabel(): string {

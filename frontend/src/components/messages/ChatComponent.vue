@@ -86,10 +86,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import http from '@/services/core/http'
-import { getEcho } from '@/services/core/echo'
 import { useAuthStore } from '@/stores/auth'
-import MessageService from '@/services/messages/MessageService'
+import MessageService, { type RealtimeReadPayload } from '@/services/messages/MessageService'
 
 interface ChatMessage {
   id: number | string
@@ -98,13 +96,6 @@ interface ChatMessage {
   created_at: string
   read_at?: string | null
   optimistic?: boolean
-}
-
-interface MessageReadPayload {
-  conversation_id?: number
-  reader_user_id?: number
-  last_read_message_id?: number
-  read_at?: string
 }
 
 export default defineComponent({
@@ -183,8 +174,8 @@ export default defineComponent({
       })
     },
     async loadHistory() {
-      const response = await http.get(`/conversations/${this.conversationId}/messages`)
-      this.messages = response.data?.data ?? []
+      const response = await MessageService.getMessages(this.conversationId)
+      this.messages = response?.data ?? []
       const latestMessageId = this.getLatestMessageId()
       if (latestMessageId > 0) {
         this.markConversationRead(latestMessageId)
@@ -194,25 +185,34 @@ export default defineComponent({
     subscribe() {
       if (!this.auth.token) return
 
-      const echo = getEcho(this.auth.token)
-      echo
-        .private(`conversations.${this.conversationId}`)
-        .listen('.message.sent', async (payload: { message?: ChatMessage }) => {
+      MessageService.subscribeToConversationRealtime(this.auth.token, this.conversationId, {
+        onMessageSent: async (payload) => {
           const incoming = payload?.message
-          if (!incoming) return
+          const incomingId = Number(incoming?.id ?? 0)
+          if (!incoming || !Number.isFinite(incomingId) || incomingId <= 0) return
 
-          const exists = this.messages.some((m) => Number(m.id) === Number(incoming.id))
+          const normalizedIncoming: ChatMessage = {
+            id: incomingId,
+            body: String(incoming.body ?? ''),
+            created_at: String(incoming.created_at ?? new Date().toISOString()),
+            read_at: incoming.read_at ?? null,
+            sender: {
+              id: Number(incoming.sender?.id ?? 0) || undefined,
+              name: String(incoming.sender?.name ?? ''),
+              email: String(incoming.sender?.email ?? ''),
+            },
+          }
+
+          const exists = this.messages.some((m) => Number(m.id) === incomingId)
           if (!exists) {
-            this.messages.push(incoming)
-            if (Number(incoming.sender?.id ?? 0) !== this.currentUserId) {
-              this.markConversationRead(Number(incoming.id))
+            this.messages.push(normalizedIncoming)
+            if (Number(normalizedIncoming.sender?.id ?? 0) !== this.currentUserId) {
+              this.markConversationRead(incomingId)
             }
             await this.scrollToBottom()
           }
-        })
-        .listen(
-          '.user.typing',
-          (payload: { user?: { id?: number; name?: string }; is_typing?: boolean }) => {
+        },
+        onUserTyping: (payload) => {
             const senderId = Number(payload?.user?.id ?? 0)
             const senderName = String(payload?.user?.name ?? '')
             const isTyping = Boolean(payload?.is_typing)
@@ -230,21 +230,18 @@ export default defineComponent({
               this.typingIds = this.typingIds.filter((id) => id !== senderId)
               this.typingNames = this.typingNames.filter((name) => name !== senderName)
             }
-          },
-        )
-        .listen('.message.read', (payload: MessageReadPayload) => {
+        },
+        onMessageRead: (payload) => {
           this.applyReadReceipt(payload)
-        })
+        },
+      })
     },
     unsubscribe() {
       if (!this.auth.token) return
-      const echo = getEcho(this.auth.token)
-      echo.leave(`private-conversations.${this.conversationId}`)
+      MessageService.unsubscribeFromConversationRealtime(this.auth.token, this.conversationId)
     },
     async sendTyping(isTyping: boolean) {
-      await http.post(`/conversations/${this.conversationId}/typing`, {
-        is_typing: isTyping,
-      })
+      await MessageService.setTyping(this.conversationId, isTyping)
     },
     getLatestMessageId(): number {
       if (!this.messages.length) return 0
@@ -345,11 +342,9 @@ export default defineComponent({
       this.updateTypingState(false)
 
       try {
-        const response = await http.post(`/conversations/${this.conversationId}/messages`, {
-          body: trimmed,
-        })
+        const response = await MessageService.sendMessage(this.conversationId, trimmed)
 
-        const persisted = response.data?.data as ChatMessage
+        const persisted = response?.data as ChatMessage
         persisted.read_at = persisted.read_at ?? null
         this.messages = this.messages.map((m) => (m.id === optimisticId ? persisted : m))
         this.$emit('message-sent-local', persisted)
@@ -359,7 +354,7 @@ export default defineComponent({
         this.sending = false
       }
     },
-    applyReadReceipt(payload: MessageReadPayload) {
+    applyReadReceipt(payload: RealtimeReadPayload) {
       const conversationId = Number(payload?.conversation_id ?? 0)
       const lastReadMessageId = Number(payload?.last_read_message_id ?? 0)
       const readerUserId = Number(payload?.reader_user_id ?? 0)

@@ -104,8 +104,10 @@
 import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useMessageStore } from '@/stores/message'
-import { getEcho } from '@/services/core/echo'
-import MessageService from '@/services/messages/MessageService'
+import MessageService, {
+  type RealtimeMessagePayload,
+  type RealtimeReadPayload,
+} from '@/services/messages/MessageService'
 import ApplicationService from '@/services/applications/ApplicationService'
 import ProjectService from '@/services/projects/ProjectService'
 import {
@@ -139,18 +141,6 @@ interface MessageConversation {
     }
   }
   [key: string]: unknown
-}
-
-interface MessageSentPayload {
-  conversation_id?: number
-  message?: MessageConversation['last_message']
-}
-
-interface MessageReadPayload {
-  conversation_id?: number
-  reader_user_id?: number
-  last_read_message_id?: number
-  read_at?: string
 }
 
 interface RecipientOption {
@@ -460,8 +450,7 @@ export default defineComponent({
       this.searchingUsers = true
 
       try {
-        const projectId = this.conversationMode === 'group' ? this.selectedProjectId : null
-        const response = await MessageService.searchConversationUsers(query, 8, projectId)
+        const response = await MessageService.searchConversationUsers(query, 8, null)
         if (nonce !== this.latestRecipientSearchNonce) {
           return
         }
@@ -508,13 +497,11 @@ export default defineComponent({
     },
     refreshRealtimeSubscriptions() {
       if (!this.auth.token) return
-
-      const echo = getEcho(this.auth.token)
       const wanted = new Set(this.conversationIds)
 
       for (const conversationId of this.subscribedConversationIds) {
         if (!wanted.has(conversationId)) {
-          echo.leave(`private-conversations.${conversationId}`)
+          MessageService.unsubscribeFromConversationRealtime(this.auth.token, conversationId)
         }
       }
 
@@ -522,32 +509,45 @@ export default defineComponent({
       for (const conversationId of wanted) {
         if (current.has(conversationId)) continue
 
-        echo
-          .private(`conversations.${conversationId}`)
-          .listen('.message.sent', (payload: MessageSentPayload) => {
+        MessageService.subscribeToConversationRealtime(this.auth.token, conversationId, {
+          onMessageSent: (payload) => {
             this.onRealtimeMessage(payload)
-          })
-          .listen('.message.read', (payload: MessageReadPayload) => {
+          },
+          onMessageRead: (payload) => {
             this.onRealtimeRead(payload)
-          })
+          },
+        })
       }
 
       this.subscribedConversationIds = [...wanted]
     },
     unsubscribeAllRealtime() {
       if (!this.auth.token) return
-
-      const echo = getEcho(this.auth.token)
       for (const conversationId of this.subscribedConversationIds) {
-        echo.leave(`private-conversations.${conversationId}`)
+        MessageService.unsubscribeFromConversationRealtime(this.auth.token, conversationId)
       }
 
       this.subscribedConversationIds = []
     },
-    onRealtimeMessage(payload: MessageSentPayload) {
+    onRealtimeMessage(payload: RealtimeMessagePayload) {
       const conversationId = Number(payload?.conversation_id ?? 0)
       const incomingMessage = payload?.message
       if (!conversationId || !incomingMessage) return
+
+      const incomingMessageId = Number(incomingMessage.id ?? 0)
+      if (!Number.isFinite(incomingMessageId) || incomingMessageId <= 0) return
+
+      const normalizedMessage: NonNullable<MessageConversation['last_message']> = {
+        id: incomingMessageId,
+        body: String(incomingMessage.body ?? ''),
+        created_at: String(incomingMessage.created_at ?? ''),
+        read_at: incomingMessage.read_at ?? null,
+        sender: {
+          id: Number(incomingMessage.sender?.id ?? 0) || undefined,
+          name: String(incomingMessage.sender?.name ?? ''),
+          email: String(incomingMessage.sender?.email ?? ''),
+        },
+      }
 
       const conversations = this.messageStore.conversations as MessageConversation[]
       const index = conversations.findIndex(
@@ -558,9 +558,9 @@ export default defineComponent({
       const conversation = conversations[index]
       if (!conversation) return
 
-      conversation.last_message = incomingMessage
+      conversation.last_message = normalizedMessage
 
-      const senderId = Number(incomingMessage.sender?.id ?? 0)
+      const senderId = Number(normalizedMessage.sender?.id ?? 0)
       const isCurrentUserSender = senderId === Number(this.auth.user?.id ?? 0)
       const isOpenConversation = Number(this.currentConversation?.id ?? 0) === conversationId
 
@@ -577,7 +577,7 @@ export default defineComponent({
         }
       }
     },
-    onRealtimeRead(payload: MessageReadPayload) {
+    onRealtimeRead(payload: RealtimeReadPayload) {
       const conversationId = Number(payload?.conversation_id ?? 0)
       const readerUserId = Number(payload?.reader_user_id ?? 0)
       const lastReadMessageId = Number(payload?.last_read_message_id ?? 0)

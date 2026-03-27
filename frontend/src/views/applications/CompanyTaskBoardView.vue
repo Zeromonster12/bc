@@ -1166,6 +1166,7 @@ import ApplicationService, {
   type ProjectTaskBoardFolder,
   type ProjectTaskBoardTask,
 } from '@/services/applications/ApplicationService'
+import { taskPriorityLabel, taskStatusLabel } from '@/services/applications/TaskBoardLabelService'
 
 type SectionMap = Record<ApplicationTaskStatus, ProjectTaskBoardFolder[]>
 
@@ -1559,9 +1560,7 @@ export default defineComponent({
       return this.sections[status].reduce((sum, folder) => sum + this.folderTaskCount(folder), 0)
     },
     statusLabel(status: ApplicationTaskStatus): string {
-      if (status === 'todo') return 'TO DO'
-      if (status === 'in_progress') return 'IN PROGRESS'
-      return 'COMPLETED'
+      return taskStatusLabel(status)
     },
     statusIcon(status: ApplicationTaskStatus) {
       if (status === 'todo') return 'Folder'
@@ -1574,11 +1573,7 @@ export default defineComponent({
       return 'h-4 w-4 text-emerald-600 dark:text-emerald-400'
     },
     priorityLabel(priority: string): string {
-      if (priority === 'low') return 'Low'
-      if (priority === 'medium') return 'Medium'
-      if (priority === 'high') return 'High'
-      if (priority === 'urgent') return 'Urgent'
-      return priority
+      return taskPriorityLabel(priority)
     },
     priorityPillClass(priority: string): string {
       if (priority === 'urgent') {
