@@ -133,7 +133,7 @@ export default defineComponent({
       })
 
       await this.applicationStore.fetchApplications({
-        per_page: 500,
+        per_page: 100,
       })
       this.ensureSelectedProject()
     },

@@ -49,7 +49,14 @@ export interface ProjectTaskBoardResponse {
 
 const ApplicationService = {
   async getAll(params: Record<string, unknown> = {}) {
-    const { data } = await http.get('/applications', { params })
+    const normalizedParams = { ...params }
+    const requestedPerPage = Number(normalizedParams.per_page)
+
+    if (Number.isFinite(requestedPerPage)) {
+      normalizedParams.per_page = Math.min(100, Math.max(1, Math.trunc(requestedPerPage)))
+    }
+
+    const { data } = await http.get('/applications', { params: normalizedParams })
     return data
   },
 

@@ -25,7 +25,6 @@
                   : 'border-[#ddd7ea] bg-white/90 text-[#3f3a56] hover:border-[#cfc7e4] hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-500',
               ]"
               @click="selectProject(project.id)"
-              ;
             >
               <span class="truncate text-xs font-semibold">{{ project.title }}</span>
               <span
