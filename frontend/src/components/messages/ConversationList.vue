@@ -75,6 +75,7 @@ interface ConversationItem {
   id: number
   type?: 'direct' | 'group'
   subject?: string
+  avatar_url?: string | null
   participants?: Array<{ id?: number; name?: string; avatar_url?: string | null }>
   unread_count?: number
   created_at?: string
@@ -116,6 +117,10 @@ export default defineComponent({
   emits: ['select'],
   methods: {
     directConversationAvatarUrl(conversation: ConversationItem): string {
+      if (conversation.type === 'group') {
+        return String(conversation.avatar_url ?? '').trim()
+      }
+
       if (conversation.type !== 'direct') {
         return ''
       }

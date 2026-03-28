@@ -89,6 +89,47 @@ const MessageService = {
     return data
   },
 
+  async promoteConversationParticipantAdmin(conversationId: number, userId: number) {
+    const { data } = await http.post(`/conversations/${conversationId}/participants/${userId}/promote-admin`)
+    return data
+  },
+
+  async demoteConversationParticipantAdmin(conversationId: number, userId: number) {
+    const { data } = await http.post(`/conversations/${conversationId}/participants/${userId}/demote-admin`)
+    return data
+  },
+
+  async updateGroupConversation(
+    conversationId: number,
+    payload: {
+      subject?: string
+      avatar?: File | null
+      remove_avatar?: boolean
+    },
+  ) {
+    const formData = new FormData()
+
+    if (typeof payload.subject === 'string') {
+      formData.append('subject', payload.subject)
+    }
+
+    if (payload.avatar instanceof File) {
+      formData.append('avatar', payload.avatar)
+    }
+
+    if (payload.remove_avatar) {
+      formData.append('remove_avatar', '1')
+    }
+
+    const { data } = await http.patch(`/conversations/${conversationId}`, formData)
+    return data
+  },
+
+  async deleteConversation(conversationId: number) {
+    const { data } = await http.delete(`/conversations/${conversationId}`)
+    return data
+  },
+
   async getConversation(id: number) {
     const { data } = await http.get(`/conversations/${id}`)
     return data

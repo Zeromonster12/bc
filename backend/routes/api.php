@@ -38,8 +38,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/conversation-users', [MessageController::class, 'searchableUsers']);
     Route::get('/conversations', [MessageController::class, 'indexConversations']);
     Route::post('/conversations', [MessageController::class, 'storeConversation']);
+    Route::patch('/conversations/{conversation}', [MessageController::class, 'updateConversation']);
+    Route::delete('/conversations/{conversation}', [MessageController::class, 'destroyConversation']);
     Route::post('/conversations/{conversation}/participants', [MessageController::class, 'addParticipant']);
     Route::delete('/conversations/{conversation}/participants/{participantUser}', [MessageController::class, 'removeParticipant']);
+    Route::post('/conversations/{conversation}/participants/{participantUser}/promote-admin', [MessageController::class, 'promoteParticipantToAdmin']);
+    Route::post('/conversations/{conversation}/participants/{participantUser}/demote-admin', [MessageController::class, 'demoteParticipantFromAdmin']);
     Route::get('/conversations/{conversation}', [MessageController::class, 'showConversation']);
     Route::get('/conversations/{conversation}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
@@ -128,3 +132,7 @@ Route::get('/users/{user}/avatar/signed', [StudentProfileController::class, 'sig
 Route::get('/users/{user}/company-logo/signed', [CompanyProfileController::class, 'signedUserLogo'])
     ->middleware('throttle:120,1')
     ->name('users.company-logo.signed');
+
+Route::get('/conversations/{conversation}/avatar/signed', [MessageController::class, 'signedConversationAvatar'])
+    ->middleware('throttle:120,1')
+    ->name('conversations.avatar.signed');

@@ -13,6 +13,7 @@ class ConversationParticipant extends Model
     protected $fillable = [
         'conversation_id',
         'user_id',
+        'is_admin',
         'last_read_message_id',
         'last_read_at',
     ];
@@ -20,6 +21,7 @@ class ConversationParticipant extends Model
     protected function casts(): array
     {
         return [
+            'is_admin' => 'boolean',
             'last_read_at' => 'datetime',
         ];
     }

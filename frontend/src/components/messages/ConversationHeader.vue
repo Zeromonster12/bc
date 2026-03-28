@@ -17,7 +17,7 @@
       />
       <span v-else>{{ avatarInitials }}</span>
     </div>
-    <div class="min-w-0">
+    <div class="min-w-0 flex-1">
       <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
         {{ title || participantNames || 'Conversation' }}
       </p>
@@ -47,6 +47,39 @@
         {{ subtitleSecondary }}
       </p>
     </div>
+    <details v-if="showGroupActions" class="relative shrink-0">
+      <summary
+        class="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-100 hover:text-slate-800 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+      >
+        <span class="text-lg leading-none">...</span>
+      </summary>
+      <div class="absolute right-0 top-full z-30 mt-2 w-48 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+        <button
+          class="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+          @click="$emit('rename-group')"
+        >
+          Rename group
+        </button>
+        <button
+          class="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+          @click="$emit('change-group-avatar')"
+        >
+          Change group photo
+        </button>
+        <button
+          class="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+          @click="$emit('add-group-users')"
+        >
+          Add users
+        </button>
+        <button
+          class="w-full rounded-lg px-3 py-2 text-left text-sm text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
+          @click="$emit('delete-group')"
+        >
+          Delete group
+        </button>
+      </div>
+    </details>
   </div>
 </template>
 
@@ -88,8 +121,12 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    showGroupActions: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ['back'],
+  emits: ['back', 'rename-group', 'change-group-avatar', 'add-group-users', 'delete-group'],
   computed: {
     avatarInitials(): string {
       const source = this.participantNames || 'Chat'

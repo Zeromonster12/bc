@@ -110,6 +110,19 @@ return [
             'throw' => false,
         ],
 
+        'groupavatar' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('GROUPAVATAR_BUCKET', 'groupavatar'),
+            'url' => env('GROUPAVATAR_URL'),
+            'endpoint' => env('GROUPAVATAR_ENDPOINT', env('AWS_ENDPOINT')),
+            'use_path_style_endpoint' => env('GROUPAVATAR_USE_PATH_STYLE_ENDPOINT', env('AWS_USE_PATH_STYLE_ENDPOINT', false)),
+            'visibility' => 'private',
+            'throw' => false,
+        ],
+
     ],
 
     /*

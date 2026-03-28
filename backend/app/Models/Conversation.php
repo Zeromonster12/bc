@@ -16,6 +16,7 @@ class Conversation extends Model
         'type',
         'subject',
         'project_id',
+        'avatar_path',
     ];
 
     public function project(): BelongsTo

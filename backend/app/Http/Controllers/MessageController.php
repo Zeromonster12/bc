@@ -11,12 +11,17 @@ use App\Models\ConversationParticipant;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class MessageController extends Controller
 {
+    private const GROUP_AVATAR_DISK = 'groupavatar';
+
     public function searchableUsers(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -83,7 +88,7 @@ class MessageController extends Controller
             ->whereHas('participantRecords', fn($q) => $q->where('user_id', $user->id))
             ->with([
                 'project:id,title',
-                'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+                'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
                 'participantRecords.user:id,name,email,role',
                 'messages:id,conversation_id,sender_user_id,body,created_at',
                 'messages.senderUser:id,name,email,role',
@@ -163,7 +168,7 @@ class MessageController extends Controller
         if ($existing) {
             $existing->load([
                 'project:id,title',
-                'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+                'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
                 'participantRecords.user:id,name,email,role',
                 'messages:id,conversation_id,sender_user_id,body,created_at',
                 'messages.senderUser:id,name,email,role',
@@ -191,7 +196,7 @@ class MessageController extends Controller
 
         $conversation->load([
             'project:id,title',
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
             'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
             'messages.senderUser:id,name,email,role',
@@ -282,12 +287,13 @@ class MessageController extends Controller
             ConversationParticipant::query()->create([
                 'conversation_id' => $conversation->id,
                 'user_id' => $participantId,
+                'is_admin' => (int) $participantId === (int) $user->id,
             ]);
         }
 
         $conversation->load([
             'project:id,title',
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
             'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
             'messages.senderUser:id,name,email,role',
@@ -319,9 +325,9 @@ class MessageController extends Controller
 
         $targetUserId = (int) $validated['user_id'];
 
-        $allowedParticipantIds = ($user->role === 'admin' && ! $conversation->project_id)
-            ? $this->allowedDirectRecipientIds($user)
-            : $this->allowedGroupParticipantIdsForProject($user, (int) $conversation->project_id);
+        $allowedParticipantIds = (int) ($conversation->project_id ?? 0) > 0
+            ? $this->allowedGroupParticipantIdsForProject($user, (int) $conversation->project_id)
+            : $this->allowedDirectRecipientIds($user);
         if (! in_array($targetUserId, $allowedParticipantIds, true)) {
             return response()->json([
                 'message' => 'Selected user is not eligible for this project group chat.',
@@ -342,11 +348,12 @@ class MessageController extends Controller
         ConversationParticipant::query()->create([
             'conversation_id' => $conversation->id,
             'user_id' => $targetUserId,
+            'is_admin' => false,
         ]);
 
         $conversation->load([
             'project:id,title',
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
             'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
             'messages.senderUser:id,name,email,role',
@@ -372,13 +379,51 @@ class MessageController extends Controller
             return response()->json(['message' => 'Participants can be managed only on project group chats.'], 422);
         }
 
-        $project = $conversation->project_id
-            ? Project::query()->find((int) $conversation->project_id)
-            : null;
-        if ($project && (int) $participantUser->id === (int) $project->company_user_id) {
+        $participantRecord = ConversationParticipant::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('user_id', $participantUser->id)
+            ->first();
+
+        if (! $participantRecord) {
             return response()->json([
-                'message' => 'Company owner cannot be removed from project group chat.',
+                'message' => 'Participant not found in this conversation.',
+            ], 404);
+        }
+
+        if ((bool) $participantRecord->is_admin && $this->groupAdminCount($conversation->id) <= 1) {
+            return response()->json([
+                'message' => 'Cannot remove the last group admin.',
             ], 422);
+        }
+
+        $participantRecord->delete();
+
+        $conversation->load([
+            'project:id,title',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
+            'participantRecords.user:id,name,email,role',
+            'messages:id,conversation_id,sender_user_id,body,created_at',
+            'messages.senderUser:id,name,email,role',
+        ]);
+
+        return response()->json([
+            'data' => $this->transformConversation($conversation, $user->id),
+        ]);
+    }
+
+    public function promoteParticipantToAdmin(Request $request, Conversation $conversation, User $participantUser): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (! $this->canManageGroupParticipants($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
+        }
+
+        if ($conversation->type !== 'group') {
+            return response()->json(['message' => 'Only group chats support admin permissions.'], 422);
         }
 
         $participantRecord = ConversationParticipant::query()
@@ -392,18 +437,69 @@ class MessageController extends Controller
             ], 404);
         }
 
-        $participantRecord->delete();
+        if (! (bool) $participantRecord->is_admin) {
+            $participantRecord->update(['is_admin' => true]);
+        }
 
         $conversation->load([
             'project:id,title',
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
             'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
             'messages.senderUser:id,name,email,role',
         ]);
 
         return response()->json([
-            'data' => $this->transformConversation($conversation, $user->id),
+            'data' => $this->transformConversation($conversation, (int) $user->id),
+        ]);
+    }
+
+    public function demoteParticipantFromAdmin(Request $request, Conversation $conversation, User $participantUser): JsonResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (! $this->canManageGroupParticipants($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
+        }
+
+        if ($conversation->type !== 'group') {
+            return response()->json(['message' => 'Only group chats support admin permissions.'], 422);
+        }
+
+        $participantRecord = ConversationParticipant::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('user_id', $participantUser->id)
+            ->first();
+
+        if (! $participantRecord) {
+            return response()->json([
+                'message' => 'Participant not found in this conversation.',
+            ], 404);
+        }
+
+        if ((bool) $participantRecord->is_admin && $this->groupAdminCount($conversation->id) <= 1) {
+            return response()->json([
+                'message' => 'Cannot demote the last group admin.',
+            ], 422);
+        }
+
+        if ((bool) $participantRecord->is_admin) {
+            $participantRecord->update(['is_admin' => false]);
+        }
+
+        $conversation->load([
+            'project:id,title',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
+            'participantRecords.user:id,name,email,role',
+            'messages:id,conversation_id,sender_user_id,body,created_at',
+            'messages.senderUser:id,name,email,role',
+        ]);
+
+        return response()->json([
+            'data' => $this->transformConversation($conversation, (int) $user->id),
         ]);
     }
 
@@ -425,7 +521,7 @@ class MessageController extends Controller
 
         $conversation->load([
             'project:id,title',
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
             'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
             'messages.senderUser:id,name,email,role',
@@ -475,7 +571,7 @@ class MessageController extends Controller
         }
 
         $conversation->load([
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
         ]);
 
         return response()->json([
@@ -583,7 +679,7 @@ class MessageController extends Controller
             'senderUser.companyProfile:id,user_id,logo_path',
         ]);
         $conversation->load([
-            'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
         ]);
 
         broadcast(new MessageSent($conversation, $message))->toOthers();
@@ -616,6 +712,183 @@ class MessageController extends Controller
         broadcast(new UserTyping($conversation, $user, (bool) $validated['is_typing']))->toOthers();
 
         return response()->json(['data' => ['ok' => true]]);
+    }
+
+    public function updateConversation(Request $request, Conversation $conversation): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (! $this->canManageGroupParticipants($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
+        }
+
+        if ($conversation->type !== 'group') {
+            return response()->json(['message' => 'Only group chats can be updated.'], 422);
+        }
+
+        $validated = $request->validate([
+            'subject' => ['nullable', 'string', 'min:3', 'max:160'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_avatar' => ['nullable', 'boolean'],
+        ]);
+
+        $updates = [];
+
+        if (array_key_exists('subject', $validated)) {
+            $subject = trim((string) ($validated['subject'] ?? ''));
+            if ($subject !== '') {
+                $updates['subject'] = $subject;
+            }
+        }
+
+        $avatarPath = is_string($conversation->avatar_path) ? $conversation->avatar_path : null;
+
+        if ((bool) ($validated['remove_avatar'] ?? false) && is_string($avatarPath) && $avatarPath !== '') {
+            Storage::disk(self::GROUP_AVATAR_DISK)->delete($avatarPath);
+            $avatarPath = null;
+        }
+
+        if (array_key_exists('avatar', $validated) && $validated['avatar']) {
+            $previousAvatarPath = $avatarPath;
+
+            try {
+                $storedAvatarPath = $validated['avatar']->store('group-avatars/' . $conversation->id, self::GROUP_AVATAR_DISK);
+            } catch (\Throwable $e) {
+                report($e);
+
+                return response()->json([
+                    'message' => 'Failed to store group avatar.',
+                    'detail' => (bool) config('app.debug', false) ? $e->getMessage() : null,
+                ], 500);
+            }
+
+            if (! is_string($storedAvatarPath) || $storedAvatarPath === '') {
+                report(new \RuntimeException('Storage write returned false for group avatar upload on disk ' . self::GROUP_AVATAR_DISK . '.'));
+
+                return response()->json([
+                    'message' => 'Failed to store group avatar.',
+                    'detail' => (bool) config('app.debug', false)
+                        ? 'Storage write returned false. Verify MinIO endpoint, credentials, bucket, and AWS_USE_PATH_STYLE_ENDPOINT.'
+                        : null,
+                ], 500);
+            }
+
+            $avatarPath = $storedAvatarPath;
+
+            if (is_string($previousAvatarPath) && $previousAvatarPath !== '') {
+                Storage::disk(self::GROUP_AVATAR_DISK)->delete($previousAvatarPath);
+            }
+        }
+
+        if ($avatarPath !== $conversation->avatar_path) {
+            $updates['avatar_path'] = $avatarPath;
+        }
+
+        if ($updates !== []) {
+            $conversation->update($updates);
+        }
+
+        $updatedConversation = Conversation::query()->findOrFail($conversation->id);
+        $updatedConversation->load([
+            'project:id,title',
+            'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
+            'participantRecords.user:id,name,email,role',
+            'messages:id,conversation_id,sender_user_id,body,created_at',
+            'messages.senderUser:id,name,email,role',
+        ]);
+
+        return response()->json([
+            'data' => $this->transformConversation($updatedConversation, (int) $user->id),
+        ]);
+    }
+
+    public function destroyConversation(Request $request, Conversation $conversation): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        if (! $this->canManageGroupParticipants($user, $conversation)) {
+            return response()->json(['message' => 'You are not allowed to manage this group chat.'], 403);
+        }
+
+        if ($conversation->type !== 'group') {
+            return response()->json(['message' => 'Only group chats can be deleted.'], 422);
+        }
+
+        $avatarPath = is_string($conversation->avatar_path) ? $conversation->avatar_path : '';
+        if ($avatarPath !== '') {
+            Storage::disk(self::GROUP_AVATAR_DISK)->delete($avatarPath);
+        }
+
+        $conversationId = (int) $conversation->id;
+        $conversation->delete();
+
+        return response()->json([
+            'data' => [
+                'ok' => true,
+                'conversation_id' => $conversationId,
+            ],
+        ]);
+    }
+
+    public function signedConversationAvatar(Request $request, Conversation $conversation)
+    {
+        if (! $request->hasValidSignature()) {
+            return response()->json([
+                'message' => 'Invalid or expired group avatar URL.',
+            ], 403);
+        }
+
+        if ($conversation->type !== 'group') {
+            return response()->json([
+                'message' => 'Group avatar not found.',
+            ], 404);
+        }
+
+        $avatarPath = Conversation::query()
+            ->where('id', $conversation->id)
+            ->value('avatar_path');
+
+        if (! is_string($avatarPath) || $avatarPath === '') {
+            return response()->json([
+                'message' => 'Group avatar not found.',
+            ], 404);
+        }
+
+        if (! Storage::disk(self::GROUP_AVATAR_DISK)->exists($avatarPath)) {
+            return response()->json([
+                'message' => 'Group avatar not found in storage.',
+            ], 404);
+        }
+
+        $stream = Storage::disk(self::GROUP_AVATAR_DISK)->readStream($avatarPath);
+
+        if (! is_resource($stream)) {
+            return response()->json([
+                'message' => 'Group avatar could not be streamed from storage.',
+            ], 500);
+        }
+
+        $disk = Storage::disk(self::GROUP_AVATAR_DISK);
+        $mimeType = $disk instanceof FilesystemAdapter
+            ? ($disk->mimeType($avatarPath) ?: 'application/octet-stream')
+            : 'application/octet-stream';
+
+        return response()->stream(function () use ($stream): void {
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     private function isParticipant(Conversation $conversation, int $userId): bool
@@ -679,21 +952,24 @@ class MessageController extends Controller
             return false;
         }
 
-        if ($user->role === 'admin') {
-            return true;
-        }
+        return $this->isGroupAdmin($conversation->id, (int) $user->id);
+    }
 
-        $projectId = (int) ($conversation->project_id ?? 0);
-        if ($projectId <= 0) {
-            return false;
-        }
+    private function isGroupAdmin(int $conversationId, int $userId): bool
+    {
+        return ConversationParticipant::query()
+            ->where('conversation_id', $conversationId)
+            ->where('user_id', $userId)
+            ->where('is_admin', true)
+            ->exists();
+    }
 
-        $project = Project::query()->find($projectId);
-        if (! $project) {
-            return false;
-        }
-
-        return $user->role === 'company' && (int) $project->company_user_id === (int) $user->id;
+    private function groupAdminCount(int $conversationId): int
+    {
+        return ConversationParticipant::query()
+            ->where('conversation_id', $conversationId)
+            ->where('is_admin', true)
+            ->count();
     }
 
     /**
@@ -840,6 +1116,7 @@ class MessageController extends Controller
             'id' => $conversation->id,
             'type' => $conversation->type,
             'subject' => $conversation->subject,
+            'avatar_url' => $this->conversationAvatarUrl($conversation),
             'project' => $conversation->project
                 ? [
                     'id' => $conversation->project->id,
@@ -852,12 +1129,29 @@ class MessageController extends Controller
                     'name' => $participant->user?->name,
                     'email' => $participant->user?->email,
                     'avatar_url' => $participant->user?->avatar_url,
+                    'is_admin' => (bool) ($participant->is_admin ?? false),
                 ])->values()
                 : [],
             'last_message' => $lastMessage ? $this->transformMessage($lastMessage, $conversation) : null,
             'unread_count' => $unreadCount,
             'created_at' => optional($conversation->created_at)->toISOString(),
         ];
+    }
+
+    private function conversationAvatarUrl(Conversation $conversation): ?string
+    {
+        $avatarPath = is_string($conversation->avatar_path) ? trim($conversation->avatar_path) : '';
+        if ($avatarPath === '') {
+            return null;
+        }
+
+        $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
+
+        return URL::temporarySignedRoute(
+            'conversations.avatar.signed',
+            now()->addMinutes($ttlMinutes),
+            ['conversation' => $conversation->id]
+        );
     }
 
     private function transformMessage(Message $message, Conversation $conversation): array
