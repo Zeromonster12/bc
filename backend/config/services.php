@@ -56,4 +56,10 @@ return [
         'verify_ssl' => (bool) env('TURNSTILE_VERIFY_SSL', true),
     ],
 
+    'geoip' => [
+        'enabled' => (bool) env('GEOIP_ENABLED', false),
+        'lookup_url' => env('GEOIP_LOOKUP_URL', 'http://ip-api.com/json/{ip}?fields=status,countryCode'),
+        'timeout_seconds' => (float) env('GEOIP_TIMEOUT_SECONDS', 1.0),
+    ],
+
 ];
