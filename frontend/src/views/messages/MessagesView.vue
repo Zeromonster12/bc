@@ -112,14 +112,14 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4"
         @click.self="closeGroupManageModal"
       >
-        <div class="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+        <div class="w-full max-w-lg rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.12)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.45)]">
           <div class="mb-4 flex items-start justify-between gap-3">
             <div>
-              <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">{{ groupModalTitle }}</h3>
-              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ groupModalSubtitle }}</p>
+              <h3 class="text-xl font-semibold text-[#1d1f31] dark:text-slate-100">{{ groupModalTitle }}</h3>
+              <p class="mt-1 text-sm font-medium text-[#7d8195] dark:text-slate-400">{{ groupModalSubtitle }}</p>
             </div>
             <button
-              class="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+              class="rounded-xl p-2 text-[#686d84] transition hover:bg-[#f8f7fc] hover:text-[#474a61] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
               @click="closeGroupManageModal"
             >
               ✕
@@ -132,13 +132,13 @@
               type="text"
               maxlength="160"
               placeholder="Group name"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+              class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] placeholder:text-[#a3a7bb] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
             />
             <div class="flex justify-end gap-2">
-              <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:text-slate-300" @click="closeGroupManageModal">Cancel</button>
+              <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Cancel</button>
               <button
                 :disabled="groupManageSubmitting || !groupEditName.trim()"
-                class="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                class="rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:opacity-50"
                 @click="saveGroupName"
               >
                 Save name
@@ -157,16 +157,16 @@
             <div class="flex justify-between gap-2">
               <button
                 :disabled="groupManageSubmitting"
-                class="rounded-xl border border-rose-200 px-3 py-2 text-sm text-rose-600 disabled:opacity-50 dark:border-rose-500/50 dark:text-rose-400"
+                class="rounded-2xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/50 dark:bg-slate-800 dark:text-rose-400"
                 @click="removeGroupAvatar"
               >
                 Remove photo
               </button>
               <div class="flex gap-2">
-                <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:text-slate-300" @click="closeGroupManageModal">Cancel</button>
+                <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Cancel</button>
                 <button
                   :disabled="groupManageSubmitting || !groupAvatarFile"
-                  class="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  class="rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:opacity-50"
                   @click="saveGroupAvatar"
                 >
                   Upload photo
@@ -176,14 +176,14 @@
           </div>
 
           <div v-else-if="groupManageMode === 'participants'" class="space-y-3">
-            <div class="max-h-52 space-y-2 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800/40">
+            <div class="max-h-52 space-y-2 overflow-y-auto rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] p-2 dark:border-slate-700 dark:bg-slate-800/40">
               <div
                 v-for="participant in currentConversation?.participants ?? []"
                 :key="Number(participant.id ?? 0)"
-                class="flex items-center justify-between gap-2 rounded-lg bg-white px-2 py-1.5 dark:bg-slate-900"
+                class="flex items-center justify-between gap-2 rounded-xl border border-[#ebeaf2] bg-white px-2.5 py-2 dark:border-slate-700 dark:bg-slate-900"
               >
                 <div class="min-w-0">
-                  <p class="truncate text-sm font-medium text-slate-800 dark:text-slate-100">
+                  <p class="truncate text-sm font-semibold text-[#474a61] dark:text-slate-100">
                     {{ participant.name || 'Unknown user' }}
                   </p>
                   <p v-if="participant.is_admin" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">Admin</p>
@@ -192,7 +192,7 @@
                   <button
                     v-if="!participant.is_admin"
                     :disabled="groupManageSubmitting || !canManageCurrentGroup"
-                    class="rounded-md border border-slate-200 px-2 py-1 text-[11px] text-slate-700 disabled:opacity-50 dark:border-slate-600 dark:text-slate-200"
+                    class="rounded-xl border border-[#ebeaf2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
                     @click="promoteParticipantAdmin(Number(participant.id ?? 0))"
                   >
                     Make admin
@@ -200,14 +200,14 @@
                   <button
                     v-else
                     :disabled="groupManageSubmitting || !canDemoteParticipant(Number(participant.id ?? 0))"
-                    class="rounded-md border border-rose-200 px-2 py-1 text-[11px] text-rose-600 disabled:opacity-50 dark:border-rose-500/40 dark:text-rose-400"
+                    class="rounded-xl border border-rose-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/40 dark:bg-slate-800 dark:text-rose-400"
                     @click="demoteParticipantAdmin(Number(participant.id ?? 0))"
                   >
                     Remove admin
                   </button>
                   <button
                     :disabled="groupManageSubmitting || !canManageCurrentGroup || Number(participant.id ?? 0) <= 0"
-                    class="rounded-md border border-rose-200 px-2 py-1 text-[11px] text-rose-600 disabled:opacity-50 dark:border-rose-500/40 dark:text-rose-400"
+                    class="rounded-xl border border-rose-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/40 dark:bg-slate-800 dark:text-rose-400"
                     @click="removeParticipantFromGroup(Number(participant.id ?? 0))"
                   >
                     Remove user
@@ -218,7 +218,7 @@
 
             <select
               v-model="groupAddUserId"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-800 focus:border-indigo-400 focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+              class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
             >
               <option :value="null">Select user</option>
               <option v-for="candidate in groupAddCandidates" :key="candidate.id" :value="candidate.id">
@@ -226,10 +226,10 @@
               </option>
             </select>
             <div class="flex justify-end gap-2">
-              <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:text-slate-300" @click="closeGroupManageModal">Close</button>
+              <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Close</button>
               <button
                 :disabled="groupManageSubmitting || !groupAddUserId"
-                class="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                class="rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:opacity-50"
                 @click="addUserToGroup"
               >
                 Add user
@@ -240,10 +240,10 @@
           <div v-else class="space-y-3">
             <p class="text-sm text-slate-700 dark:text-slate-200">This will permanently delete this group chat for all participants.</p>
             <div class="flex justify-end gap-2">
-              <button class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-600 dark:text-slate-300" @click="closeGroupManageModal">Cancel</button>
+              <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Cancel</button>
               <button
                 :disabled="groupManageSubmitting"
-                class="rounded-xl bg-rose-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                class="rounded-full bg-rose-600 px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(225,29,72,0.25)] transition hover:brightness-105 disabled:opacity-50"
                 @click="deleteCurrentGroup"
               >
                 Delete group
@@ -270,6 +270,12 @@ import ApplicationService from '@/services/applications/ApplicationService'
 import ProjectService from '@/services/projects/ProjectService'
 import {
   buildParticipantNames,
+  extractAcceptedApplicationProjects,
+  extractErrorMessage,
+  normalizeProjectOptions,
+  normalizeRecipientOptions,
+  type ProjectOption,
+  type RecipientOption,
   toNewGroupConversationPayload,
   toNewConversationPayload,
   validateNewGroupConversation,
@@ -301,17 +307,6 @@ interface MessageConversation {
     }
   }
   [key: string]: unknown
-}
-
-interface RecipientOption {
-  id: number
-  name: string
-  email: string
-}
-
-interface ProjectOption {
-  id: number
-  title: string
 }
 
 export default defineComponent({
@@ -612,8 +607,7 @@ export default defineComponent({
         await this.reloadCurrentConversationPreservingSelection()
         this.closeGroupManageModal()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to rename group.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to rename group.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -632,8 +626,7 @@ export default defineComponent({
         await this.reloadCurrentConversationPreservingSelection()
         this.closeGroupManageModal()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to update group photo.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to update group photo.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -651,8 +644,7 @@ export default defineComponent({
         await this.reloadCurrentConversationPreservingSelection()
         this.closeGroupManageModal()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to remove group photo.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to remove group photo.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -675,12 +667,7 @@ export default defineComponent({
             .filter((id) => Number.isFinite(id) && id > 0),
         )
 
-        this.groupAddCandidates = (Array.isArray(response?.data) ? response.data : [])
-          .map((item: Partial<RecipientOption>) => ({
-            id: Number(item.id ?? 0),
-            name: String(item.name ?? ''),
-            email: String(item.email ?? ''),
-          }))
+        this.groupAddCandidates = normalizeRecipientOptions(response?.data)
           .filter((item: RecipientOption) => item.id > 0 && !existingIds.has(item.id))
       } catch {
         this.groupAddCandidates = []
@@ -702,8 +689,7 @@ export default defineComponent({
         this.groupAddUserId = null
         await this.loadGroupAddCandidates()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to add user.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to add user.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -735,8 +721,7 @@ export default defineComponent({
         await MessageService.promoteConversationParticipantAdmin(conversationId, participantUserId)
         await this.reloadCurrentConversationPreservingSelection()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to grant admin permission.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to grant admin permission.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -753,8 +738,7 @@ export default defineComponent({
         await MessageService.demoteConversationParticipantAdmin(conversationId, participantUserId)
         await this.reloadCurrentConversationPreservingSelection()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to revoke admin permission.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to revoke admin permission.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -772,8 +756,7 @@ export default defineComponent({
         await this.reloadCurrentConversationPreservingSelection()
         await this.loadGroupAddCandidates()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to remove user from group.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to remove user from group.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -791,8 +774,7 @@ export default defineComponent({
         await this.reloadCurrentConversationPreservingSelection(conversationId)
         this.closeGroupManageModal()
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.groupManageError = err?.response?.data?.message ?? 'Failed to delete group.'
+        this.groupManageError = extractErrorMessage(e, 'Failed to delete group.')
       } finally {
         this.groupManageSubmitting = false
       }
@@ -924,15 +906,7 @@ export default defineComponent({
       this.searchingUsers = true
       try {
         const response = await MessageService.searchConversationUsers('', 50, isAdmin ? null : normalizedProjectId)
-        const options = Array.isArray(response?.data) ? response.data : []
-
-        this.recipientOptions = options
-          .map((item: Partial<RecipientOption>) => ({
-            id: Number(item.id ?? 0),
-            name: String(item.name ?? ''),
-            email: String(item.email ?? ''),
-          }))
-          .filter((item: RecipientOption) => item.id > 0 && item.name && item.email)
+        this.recipientOptions = normalizeRecipientOptions(response?.data)
       } catch {
         this.recipientOptions = []
       } finally {
@@ -947,13 +921,7 @@ export default defineComponent({
             per_page: 100,
           })
 
-          const projects = Array.isArray(response?.data) ? response.data : []
-          this.projectOptions = projects
-            .map((project: { id?: number; title?: string }) => ({
-              id: Number(project.id ?? 0),
-              title: String(project.title ?? '').trim(),
-            }))
-            .filter((project: ProjectOption) => project.id > 0 && project.title.length > 0)
+          this.projectOptions = normalizeProjectOptions(response?.data)
           return
         }
 
@@ -963,13 +931,7 @@ export default defineComponent({
             per_page: 100,
           })
 
-          const projects = Array.isArray(response?.data) ? response.data : []
-          this.projectOptions = projects
-            .map((project: { id?: number; title?: string }) => ({
-              id: Number(project.id ?? 0),
-              title: String(project.title ?? '').trim(),
-            }))
-            .filter((project: ProjectOption) => project.id > 0 && project.title.length > 0)
+          this.projectOptions = normalizeProjectOptions(response?.data)
           return
         }
 
@@ -979,18 +941,7 @@ export default defineComponent({
             per_page: 200,
           })
 
-          const applications = Array.isArray(response?.data) ? response.data : []
-          const uniqueByProject = new Map<number, ProjectOption>()
-
-          applications.forEach((application: { project?: { id?: number; title?: string } }) => {
-            const projectId = Number(application.project?.id ?? 0)
-            const projectTitle = String(application.project?.title ?? '').trim()
-            if (projectId > 0 && projectTitle) {
-              uniqueByProject.set(projectId, { id: projectId, title: projectTitle })
-            }
-          })
-
-          this.projectOptions = Array.from(uniqueByProject.values())
+          this.projectOptions = extractAcceptedApplicationProjects(response?.data)
           return
         }
 
@@ -1021,14 +972,7 @@ export default defineComponent({
           return
         }
 
-        const options = Array.isArray(response?.data) ? response.data : []
-        this.recipientOptions = options
-          .map((item: Partial<RecipientOption>) => ({
-            id: Number(item.id ?? 0),
-            name: String(item.name ?? ''),
-            email: String(item.email ?? ''),
-          }))
-          .filter((item: RecipientOption) => item.id > 0 && item.name && item.email)
+        this.recipientOptions = normalizeRecipientOptions(response?.data)
 
         if (
           this.directRecipientDropdownId &&
@@ -1250,8 +1194,7 @@ export default defineComponent({
           this.recipientOptions = []
           return
         } catch (e: unknown) {
-          const err = e as { response?: { data?: { message?: string } } }
-          this.newConvError = err?.response?.data?.message ?? 'Failed to create group conversation.'
+          this.newConvError = extractErrorMessage(e, 'Failed to create group conversation.')
           return
         } finally {
           this.creating = false
@@ -1286,8 +1229,7 @@ export default defineComponent({
         this.directRecipientDropdownId = null
         this.recipientOptions = []
       } catch (e: unknown) {
-        const err = e as { response?: { data?: { message?: string } } }
-        this.newConvError = err?.response?.data?.message ?? 'Failed to start conversation.'
+        this.newConvError = extractErrorMessage(e, 'Failed to start conversation.')
       } finally {
         this.creating = false
       }
