@@ -140,20 +140,13 @@
               >
                 No applications yet.
               </div>
-              <div v-else class="space-y-3">
-                <ApplicationCard v-for="app in applicationStore.applications" :key="app.id" :application="app">
-                  <template #actions>
-                    <div class="flex gap-2 mt-3" v-if="app.status === 'pending'">
-                      <BaseButton variant="primary" size="sm" @click="updateStatus(app.id, 'accepted')">
-                        Accept
-                      </BaseButton>
-                      <BaseButton variant="danger" size="sm" @click="updateStatus(app.id, 'rejected')">
-                        Reject
-                      </BaseButton>
-                    </div>
-                  </template>
-                </ApplicationCard>
-              </div>
+              <CompanyApplicantsPanel
+                v-else
+                :selected-project="{ id: project.id, title: project.title ?? 'Project' }"
+                :applications="applicationStore.applications"
+                :updating-id="updatingId"
+                @update-status="handlePanelUpdateStatus"
+              />
             </div>
           </div>
 
@@ -310,7 +303,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useProjectStore } from '@/stores/project'
 import { useApplicationStore } from '@/stores/application'
 import AppLayout from '@/layouts/AppLayout.vue'
-import ApplicationCard from '@/components/applications/ApplicationCard.vue'
+import CompanyApplicantsPanel from '@/components/applications/CompanyApplicantsPanel.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
 import ProjectStatusBadge from '@/components/projects/ProjectStatusBadge.vue'
@@ -351,7 +344,7 @@ export default defineComponent({
   name: 'ProjectDetailView',
   components: {
     AppLayout,
-    ApplicationCard,
+    CompanyApplicantsPanel,
     BaseButton,
     BaseAlert,
     ProjectStatusBadge,
@@ -369,6 +362,7 @@ export default defineComponent({
       loading: true,
       fetchError: '',
       deleting: false,
+      updatingId: null as number | null,
       showApplyModal: false,
       coverLetter: '',
       applying: false,
@@ -458,6 +452,9 @@ export default defineComponent({
     }
   },
   methods: {
+    handlePanelUpdateStatus(payload: { id: number; status: 'accepted' | 'rejected' }) {
+      return this.updateStatus(payload.id, payload.status)
+    },
     locationStrategyLabel(strategy?: string): string {
       if (strategy === 'onsite') return 'On-site'
       if (strategy === 'hybrid') return 'Hybrid'
@@ -517,7 +514,12 @@ export default defineComponent({
       }
     },
     async updateStatus(applicationId: number, status: 'accepted' | 'rejected') {
-      await this.applicationStore.updateStatus(applicationId, status)
+      this.updatingId = applicationId
+      try {
+        await this.applicationStore.updateStatus(applicationId, status)
+      } finally {
+        this.updatingId = null
+      }
     },
   },
 })
