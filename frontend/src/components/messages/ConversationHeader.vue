@@ -21,8 +21,15 @@
       <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
         {{ title || participantNames || 'Conversation' }}
       </p>
-      <p v-if="subtitle" class="truncate text-xs text-slate-500 dark:text-slate-400">
-        {{ subtitle }}
+      <p v-if="participantsLabel || subtitle" class="flex items-center gap-1 truncate text-xs text-slate-500 dark:text-slate-400">
+        <span class="truncate">{{ participantsLabel || subtitle }}</span>
+        <span
+          v-if="participantsExtraCount > 0"
+          :title="participantsTooltip"
+          class="shrink-0 cursor-help rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+        >
+          +{{ participantsExtraCount }}
+        </span>
       </p>
       <p v-if="subtitleSecondary" class="truncate text-xs text-slate-500 dark:text-slate-400">
         {{ subtitleSecondary }}
@@ -42,6 +49,18 @@ export default defineComponent({
       default: '',
     },
     subtitle: {
+      type: String,
+      default: '',
+    },
+    participantsLabel: {
+      type: String,
+      default: '',
+    },
+    participantsExtraCount: {
+      type: Number,
+      default: 0,
+    },
+    participantsTooltip: {
       type: String,
       default: '',
     },

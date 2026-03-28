@@ -86,6 +86,9 @@
               <ConversationHeader
                 :title="currentConversationTitle"
                 :subtitle="currentConversationSubtitle"
+                :participants-label="currentConversationParticipantsLabel"
+                :participants-extra-count="currentConversationParticipantsExtraCount"
+                :participants-tooltip="currentConversationParticipantsTooltip"
                 :subtitle-secondary="currentConversationProjectSubtitle"
                 :avatar-url="currentConversationAvatarUrl"
                 :participant-names="participantNames"
@@ -225,9 +228,62 @@ export default defineComponent({
         return ''
       }
 
-      const participants = this.groupParticipantsSummary(this.currentConversation)
+      return this.currentConversationParticipantsLabel || 'Group conversation'
+    },
+    currentConversationParticipantsLabel(): string {
+      if (this.currentConversation?.type !== 'group') {
+        return ''
+      }
 
-      return participants ? `Participants: ${participants}` : 'Group conversation'
+      const currentUserId = Number(this.auth.user?.id ?? 0)
+      const participantIds = (this.currentConversation?.participants ?? [])
+        .map((participant) => Number(participant.id ?? 0))
+        .filter((id) => Number.isFinite(id) && id > 0)
+
+      if (!participantIds.length) {
+        return ''
+      }
+
+      return currentUserId > 0 && participantIds.includes(currentUserId)
+        ? 'Participants: You'
+        : 'Participants'
+    },
+    currentConversationParticipantsExtraCount(): number {
+      if (this.currentConversation?.type !== 'group') {
+        return 0
+      }
+
+      const currentUserId = Number(this.auth.user?.id ?? 0)
+      const uniqueParticipantIds = Array.from(
+        new Set(
+          (this.currentConversation?.participants ?? [])
+            .map((participant) => Number(participant.id ?? 0))
+            .filter((id) => Number.isFinite(id) && id > 0),
+        ),
+      )
+
+      if (!uniqueParticipantIds.length) {
+        return 0
+      }
+
+      if (currentUserId > 0 && uniqueParticipantIds.includes(currentUserId)) {
+        return uniqueParticipantIds.filter((id) => id !== currentUserId).length
+      }
+
+      return uniqueParticipantIds.length
+    },
+    currentConversationParticipantsTooltip(): string {
+      if (this.currentConversation?.type !== 'group') {
+        return ''
+      }
+
+      const currentUserId = Number(this.auth.user?.id ?? 0)
+      const names = (this.currentConversation?.participants ?? [])
+        .filter((participant) => Number(participant.id ?? 0) !== currentUserId)
+        .map((participant) => String(participant.name ?? '').trim())
+        .filter((name, index, arr) => Boolean(name) && arr.indexOf(name) === index)
+
+      return names.join(', ')
     },
     currentConversationProjectSubtitle(): string {
       if (this.currentConversation?.type !== 'group') {

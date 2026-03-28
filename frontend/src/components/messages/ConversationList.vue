@@ -39,12 +39,6 @@
                 {{ formatConversationTime(convo.last_message?.created_at || convo.created_at) }}
               </span>
             </div>
-            <p
-              v-if="groupParticipantsLabel(convo)"
-              class="mt-0.5 truncate text-[11px] text-slate-500 dark:text-slate-400"
-            >
-              Participants: {{ groupParticipantsLabel(convo) }}
-            </p>
             <div class="mt-0.5 flex items-center gap-2">
               <p class="truncate text-xs text-slate-500 dark:text-slate-400">
                 {{ lastMessagePreview(convo) }}

@@ -80,14 +80,14 @@
     </div>
 
     <div class="sticky bottom-0 z-10 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-      <div class="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
+      <div class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
         <textarea
           ref="textareaRef"
           v-model="body"
           rows="1"
           :disabled="sending"
           placeholder="Type a message"
-          class="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-2 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-transparent focus:outline-none disabled:opacity-50 dark:text-slate-100 dark:placeholder:text-slate-500"
+          class="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-2 py-2 text-sm leading-5 text-slate-800 placeholder:text-slate-400 focus:border-transparent focus:outline-none disabled:opacity-50 dark:text-slate-100 dark:placeholder:text-slate-500"
           @keydown.enter.exact.prevent="send"
           @input="handleTypingInput"
         />
