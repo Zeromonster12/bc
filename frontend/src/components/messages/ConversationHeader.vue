@@ -18,6 +18,9 @@
       <p v-if="subtitle" class="truncate text-xs text-slate-500 dark:text-slate-400">
         {{ subtitle }}
       </p>
+      <p v-if="subtitleSecondary" class="truncate text-xs text-slate-500 dark:text-slate-400">
+        {{ subtitleSecondary }}
+      </p>
     </div>
   </div>
 </template>
@@ -33,6 +36,10 @@ export default defineComponent({
       default: '',
     },
     subtitle: {
+      type: String,
+      default: '',
+    },
+    subtitleSecondary: {
       type: String,
       default: '',
     },

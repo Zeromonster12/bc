@@ -460,6 +460,7 @@ class MessageController extends Controller
             ->with([
                 'senderUser:id,name,email,role',
                 'senderUser.studentProfile:id,user_id,avatar_path',
+                'senderUser.companyProfile:id,user_id,logo_path',
             ])
             ->orderBy('id')
             ->paginate($perPage);
@@ -579,6 +580,7 @@ class MessageController extends Controller
         $message->load([
             'senderUser:id,name,email,role',
             'senderUser.studentProfile:id,user_id,avatar_path',
+            'senderUser.companyProfile:id,user_id,logo_path',
         ]);
         $conversation->load([
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',

@@ -144,18 +144,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAvatarUrlAttribute(): ?string
     {
         $avatarPath = null;
+        $signedRouteName = null;
 
-        if ($this->relationLoaded('studentProfile')) {
-            $avatarPath = $this->studentProfile?->avatar_path;
-        } elseif ($this->role === 'student') {
-            $avatarPath = $this->studentProfile()->value('avatar_path');
+        if ($this->role === 'company') {
+            if ($this->relationLoaded('companyProfile')) {
+                $avatarPath = $this->companyProfile?->logo_path;
+            } else {
+                $avatarPath = $this->companyProfile()->value('logo_path');
+            }
+            $signedRouteName = 'users.company-logo.signed';
+        } else {
+            if ($this->relationLoaded('studentProfile')) {
+                $avatarPath = $this->studentProfile?->avatar_path;
+            } elseif ($this->role === 'student') {
+                $avatarPath = $this->studentProfile()->value('avatar_path');
+            }
+            $signedRouteName = 'users.avatar.signed';
         }
 
         if (is_string($avatarPath) && $avatarPath !== '') {
             $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));
 
             return URL::temporarySignedRoute(
-                'users.avatar.signed',
+                $signedRouteName,
                 now()->addMinutes($ttlMinutes),
                 ['user' => $this->id]
             );

@@ -86,6 +86,7 @@
               <ConversationHeader
                 :title="currentConversationTitle"
                 :subtitle="currentConversationSubtitle"
+                :subtitle-secondary="currentConversationProjectSubtitle"
                 :participant-names="participantNames"
                 @back="backToList"
               />
@@ -211,19 +212,20 @@ export default defineComponent({
         return ''
       }
 
-      const participants = this.participantNames.trim()
+      const participants = this.groupParticipantsSummary(this.currentConversation)
+
+      return participants ? `Participants: ${participants}` : 'Group conversation'
+    },
+    currentConversationProjectSubtitle(): string {
+      if (this.currentConversation?.type !== 'group') {
+        return ''
+      }
+
       const projectTitle = String((this.currentConversation?.project as { title?: string } | null)?.title ?? '').trim()
 
-      if (participants && projectTitle) {
-        return `Participants: ${participants} • Project: ${projectTitle}`
-      }
-
-      if (participants) {
-        return `Participants: ${participants}`
-      }
-
-      return projectTitle ? `Project: ${projectTitle}` : 'Group conversation'
+      return projectTitle ? `Project: ${projectTitle}` : ''
     },
+
     filteredConversations(): MessageConversation[] {
       const q = this.searchQuery.trim().toLowerCase()
       if (!q) return this.messageStore.conversations as MessageConversation[]
@@ -265,6 +267,30 @@ export default defineComponent({
     this.unsubscribeAllRealtime()
   },
   methods: {
+    groupParticipantsSummary(conversation: MessageConversation | null): string {
+      const participantIds = Array.from(
+        new Set(
+          (conversation?.participants ?? [])
+            .map((participant) => Number(participant.id ?? 0))
+            .filter((id) => Number.isFinite(id) && id > 0),
+        ),
+      )
+
+      if (!participantIds.length) {
+        return ''
+      }
+
+      const currentUserId = Number(this.auth.user?.id ?? 0)
+      const hasCurrentUser = currentUserId > 0 && participantIds.includes(currentUserId)
+
+      if (hasCurrentUser) {
+        const otherUsersCount = participantIds.filter((id) => id !== currentUserId).length
+
+        return otherUsersCount > 0 ? `You +${otherUsersCount}` : 'You'
+      }
+
+      return this.participantNames.trim()
+    },
     onRecipientQueryChange(value: string) {
       this.newParticipantQuery = value
       if (this.conversationMode === 'direct') {

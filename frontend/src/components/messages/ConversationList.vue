@@ -121,12 +121,36 @@ export default defineComponent({
         .filter(Boolean)
         .join(', ')
     },
+    participantSummary(conversation: ConversationItem): string {
+      const uniqueParticipantIds = Array.from(
+        new Set(
+          (conversation.participants ?? [])
+            .map((participant) => Number(participant.id ?? 0))
+            .filter((id) => Number.isFinite(id) && id > 0),
+        ),
+      )
+
+      if (!uniqueParticipantIds.length) {
+        return ''
+      }
+
+      const hasCurrentUser = uniqueParticipantIds.includes(this.currentUserId)
+      const otherUsersCount = hasCurrentUser
+        ? uniqueParticipantIds.filter((id) => id !== this.currentUserId).length
+        : uniqueParticipantIds.length
+
+      if (hasCurrentUser) {
+        return otherUsersCount > 0 ? `You +${otherUsersCount}` : 'You'
+      }
+
+      return this.conversationParticipantNames(conversation)
+    },
     groupParticipantsLabel(conversation: ConversationItem): string {
       if (conversation.type !== 'group') {
         return ''
       }
 
-      return this.conversationParticipantNames(conversation)
+      return this.participantSummary(conversation)
     },
     conversationTitle(conversation: ConversationItem): string {
       if (conversation.type === 'group' && String(conversation.subject ?? '').trim()) {
