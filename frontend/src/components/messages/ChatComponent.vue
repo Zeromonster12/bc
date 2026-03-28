@@ -9,34 +9,68 @@
           Number(message.sender?.id) === currentUserId ? 'justify-end' : 'justify-start',
         ]"
       >
-        <div
-          :class="[
-            'max-w-[85%] rounded-2xl px-4 py-2 text-sm shadow-sm md:max-w-lg',
-            Number(message.sender?.id) === currentUserId
-              ? 'rounded-br-sm bg-indigo-600 text-white'
-              : 'rounded-bl-sm border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
-          ]"
-        >
-          <p>{{ message.body }}</p>
-          <p
+        <div class="max-w-[85%] md:max-w-lg">
+          <div
             :class="[
-              'mt-1 flex items-center justify-end gap-1 text-[11px]',
-              Number(message.sender?.id) === currentUserId
-                ? 'text-indigo-200'
-                : 'text-slate-400 dark:text-slate-500',
+              'mb-1 flex items-center gap-2',
+              Number(message.sender?.id) === currentUserId ? 'justify-end' : 'justify-start',
             ]"
           >
-            <span>{{ formatTime(message.created_at) }}</span>
-            <span
-              v-if="Number(message.sender?.id) === currentUserId"
+            <div
               :class="[
-                'font-semibold tracking-tight',
-                message.read_at ? 'text-sky-300' : 'text-indigo-200',
+                'h-6 w-6 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-[10px] font-semibold text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300',
+                Number(message.sender?.id) === currentUserId ? 'order-2' : '',
               ]"
             >
-              {{ message.read_at ? '✓✓' : message.optimistic ? '⏳' : '✓' }}
-            </span>
-          </p>
+              <img
+                v-if="messageAvatarUrl(message)"
+                :src="messageAvatarUrl(message)"
+                alt="Author avatar"
+                class="h-full w-full object-cover"
+              />
+              <div v-else class="flex h-full w-full items-center justify-center">
+                {{ messageInitials(message) }}
+              </div>
+            </div>
+            <p
+              :class="[
+                'truncate text-[11px] font-semibold text-slate-600 dark:text-slate-300',
+                Number(message.sender?.id) === currentUserId ? 'order-1' : '',
+              ]"
+            >
+              {{ messageAuthorName(message) }}
+            </p>
+          </div>
+
+          <div
+            :class="[
+              'rounded-2xl px-4 py-2 text-sm shadow-sm',
+              Number(message.sender?.id) === currentUserId
+                ? 'rounded-br-sm bg-indigo-600 text-white'
+                : 'rounded-bl-sm border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
+            ]"
+          >
+            <p>{{ message.body }}</p>
+            <p
+              :class="[
+                'mt-1 flex items-center justify-end gap-1 text-[11px]',
+                Number(message.sender?.id) === currentUserId
+                  ? 'text-indigo-200'
+                  : 'text-slate-400 dark:text-slate-500',
+              ]"
+            >
+              <span>{{ formatTime(message.created_at) }}</span>
+              <span
+                v-if="Number(message.sender?.id) === currentUserId"
+                :class="[
+                  'font-semibold tracking-tight',
+                  message.read_at ? 'text-sky-300' : 'text-indigo-200',
+                ]"
+              >
+                {{ message.read_at ? '✓✓' : message.optimistic ? '⏳' : '✓' }}
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -88,10 +122,11 @@
 import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import MessageService, { type RealtimeReadPayload } from '@/services/messages/MessageService'
+import { resolveAssetUrl } from '@/services/core/url'
 
 interface ChatMessage {
   id: number | string
-  sender?: { id?: number; name?: string; email?: string }
+  sender?: { id?: number; name?: string; email?: string; avatar_url?: string | null }
   body: string
   created_at: string
   read_at?: string | null
@@ -173,6 +208,33 @@ export default defineComponent({
         minute: '2-digit',
       })
     },
+    messageAuthorName(message: ChatMessage): string {
+      return String(message.sender?.name ?? '').trim() || 'Unknown user'
+    },
+    messageAvatarUrl(message: ChatMessage): string {
+      const senderAvatar = resolveAssetUrl(message.sender?.avatar_url)
+      if (senderAvatar) {
+        return senderAvatar
+      }
+
+      const senderId = Number(message.sender?.id ?? 0)
+      if (senderId === this.currentUserId) {
+        return resolveAssetUrl((this.auth.user as { avatar_url?: string | null } | undefined)?.avatar_url)
+      }
+
+      return ''
+    },
+    messageInitials(message: ChatMessage): string {
+      const source = this.messageAuthorName(message)
+      return source
+        .split(' ')
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase() || 'U'
+    },
     async loadHistory() {
       const response = await MessageService.getMessages(this.conversationId)
       this.messages = response?.data ?? []
@@ -200,6 +262,7 @@ export default defineComponent({
               id: Number(incoming.sender?.id ?? 0) || undefined,
               name: String(incoming.sender?.name ?? ''),
               email: String(incoming.sender?.email ?? ''),
+              avatar_url: (incoming.sender as { avatar_url?: string | null } | undefined)?.avatar_url ?? null,
             },
           }
 
@@ -319,6 +382,7 @@ export default defineComponent({
           id: this.currentUserId,
           name: this.auth.user?.name,
           email: this.auth.user?.email,
+          avatar_url: (this.auth.user as { avatar_url?: string | null } | undefined)?.avatar_url ?? null,
         },
         created_at: new Date().toISOString(),
         read_at: null,
