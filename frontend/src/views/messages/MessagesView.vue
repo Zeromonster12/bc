@@ -87,6 +87,7 @@
                 :title="currentConversationTitle"
                 :subtitle="currentConversationSubtitle"
                 :subtitle-secondary="currentConversationProjectSubtitle"
+                :avatar-url="currentConversationAvatarUrl"
                 :participant-names="participantNames"
                 @back="backToList"
               />
@@ -128,7 +129,7 @@ interface MessageConversation {
   id: number
   type?: 'direct' | 'group'
   subject?: string
-  participants?: Array<{ id?: number; name?: string }>
+  participants?: Array<{ id?: number; name?: string; avatar_url?: string | null }>
   unread_count?: number
   last_message?: {
     id?: number
@@ -206,6 +207,18 @@ export default defineComponent({
       }
 
       return this.participantNames || 'Conversation'
+    },
+    currentConversationAvatarUrl(): string {
+      if (this.currentConversation?.type !== 'direct') {
+        return ''
+      }
+
+      const currentUserId = Number(this.auth.user?.id ?? 0)
+      return String(
+        (this.currentConversation?.participants ?? []).find(
+          (participant) => Number(participant.id ?? 0) !== currentUserId,
+        )?.avatar_url ?? '',
+      ).trim()
     },
     currentConversationSubtitle(): string {
       if (this.currentConversation?.type !== 'group') {

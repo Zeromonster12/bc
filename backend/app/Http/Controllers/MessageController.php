@@ -84,9 +84,9 @@ class MessageController extends Controller
             ->with([
                 'project:id,title',
                 'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-                'participantRecords.user:id,name,email',
+                'participantRecords.user:id,name,email,role',
                 'messages:id,conversation_id,sender_user_id,body,created_at',
-                'messages.senderUser:id,name,email',
+                'messages.senderUser:id,name,email,role',
             ])
             ->latest('updated_at')
             ->get()
@@ -164,9 +164,9 @@ class MessageController extends Controller
             $existing->load([
                 'project:id,title',
                 'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-                'participantRecords.user:id,name,email',
+                'participantRecords.user:id,name,email,role',
                 'messages:id,conversation_id,sender_user_id,body,created_at',
-                'messages.senderUser:id,name,email',
+                'messages.senderUser:id,name,email,role',
             ]);
 
             return response()->json([
@@ -192,9 +192,9 @@ class MessageController extends Controller
         $conversation->load([
             'project:id,title',
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-            'participantRecords.user:id,name,email',
+            'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
-            'messages.senderUser:id,name,email',
+            'messages.senderUser:id,name,email,role',
         ]);
 
         return response()->json([
@@ -288,9 +288,9 @@ class MessageController extends Controller
         $conversation->load([
             'project:id,title',
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-            'participantRecords.user:id,name,email',
+            'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
-            'messages.senderUser:id,name,email',
+            'messages.senderUser:id,name,email,role',
         ]);
 
         return response()->json([
@@ -347,9 +347,9 @@ class MessageController extends Controller
         $conversation->load([
             'project:id,title',
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-            'participantRecords.user:id,name,email',
+            'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
-            'messages.senderUser:id,name,email',
+            'messages.senderUser:id,name,email,role',
         ]);
 
         return response()->json([
@@ -397,9 +397,9 @@ class MessageController extends Controller
         $conversation->load([
             'project:id,title',
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-            'participantRecords.user:id,name,email',
+            'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
-            'messages.senderUser:id,name,email',
+            'messages.senderUser:id,name,email,role',
         ]);
 
         return response()->json([
@@ -426,9 +426,9 @@ class MessageController extends Controller
         $conversation->load([
             'project:id,title',
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
-            'participantRecords.user:id,name,email',
+            'participantRecords.user:id,name,email,role',
             'messages:id,conversation_id,sender_user_id,body,created_at',
-            'messages.senderUser:id,name,email',
+            'messages.senderUser:id,name,email,role',
         ]);
 
         return response()->json([
@@ -851,6 +851,7 @@ class MessageController extends Controller
                     'id' => $participant->user?->id,
                     'name' => $participant->user?->name,
                     'email' => $participant->user?->email,
+                    'avatar_url' => $participant->user?->avatar_url,
                 ])->values()
                 : [],
             'last_message' => $lastMessage ? $this->transformMessage($lastMessage, $conversation) : null,

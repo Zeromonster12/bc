@@ -22,7 +22,13 @@
           <div
             class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
           >
-            {{ initialsForConversation(convo) }}
+            <img
+              v-if="directConversationAvatarUrl(convo)"
+              :src="directConversationAvatarUrl(convo)"
+              alt=""
+              class="h-full w-full rounded-full object-cover"
+            />
+            <span v-else>{{ initialsForConversation(convo) }}</span>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
@@ -75,7 +81,7 @@ interface ConversationItem {
   id: number
   type?: 'direct' | 'group'
   subject?: string
-  participants?: Array<{ id?: number; name?: string }>
+  participants?: Array<{ id?: number; name?: string; avatar_url?: string | null }>
   unread_count?: number
   created_at?: string
   project?: {
@@ -114,6 +120,17 @@ export default defineComponent({
   },
   emits: ['select'],
   methods: {
+    directConversationAvatarUrl(conversation: ConversationItem): string {
+      if (conversation.type !== 'direct') {
+        return ''
+      }
+
+      return String(
+        (conversation.participants ?? []).find(
+          (participant) => Number(participant.id ?? 0) !== this.currentUserId,
+        )?.avatar_url ?? '',
+      ).trim()
+    },
     conversationParticipantNames(conversation: ConversationItem): string {
       return (conversation.participants ?? [])
         .filter((participant) => Number(participant.id ?? 0) !== this.currentUserId)

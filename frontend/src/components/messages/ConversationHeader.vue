@@ -9,7 +9,13 @@
     <div
       class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
     >
-      {{ avatarInitials }}
+      <img
+        v-if="avatarUrl"
+        :src="avatarUrl"
+        alt=""
+        class="h-full w-full rounded-full object-cover"
+      />
+      <span v-else>{{ avatarInitials }}</span>
     </div>
     <div class="min-w-0">
       <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -40,6 +46,10 @@ export default defineComponent({
       default: '',
     },
     subtitleSecondary: {
+      type: String,
+      default: '',
+    },
+    avatarUrl: {
       type: String,
       default: '',
     },
