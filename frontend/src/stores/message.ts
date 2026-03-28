@@ -43,24 +43,17 @@ export const useMessageStore = defineStore('message', {
   },
 
   actions: {
-    upsertConversation(conversation: Conversation, moveToTop = true) {
+    upsertConversation(conversation: Conversation) {
       const index = this.conversations.findIndex((item) => item.id === conversation.id)
 
       if (index === -1) {
-        this.conversations.unshift(conversation)
+        this.conversations.push(conversation)
         return
       }
 
       this.conversations[index] = {
         ...this.conversations[index],
         ...conversation,
-      }
-
-      if (moveToTop && index > 0) {
-        const moved = this.conversations.splice(index, 1)[0]
-        if (moved) {
-          this.conversations.unshift(moved)
-        }
       }
     },
 
