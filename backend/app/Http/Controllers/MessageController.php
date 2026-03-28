@@ -457,7 +457,10 @@ class MessageController extends Controller
 
         $messages = Message::query()
             ->where('conversation_id', $conversation->id)
-            ->with('senderUser:id,name,email,avatar_url')
+            ->with([
+                'senderUser:id,name,email,role',
+                'senderUser.studentProfile:id,user_id,avatar_path',
+            ])
             ->orderBy('id')
             ->paginate($perPage);
 
@@ -573,7 +576,10 @@ class MessageController extends Controller
 
         $conversation->update(['updated_at' => now()]);
 
-        $message->load('senderUser:id,name,email,avatar_url');
+        $message->load([
+            'senderUser:id,name,email,role',
+            'senderUser.studentProfile:id,user_id,avatar_path',
+        ]);
         $conversation->load([
             'participantRecords:id,conversation_id,user_id,last_read_message_id,last_read_at',
         ]);
