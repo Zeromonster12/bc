@@ -108,6 +108,7 @@ const MessageService = {
     },
   ) {
     const formData = new FormData()
+    formData.append('_method', 'PATCH')
 
     if (typeof payload.subject === 'string') {
       formData.append('subject', payload.subject)
@@ -121,7 +122,7 @@ const MessageService = {
       formData.append('remove_avatar', '1')
     }
 
-    const { data } = await http.patch(`/conversations/${conversationId}`, formData)
+    const { data } = await http.post(`/conversations/${conversationId}`, formData)
     return data
   },
 
