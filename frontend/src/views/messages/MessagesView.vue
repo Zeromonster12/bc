@@ -205,6 +205,13 @@
                   >
                     Remove admin
                   </button>
+                  <button
+                    :disabled="groupManageSubmitting || !canManageCurrentGroup || Number(participant.id ?? 0) <= 0"
+                    class="rounded-md border border-rose-200 px-2 py-1 text-[11px] text-rose-600 disabled:opacity-50 dark:border-rose-500/40 dark:text-rose-400"
+                    @click="removeParticipantFromGroup(Number(participant.id ?? 0))"
+                  >
+                    Remove user
+                  </button>
                 </div>
               </div>
             </div>
@@ -748,6 +755,25 @@ export default defineComponent({
       } catch (e: unknown) {
         const err = e as { response?: { data?: { message?: string } } }
         this.groupManageError = err?.response?.data?.message ?? 'Failed to revoke admin permission.'
+      } finally {
+        this.groupManageSubmitting = false
+      }
+    },
+    async removeParticipantFromGroup(participantUserId: number) {
+      const conversationId = this.currentConversationId()
+      if (!conversationId || participantUserId <= 0) {
+        return
+      }
+
+      this.groupManageSubmitting = true
+      this.groupManageError = ''
+      try {
+        await MessageService.removeConversationParticipant(conversationId, participantUserId)
+        await this.reloadCurrentConversationPreservingSelection()
+        await this.loadGroupAddCandidates()
+      } catch (e: unknown) {
+        const err = e as { response?: { data?: { message?: string } } }
+        this.groupManageError = err?.response?.data?.message ?? 'Failed to remove user from group.'
       } finally {
         this.groupManageSubmitting = false
       }
