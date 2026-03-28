@@ -30,12 +30,34 @@ class LoginMetadataLogger
 
     private function countryCode(Request $request): ?string
     {
-        $country = strtoupper((string) $request->header('CF-IPCountry', ''));
+        $candidateHeaders = [
+            'CF-IPCountry',
+            'CloudFront-Viewer-Country',
+            'X-Country-Code',
+            'X-Geo-Country',
+            'X-AppEngine-Country',
+            'X-Vercel-IP-Country',
+            'X-Azure-ClientIP-Country',
+        ];
 
-        if ($country === '' || strlen($country) !== 2) {
-            return null;
+        foreach ($candidateHeaders as $header) {
+            $country = strtoupper(trim((string) $request->header($header, '')));
+
+            if ($country === '' || strlen($country) !== 2) {
+                continue;
+            }
+
+            if (!ctype_alpha($country)) {
+                continue;
+            }
+
+            if (in_array($country, ['XX', 'T1'], true)) {
+                continue;
+            }
+
+            return $country;
         }
 
-        return $country;
+        return null;
     }
 }
