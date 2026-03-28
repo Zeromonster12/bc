@@ -47,7 +47,7 @@
             </p>
             <div class="mt-0.5 flex items-center gap-2">
               <p class="truncate text-xs text-slate-500 dark:text-slate-400">
-                {{ convo.last_message?.body || 'No messages yet' }}
+                {{ lastMessagePreview(convo) }}
               </p>
               <span
                 v-if="lastMessageStatus(convo)"
@@ -94,6 +94,7 @@ interface ConversationItem {
     read_at?: string | null
     sender?: {
       id?: number
+      name?: string
     }
   }
 }
@@ -177,6 +178,24 @@ export default defineComponent({
       const participantNames = this.conversationParticipantNames(conversation)
 
       return participantNames || conversation.project?.title || 'Chat'
+    },
+    lastMessagePreview(conversation: ConversationItem): string {
+      const body = String(conversation.last_message?.body ?? '').trim()
+      if (!body) {
+        return 'No messages yet'
+      }
+
+      if (conversation.type !== 'group') {
+        return body
+      }
+
+      const senderId = Number(conversation.last_message?.sender?.id ?? 0)
+      const senderNameRaw = String(conversation.last_message?.sender?.name ?? '').trim()
+      const senderName = senderId > 0 && senderId === this.currentUserId
+        ? 'You'
+        : (senderNameRaw || 'Unknown')
+
+      return `${senderName}: ${body}`
     },
     lastMessageStatus(conversation: ConversationItem): 'delivered' | 'seen' | null {
       const senderId = Number(conversation.last_message?.sender?.id ?? 0)
