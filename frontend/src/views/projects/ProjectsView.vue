@@ -17,6 +17,36 @@
 
         <section class="space-y-4">
           <div class="flex w-full flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200/80 bg-white/80 p-2.5 dark:border-slate-700/70 dark:bg-slate-900/70">
+            <div
+              v-if="auth.isCompany"
+              class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-600 dark:bg-slate-800"
+            >
+              <button
+                type="button"
+                class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+                :class="
+                  companyScope === 'all'
+                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
+                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                "
+                @click="setCompanyScope('all')"
+              >
+                All
+              </button>
+              <button
+                type="button"
+                class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
+                :class="
+                  companyScope === 'mine'
+                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
+                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                "
+                @click="setCompanyScope('mine')"
+              >
+                Mine
+              </button>
+            </div>
+
             <div class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-600 dark:bg-slate-800">
               <button
                 type="button"
@@ -128,6 +158,7 @@ export default defineComponent({
     return {
       filters: {} as Record<string, unknown>,
       viewMode: 'grid' as 'grid' | 'list',
+      companyScope: 'all' as 'all' | 'mine',
     }
   },
   computed: {
@@ -135,7 +166,7 @@ export default defineComponent({
       return this.isCompanyMyProjectsScope ? 'My Projects' : 'Projects'
     },
     isCompanyMyProjectsScope(): boolean {
-      return this.auth.isCompany && this.$route.query.company === 'me'
+      return this.auth.isCompany && this.companyScope === 'mine'
     },
     availableTechOptions(): string[] {
       const fromProjects = this.projectStore.projects.flatMap((project) => project.tech_stack ?? [])
@@ -147,14 +178,30 @@ export default defineComponent({
     },
   },
   mounted() {
+    if (this.auth.isCompany && this.$route.query.company === 'me') {
+      this.companyScope = 'mine'
+    }
+
     this.fetchWithCurrentScope(1)
   },
   watch: {
     '$route.query.company'() {
+      if (this.auth.isCompany) {
+        this.companyScope = this.$route.query.company === 'me' ? 'mine' : 'all'
+      }
+
       this.fetchWithCurrentScope(1)
     },
   },
   methods: {
+    setCompanyScope(scope: 'all' | 'mine') {
+      if (!this.auth.isCompany || this.companyScope === scope) {
+        return
+      }
+
+      this.companyScope = scope
+      this.fetchWithCurrentScope(1)
+    },
     scopedFilters(baseFilters: Record<string, unknown>): Record<string, unknown> {
       if (!this.isCompanyMyProjectsScope) {
         return { ...baseFilters }

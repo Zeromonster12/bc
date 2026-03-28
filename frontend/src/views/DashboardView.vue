@@ -356,9 +356,9 @@ import { useAuthStore } from '@/stores/auth'
 import { useProjectStore } from '@/stores/project'
 import { useApplicationStore } from '@/stores/application'
 import { useMessageStore } from '@/stores/message'
+import ProjectService from '@/services/projects/ProjectService'
 import {
   countAcceptedApplications,
-  countOpenProjects,
   createDefaultDashboardStats,
 } from '@/services/dashboard/DashboardService'
 import AdminService from '@/services/admin/AdminService'
@@ -548,13 +548,21 @@ export default defineComponent({
         this.applicationStore.applications,
       )
     } else if (this.auth.isCompany) {
+      const companyId = Number(this.auth.user?.id ?? 0)
       await Promise.all([
-        this.projectStore.fetchProjects({ per_page: 6 }),
+        this.projectStore.fetchProjects({ per_page: 6, company_id: companyId }),
         this.applicationStore.fetchApplications(),
         this.messageStore.fetchConversations(),
       ])
+
+      const openProjectsResponse = await ProjectService.getAll({
+        company_id: companyId,
+        status: 'open',
+        per_page: 1,
+      })
+
       this.stats.myProjects = this.projectStore.pagination?.total ?? 0
-      this.stats.openProjects = countOpenProjects(this.projectStore.projects)
+      this.stats.openProjects = Number(openProjectsResponse?.meta?.total ?? 0)
       this.stats.totalApplications = this.applicationStore.applications.length
     } else if (this.auth.isAdmin) {
       const [usersRes, projectsRes] = await Promise.all([

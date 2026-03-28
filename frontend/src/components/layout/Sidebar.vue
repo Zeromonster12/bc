@@ -314,11 +314,11 @@ export default defineComponent({
         },
         {
           name: 'projects',
-          label: 'My projects',
+          label: 'Projects',
           icon: 'FolderKanban',
           roles: ['company'],
           section: 'Work',
-          to: { name: 'projects', query: { company: 'me' } },
+          to: { name: 'projects' },
         },
         {
           name: 'applications',
