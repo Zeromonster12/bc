@@ -25,10 +25,22 @@
         <span class="truncate">{{ participantsLabel || subtitle }}</span>
         <span
           v-if="participantsExtraCount > 0"
-          :title="participantsTooltip"
-          class="shrink-0 cursor-help rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+          class="group/participants relative shrink-0"
         >
-          +{{ participantsExtraCount }}
+          <span
+            class="inline-flex cursor-help items-center rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+          >
+            +{{ participantsExtraCount }}
+          </span>
+          <span
+            v-if="participantsTooltip"
+            class="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max max-w-[18rem] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-medium leading-4 text-slate-700 opacity-0 shadow-lg transition-all duration-150 group-hover/participants:translate-y-0 group-hover/participants:opacity-100 group-focus-within/participants:translate-y-0 group-focus-within/participants:opacity-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+          >
+            <span
+              class="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-l border-t border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800"
+            />
+            {{ participantsTooltip }}
+          </span>
         </span>
       </p>
       <p v-if="subtitleSecondary" class="truncate text-xs text-slate-500 dark:text-slate-400">
