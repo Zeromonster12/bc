@@ -33,6 +33,12 @@
                 {{ formatConversationTime(convo.last_message?.created_at || convo.created_at) }}
               </span>
             </div>
+            <p
+              v-if="groupParticipantsLabel(convo)"
+              class="mt-0.5 truncate text-[11px] text-slate-500 dark:text-slate-400"
+            >
+              Participants: {{ groupParticipantsLabel(convo) }}
+            </p>
             <div class="mt-0.5 flex items-center gap-2">
               <p class="truncate text-xs text-slate-500 dark:text-slate-400">
                 {{ convo.last_message?.body || 'No messages yet' }}
@@ -108,16 +114,26 @@ export default defineComponent({
   },
   emits: ['select'],
   methods: {
+    conversationParticipantNames(conversation: ConversationItem): string {
+      return (conversation.participants ?? [])
+        .filter((participant) => Number(participant.id ?? 0) !== this.currentUserId)
+        .map((participant) => String(participant.name ?? '').trim())
+        .filter(Boolean)
+        .join(', ')
+    },
+    groupParticipantsLabel(conversation: ConversationItem): string {
+      if (conversation.type !== 'group') {
+        return ''
+      }
+
+      return this.conversationParticipantNames(conversation)
+    },
     conversationTitle(conversation: ConversationItem): string {
       if (conversation.type === 'group' && String(conversation.subject ?? '').trim()) {
         return String(conversation.subject ?? '').trim()
       }
 
-      const participantNames = (conversation.participants ?? [])
-        .filter((participant) => Number(participant.id ?? 0) !== this.currentUserId)
-        .map((participant) => String(participant.name ?? '').trim())
-        .filter(Boolean)
-        .join(', ')
+      const participantNames = this.conversationParticipantNames(conversation)
 
       return participantNames || conversation.project?.title || 'Chat'
     },

@@ -211,7 +211,17 @@ export default defineComponent({
         return ''
       }
 
+      const participants = this.participantNames.trim()
       const projectTitle = String((this.currentConversation?.project as { title?: string } | null)?.title ?? '').trim()
+
+      if (participants && projectTitle) {
+        return `Participants: ${participants} • Project: ${projectTitle}`
+      }
+
+      if (participants) {
+        return `Participants: ${participants}`
+      }
+
       return projectTitle ? `Project: ${projectTitle}` : 'Group conversation'
     },
     filteredConversations(): MessageConversation[] {
