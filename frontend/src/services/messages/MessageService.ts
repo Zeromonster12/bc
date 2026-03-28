@@ -122,7 +122,9 @@ const MessageService = {
       formData.append('remove_avatar', '1')
     }
 
-    const { data } = await http.post(`/conversations/${conversationId}`, formData)
+    const { data } = await http.post(`/conversations/${conversationId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
     return data
   },
 
