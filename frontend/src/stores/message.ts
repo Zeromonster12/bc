@@ -43,6 +43,27 @@ export const useMessageStore = defineStore('message', {
   },
 
   actions: {
+    upsertConversation(conversation: Conversation, moveToTop = true) {
+      const index = this.conversations.findIndex((item) => item.id === conversation.id)
+
+      if (index === -1) {
+        this.conversations.unshift(conversation)
+        return
+      }
+
+      this.conversations[index] = {
+        ...this.conversations[index],
+        ...conversation,
+      }
+
+      if (moveToTop && index > 0) {
+        const moved = this.conversations.splice(index, 1)[0]
+        if (moved) {
+          this.conversations.unshift(moved)
+        }
+      }
+    },
+
     async fetchConversations() {
       this.loading = true
       try {
@@ -54,25 +75,22 @@ export const useMessageStore = defineStore('message', {
     },
 
     async openConversation(id: number) {
-      this.loading = true
-      try {
-        const [convResult, msgResult] = await Promise.all([
-          MessageService.getConversation(id),
-          MessageService.getMessages(id),
-        ])
-        this.currentConversation = convResult.data
-        this.messages = msgResult.data
-        this.messagesPagination = msgResult.meta ?? null
+      const [convResult, msgResult] = await Promise.all([
+        MessageService.getConversation(id),
+        MessageService.getMessages(id),
+      ])
 
-        // Mark as read in conversations list
-        const index = this.conversations.findIndex((c) => c.id === id)
-        if (index !== -1) {
-          const conversation = this.conversations[index]
-          if (conversation) conversation.unread_count = 0
-        }
-      } finally {
-        this.loading = false
+      const openedConversation = {
+        ...(convResult.data as Conversation),
+        unread_count: 0,
       }
+
+      this.currentConversation = openedConversation
+      this.messages = msgResult.data
+      this.messagesPagination = msgResult.meta ?? null
+
+      // Keep sidebar synchronized with server payload without flashing loading state.
+      this.upsertConversation(openedConversation)
     },
 
     async sendMessage(body: string) {
@@ -104,9 +122,9 @@ export const useMessageStore = defineStore('message', {
 
     async startConversation(payload: Record<string, unknown>) {
       const result = await MessageService.createConversation(payload)
-      const existing = this.conversations.find((c) => c.id === result.data.id)
-      if (!existing) this.conversations.unshift(result.data)
-      await this.openConversation(result.data.id)
+
+      this.upsertConversation(result.data as Conversation)
+      await this.openConversation((result.data as Conversation).id)
       return result.data as Conversation
     },
   },

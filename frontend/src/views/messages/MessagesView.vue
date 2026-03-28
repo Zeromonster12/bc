@@ -286,7 +286,7 @@ interface MessageConversation {
   type?: 'direct' | 'group'
   subject?: string
   avatar_url?: string | null
-  project?: { id?: number; title?: string } | null
+  project?: { id?: number; title?: string }
   participants?: Array<{ id?: number; name?: string; avatar_url?: string | null; is_admin?: boolean }>
   unread_count?: number
   last_message?: {
