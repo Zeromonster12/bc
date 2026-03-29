@@ -160,9 +160,9 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
-  // Attempt to rehydrate user from token on first load
-  if (auth.token && !auth.user) {
-    await auth.fetchUser()
+  // Attempt to rehydrate user from session cookie on first load.
+  if (!auth.initialized) {
+    await auth.hydrateSession()
   }
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {

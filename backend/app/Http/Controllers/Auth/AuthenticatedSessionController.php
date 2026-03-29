@@ -60,7 +60,11 @@ class AuthenticatedSessionController extends Controller
             ], 403);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        Auth::guard('web')->login($user);
+
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         $this->metadataLogger->log(
             $request,
@@ -71,7 +75,6 @@ class AuthenticatedSessionController extends Controller
         );
 
         return response()->json([
-            'token' => $token,
             'data' => $user,
         ]);
     }
@@ -84,8 +87,6 @@ class AuthenticatedSessionController extends Controller
         if ($request->bearerToken()) {
             PersonalAccessToken::findToken($request->bearerToken())?->delete();
         }
-
-        $request->user()->tokens()->delete();
 
         if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();

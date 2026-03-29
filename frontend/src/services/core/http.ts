@@ -14,11 +14,6 @@ const http: AxiosInstance = axios.create({
 })
 
 http.interceptors.request.use((config) => {
-  const auth = useAuthStore()
-  if (auth.token) {
-    config.headers.Authorization = `Bearer ${auth.token}`
-  }
-
   const echo = getExistingEcho()
   const socketId = echo?.socketId?.()
   if (socketId) {
@@ -32,9 +27,15 @@ http.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
+      const requestUrl = String(error.config?.url ?? '')
+      const isSessionProbeRequest = requestUrl === '/auth/user' || requestUrl.endsWith('/auth/user')
+
       const auth = useAuthStore()
       auth.clearSession()
-      await router.push({ name: 'login' })
+
+      if (!isSessionProbeRequest) {
+        await router.push({ name: 'login' })
+      }
     }
     return Promise.reject(error)
   },

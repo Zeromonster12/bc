@@ -9,6 +9,7 @@ use App\Services\Auth\LoginMetadataLogger;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -121,12 +122,15 @@ class GoogleOAuthController extends Controller
             $user->forceFill(['email_verified_at' => now()])->save();
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        Auth::guard('web')->login($user);
+
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         $this->metadataLogger->log($request, $user, $email, true, 'oauth_google_success');
 
         return response()->json([
-            'token' => $token,
             'data' => $user,
         ]);
     }

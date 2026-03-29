@@ -11,7 +11,7 @@ window.Pusher = Pusher
 
 let echoInstance: Echo<'reverb'> | null = null
 
-const createEcho = (token: string): Echo<'reverb'> => {
+const createEcho = (): Echo<'reverb'> => {
   const wsHost = import.meta.env.VITE_REVERB_HOST ?? 'localhost'
   const wsPort = Number(import.meta.env.VITE_REVERB_PORT ?? 8080)
   const wsScheme = (import.meta.env.VITE_REVERB_SCHEME ?? 'http').toLowerCase()
@@ -25,19 +25,19 @@ const createEcho = (token: string): Echo<'reverb'> => {
     wssPort: wsPort,
     forceTLS,
     enabledTransports: ['ws', 'wss'],
+    withCredentials: true,
     authEndpoint: `${(import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api').replace(/\/api\/?$/, '')}/broadcasting/auth`,
     auth: {
       headers: {
-        Authorization: `Bearer ${token}`,
         Accept: 'application/json',
       },
     },
   })
 }
 
-export const getEcho = (token: string): Echo<'reverb'> => {
+export const getEcho = (): Echo<'reverb'> => {
   if (!echoInstance) {
-    echoInstance = createEcho(token)
+    echoInstance = createEcho()
   }
 
   return echoInstance

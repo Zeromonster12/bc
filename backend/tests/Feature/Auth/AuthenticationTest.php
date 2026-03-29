@@ -21,9 +21,10 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response->assertOk()->assertJsonStructure([
-            'token',
             'data' => ['id', 'name', 'email', 'role'],
-        ]);
+        ])->assertJsonMissingPath('token');
+
+        $this->assertAuthenticatedAs($user, 'web');
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void

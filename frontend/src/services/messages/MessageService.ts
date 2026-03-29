@@ -166,13 +166,10 @@ const MessageService = {
   },
 
   subscribeToConversationRealtime(
-    token: string,
     conversationId: number,
     handlers: ConversationRealtimeHandlers,
   ) {
-    if (!token) return
-
-    const echo = getEcho(token)
+    const echo = getEcho()
     const channel = echo.private(`conversations.${conversationId}`)
 
     if (handlers.onMessageSent) {
@@ -188,9 +185,8 @@ const MessageService = {
     }
   },
 
-  unsubscribeFromConversationRealtime(token: string, conversationId: number) {
-    if (!token) return
-    const echo = getEcho(token)
+  unsubscribeFromConversationRealtime(conversationId: number) {
+    const echo = getEcho()
     echo.leave(`private-conversations.${conversationId}`)
   },
 }

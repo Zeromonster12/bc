@@ -245,9 +245,7 @@ export default defineComponent({
       await this.scrollToBottom()
     },
     subscribe() {
-      if (!this.auth.token) return
-
-      MessageService.subscribeToConversationRealtime(this.auth.token, this.conversationId, {
+      MessageService.subscribeToConversationRealtime(this.conversationId, {
         onMessageSent: async (payload) => {
           const incoming = payload?.message
           const incomingId = Number(incoming?.id ?? 0)
@@ -300,8 +298,7 @@ export default defineComponent({
       })
     },
     unsubscribe() {
-      if (!this.auth.token) return
-      MessageService.unsubscribeFromConversationRealtime(this.auth.token, this.conversationId)
+      MessageService.unsubscribeFromConversationRealtime(this.conversationId)
     },
     async sendTyping(isTyping: boolean) {
       await MessageService.setTyping(this.conversationId, isTyping)

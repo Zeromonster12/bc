@@ -1006,12 +1006,11 @@ export default defineComponent({
       }
     },
     refreshRealtimeSubscriptions() {
-      if (!this.auth.token) return
       const wanted = new Set(this.conversationIds)
 
       for (const conversationId of this.subscribedConversationIds) {
         if (!wanted.has(conversationId)) {
-          MessageService.unsubscribeFromConversationRealtime(this.auth.token, conversationId)
+          MessageService.unsubscribeFromConversationRealtime(conversationId)
         }
       }
 
@@ -1019,7 +1018,7 @@ export default defineComponent({
       for (const conversationId of wanted) {
         if (current.has(conversationId)) continue
 
-        MessageService.subscribeToConversationRealtime(this.auth.token, conversationId, {
+        MessageService.subscribeToConversationRealtime(conversationId, {
           onMessageSent: (payload) => {
             this.onRealtimeMessage(payload)
           },
@@ -1032,9 +1031,8 @@ export default defineComponent({
       this.subscribedConversationIds = [...wanted]
     },
     unsubscribeAllRealtime() {
-      if (!this.auth.token) return
       for (const conversationId of this.subscribedConversationIds) {
-        MessageService.unsubscribeFromConversationRealtime(this.auth.token, conversationId)
+        MessageService.unsubscribeFromConversationRealtime(conversationId)
       }
 
       this.subscribedConversationIds = []

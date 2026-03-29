@@ -18,26 +18,25 @@ interface User {
 
 interface AuthState {
   user: User | null
-  token: string | null
   loading: boolean
   error: string | null
+  initialized: boolean
 }
 
 interface AuthResult {
-  token: string
   data: User
 }
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
     user: null,
-    token: sessionStorage.getItem('auth_token'),
     loading: false,
     error: null,
+    initialized: false,
   }),
 
   getters: {
-    isAuthenticated: (state): boolean => !!state.token && !!state.user,
+    isAuthenticated: (state): boolean => !!state.user,
     isStudent: (state): boolean => state.user?.role === 'student',
     isCompany: (state): boolean => state.user?.role === 'company',
     isAdmin: (state): boolean => state.user?.role === 'admin',
@@ -85,37 +84,47 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchUser() {
-      if (!this.token) return
       try {
         const result = await AuthService.getUser()
         this.user = result.data
-      } catch {
-        this.clearSession()
-      }
-    },
-
-    async fetchUserSilently(): Promise<boolean> {
-      if (!this.token) return false
-      try {
-        const result = await AuthService.getUser()
-        this.user = result.data
+        this.initialized = true
         return true
       } catch {
+        this.clearSession()
         return false
       }
     },
 
+    async fetchUserSilently(): Promise<boolean> {
+      try {
+        const result = await AuthService.getUser()
+        this.user = result.data
+        this.initialized = true
+        return true
+      } catch {
+        this.user = null
+        this.initialized = true
+        return false
+      }
+    },
+
+    async hydrateSession(): Promise<boolean> {
+      if (this.initialized) {
+        return this.isAuthenticated
+      }
+
+      return this.fetchUserSilently()
+    },
+
     setAuthenticatedSession(result: AuthResult) {
-      this.token = result.token
       this.user = result.data
-      sessionStorage.setItem('auth_token', result.token)
+      this.initialized = true
     },
 
     clearSession() {
       this.user = null
-      this.token = null
       this.error = null
-      sessionStorage.removeItem('auth_token')
+      this.initialized = true
     },
   },
 })
