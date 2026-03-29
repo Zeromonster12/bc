@@ -46,9 +46,12 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/conversations/{conversation}/participants/{participantUser}/demote-admin', [MessageController::class, 'demoteParticipantFromAdmin']);
     Route::get('/conversations/{conversation}', [MessageController::class, 'showConversation']);
     Route::get('/conversations/{conversation}/messages', [MessageController::class, 'index']);
-    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
-    Route::post('/conversations/{conversation}/read', [MessageController::class, 'markRead']);
-    Route::post('/conversations/{conversation}/typing', [MessageController::class, 'typing']);
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store'])
+        ->middleware('throttle:chat-write');
+    Route::post('/conversations/{conversation}/read', [MessageController::class, 'markRead'])
+        ->middleware('throttle:chat-read');
+    Route::post('/conversations/{conversation}/typing', [MessageController::class, 'typing'])
+        ->middleware('throttle:chat-typing');
 
     Route::get('/applications', [ApplicationController::class, 'index']);
     Route::get('/applications/{application}/tasks', [ApplicationController::class, 'listTasks']);
