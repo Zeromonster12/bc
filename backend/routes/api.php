@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->group(function (): void {
     require base_path('routes/auth.php');
 
-    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    Route::middleware(['web', 'auth:sanctum'])->get('/user', function (Request $request) {
         return response()->json([
             'data' => $request->user(),
         ]);
