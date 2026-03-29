@@ -4,7 +4,7 @@ use App\Models\ConversationParticipant;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::routes([
-    'middleware' => ['auth:sanctum'],
+    'middleware' => ['web', 'auth:sanctum'],
 ]);
 
 Broadcast::channel('conversations.{conversationId}', function ($user, int $conversationId): bool {
