@@ -121,6 +121,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useMessageStore } from '@/stores/message'
 import MessageService, { type RealtimeReadPayload } from '@/services/messages/MessageService'
 import { resolveAssetUrl } from '@/services/core/url'
 
@@ -145,11 +146,11 @@ export default defineComponent({
   setup() {
     return {
       auth: useAuthStore(),
+      messageStore: useMessageStore(),
     }
   },
   data() {
     return {
-      messages: [] as ChatMessage[],
       body: '',
       sending: false,
       typingIds: [] as number[],
@@ -162,6 +163,9 @@ export default defineComponent({
     }
   },
   computed: {
+    messages(): ChatMessage[] {
+      return this.messageStore.messages as ChatMessage[]
+    },
     currentUserId(): number {
       return Number(this.auth.user?.id ?? 0)
     },
@@ -177,12 +181,12 @@ export default defineComponent({
       this.typingIds = []
       this.typingNames = []
       this.typingStateSent = false
-      await this.loadHistory()
+      await this.syncConversationViewState()
       this.subscribe()
     },
   },
   async mounted() {
-    await this.loadHistory()
+    await this.syncConversationViewState()
     this.subscribe()
   },
   beforeUnmount() {
@@ -235,9 +239,7 @@ export default defineComponent({
         .join('')
         .toUpperCase() || 'U'
     },
-    async loadHistory() {
-      const response = await MessageService.getMessages(this.conversationId)
-      this.messages = response?.data ?? []
+    async syncConversationViewState() {
       const latestMessageId = this.getLatestMessageId()
       if (latestMessageId > 0) {
         this.markConversationRead(latestMessageId)
@@ -370,25 +372,7 @@ export default defineComponent({
       if (!trimmed || this.sending) return
 
       this.sending = true
-
-      const optimisticId = `tmp-${Date.now()}`
-      const optimisticMessage: ChatMessage = {
-        id: optimisticId,
-        body: trimmed,
-        sender: {
-          id: this.currentUserId,
-          name: this.auth.user?.name,
-          email: this.auth.user?.email,
-          avatar_url: (this.auth.user as { avatar_url?: string | null } | undefined)?.avatar_url ?? null,
-        },
-        created_at: new Date().toISOString(),
-        read_at: null,
-        optimistic: true,
-      }
-
-      this.messages.push(optimisticMessage)
       this.body = ''
-      await this.scrollToBottom()
 
       const textarea = this.$refs.textareaRef as HTMLTextAreaElement | undefined
       if (textarea) {
@@ -403,14 +387,13 @@ export default defineComponent({
       this.updateTypingState(false)
 
       try {
-        const response = await MessageService.sendMessage(this.conversationId, trimmed)
-
-        const persisted = response?.data as ChatMessage
-        persisted.read_at = persisted.read_at ?? null
-        this.messages = this.messages.map((m) => (m.id === optimisticId ? persisted : m))
-        this.$emit('message-sent-local', persisted)
+        const persisted = await this.messageStore.sendMessage(trimmed)
+        if (persisted) {
+          this.$emit('message-sent-local', persisted as ChatMessage)
+          await this.scrollToBottom()
+        }
       } catch {
-        this.messages = this.messages.filter((m) => m.id !== optimisticId)
+        this.body = trimmed
       } finally {
         this.sending = false
       }
@@ -425,20 +408,17 @@ export default defineComponent({
       if (!lastReadMessageId || !readAt) return
       if (!readerUserId || readerUserId === this.currentUserId) return
 
-      this.messages = this.messages.map((message) => {
+      for (const message of this.messages) {
         const messageId = Number(message.id)
         const senderId = Number(message.sender?.id ?? 0)
         const isOutgoing = senderId === this.currentUserId
 
         if (!isOutgoing || !Number.isFinite(messageId) || messageId > lastReadMessageId) {
-          return message
+          continue
         }
 
-        return {
-          ...message,
-          read_at: readAt,
-        }
-      })
+        message.read_at = readAt
+      }
     },
   },
 })
