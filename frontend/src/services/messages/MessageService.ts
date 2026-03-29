@@ -38,6 +38,8 @@ interface ConversationRealtimeHandlers {
   onUserTyping?: (payload: RealtimeTypingPayload) => void | Promise<void>
 }
 
+type ConversationRealtimeTeardown = () => void
+
 const MessageService = {
   async getConversations() {
     const { data } = await http.get('/conversations')
@@ -169,20 +171,38 @@ const MessageService = {
   subscribeToConversationRealtime(
     conversationId: number,
     handlers: ConversationRealtimeHandlers,
-  ) {
+  ): ConversationRealtimeTeardown {
     const echo = getEcho()
     const channel = echo.private(`conversations.${conversationId}`)
 
-    if (handlers.onMessageSent) {
-      channel.listen('.message.sent', handlers.onMessageSent)
+    const messageHandler = handlers.onMessageSent
+    const readHandler = handlers.onMessageRead
+    const typingHandler = handlers.onUserTyping
+
+    if (messageHandler) {
+      channel.listen('.message.sent', messageHandler)
     }
 
-    if (handlers.onMessageRead) {
-      channel.listen('.message.read', handlers.onMessageRead)
+    if (readHandler) {
+      channel.listen('.message.read', readHandler)
     }
 
-    if (handlers.onUserTyping) {
-      channel.listen('.user.typing', handlers.onUserTyping)
+    if (typingHandler) {
+      channel.listen('.user.typing', typingHandler)
+    }
+
+    return () => {
+      if (messageHandler) {
+        channel.stopListening('.message.sent', messageHandler)
+      }
+
+      if (readHandler) {
+        channel.stopListening('.message.read', readHandler)
+      }
+
+      if (typingHandler) {
+        channel.stopListening('.user.typing', typingHandler)
+      }
     }
   },
 

@@ -155,6 +155,7 @@ export default defineComponent({
       sending: false,
       typingIds: [] as number[],
       typingNames: [] as string[],
+      realtimeTeardown: null as (() => void) | null,
       typingTimeoutId: null as number | null,
       typingStateSent: false,
       readAckInFlight: false,
@@ -183,7 +184,7 @@ export default defineComponent({
         void this.sendTyping(false, oldConversationId)
       }
 
-      this.unsubscribe(oldConversationId)
+      this.unsubscribe()
       this.typingIds = []
       this.typingNames = []
       this.typingStateSent = false
@@ -202,7 +203,7 @@ export default defineComponent({
     }
 
     this.updateTypingState(false)
-    this.unsubscribe(this.conversationId)
+    this.unsubscribe()
   },
   methods: {
     async scrollToBottom() {
@@ -256,7 +257,9 @@ export default defineComponent({
       const targetConversationId = Number(conversationId ?? this.conversationId)
       if (!Number.isFinite(targetConversationId) || targetConversationId <= 0) return
 
-      MessageService.subscribeToConversationRealtime(targetConversationId, {
+      this.unsubscribe()
+
+      this.realtimeTeardown = MessageService.subscribeToConversationRealtime(targetConversationId, {
         onMessageSent: async (payload) => {
           const payloadConversationId = Number(payload?.conversation_id ?? 0)
           if (!payloadConversationId || payloadConversationId !== targetConversationId || payloadConversationId !== this.conversationId) {
@@ -323,11 +326,11 @@ export default defineComponent({
         },
       })
     },
-    unsubscribe(conversationId?: number) {
-      const targetConversationId = Number(conversationId ?? 0)
-      if (!Number.isFinite(targetConversationId) || targetConversationId <= 0) return
-
-      MessageService.unsubscribeFromConversationRealtime(targetConversationId)
+    unsubscribe() {
+      if (this.realtimeTeardown) {
+        this.realtimeTeardown()
+        this.realtimeTeardown = null
+      }
     },
     async sendTyping(isTyping: boolean, conversationId?: number) {
       const targetConversationId = Number(conversationId ?? this.conversationId)
