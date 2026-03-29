@@ -176,18 +176,24 @@ export default defineComponent({
     },
   },
   watch: {
-    async conversationId() {
-      this.unsubscribe()
+    async conversationId(nextConversationId: number, previousConversationId: number) {
+      const oldConversationId = Number(previousConversationId ?? 0)
+
+      if (oldConversationId > 0 && this.typingStateSent) {
+        void this.sendTyping(false, oldConversationId)
+      }
+
+      this.unsubscribe(oldConversationId)
       this.typingIds = []
       this.typingNames = []
       this.typingStateSent = false
       await this.syncConversationViewState()
-      this.subscribe()
+      this.subscribe(Number(nextConversationId ?? this.conversationId))
     },
   },
   async mounted() {
     await this.syncConversationViewState()
-    this.subscribe()
+    this.subscribe(this.conversationId)
   },
   beforeUnmount() {
     if (this.typingTimeoutId !== null) {
@@ -196,7 +202,7 @@ export default defineComponent({
     }
 
     this.updateTypingState(false)
-    this.unsubscribe()
+    this.unsubscribe(this.conversationId)
   },
   methods: {
     async scrollToBottom() {
@@ -246,9 +252,17 @@ export default defineComponent({
       }
       await this.scrollToBottom()
     },
-    subscribe() {
-      MessageService.subscribeToConversationRealtime(this.conversationId, {
+    subscribe(conversationId?: number) {
+      const targetConversationId = Number(conversationId ?? this.conversationId)
+      if (!Number.isFinite(targetConversationId) || targetConversationId <= 0) return
+
+      MessageService.subscribeToConversationRealtime(targetConversationId, {
         onMessageSent: async (payload) => {
+          const payloadConversationId = Number(payload?.conversation_id ?? 0)
+          if (!payloadConversationId || payloadConversationId !== targetConversationId || payloadConversationId !== this.conversationId) {
+            return
+          }
+
           const incoming = payload?.message
           const incomingId = Number(incoming?.id ?? 0)
           if (!incoming || !Number.isFinite(incomingId) || incomingId <= 0) return
@@ -276,34 +290,50 @@ export default defineComponent({
           }
         },
         onUserTyping: (payload) => {
-            const senderId = Number(payload?.user?.id ?? 0)
-            const senderName = String(payload?.user?.name ?? '')
-            const isTyping = Boolean(payload?.is_typing)
+          const payloadConversationId = Number(payload?.conversation_id ?? 0)
+          if (!payloadConversationId || payloadConversationId !== targetConversationId || payloadConversationId !== this.conversationId) {
+            return
+          }
 
-            if (!senderId || senderId === this.currentUserId) return
+          const senderId = Number(payload?.user?.id ?? 0)
+          const senderName = String(payload?.user?.name ?? '')
+          const isTyping = Boolean(payload?.is_typing)
 
-            if (isTyping) {
-              if (!this.typingIds.includes(senderId)) {
-                this.typingIds.push(senderId)
-              }
-              if (senderName && !this.typingNames.includes(senderName)) {
-                this.typingNames.push(senderName)
-              }
-            } else {
-              this.typingIds = this.typingIds.filter((id) => id !== senderId)
-              this.typingNames = this.typingNames.filter((name) => name !== senderName)
+          if (!senderId || senderId === this.currentUserId) return
+
+          if (isTyping) {
+            if (!this.typingIds.includes(senderId)) {
+              this.typingIds.push(senderId)
             }
+            if (senderName && !this.typingNames.includes(senderName)) {
+              this.typingNames.push(senderName)
+            }
+          } else {
+            this.typingIds = this.typingIds.filter((id) => id !== senderId)
+            this.typingNames = this.typingNames.filter((name) => name !== senderName)
+          }
         },
         onMessageRead: (payload) => {
+          const payloadConversationId = Number(payload?.conversation_id ?? 0)
+          if (!payloadConversationId || payloadConversationId !== targetConversationId || payloadConversationId !== this.conversationId) {
+            return
+          }
+
           this.applyReadReceipt(payload)
         },
       })
     },
-    unsubscribe() {
-      MessageService.unsubscribeFromConversationRealtime(this.conversationId)
+    unsubscribe(conversationId?: number) {
+      const targetConversationId = Number(conversationId ?? 0)
+      if (!Number.isFinite(targetConversationId) || targetConversationId <= 0) return
+
+      MessageService.unsubscribeFromConversationRealtime(targetConversationId)
     },
-    async sendTyping(isTyping: boolean) {
-      await MessageService.setTyping(this.conversationId, isTyping)
+    async sendTyping(isTyping: boolean, conversationId?: number) {
+      const targetConversationId = Number(conversationId ?? this.conversationId)
+      if (!Number.isFinite(targetConversationId) || targetConversationId <= 0) return
+
+      await MessageService.setTyping(targetConversationId, isTyping)
     },
     getLatestMessageId(): number {
       if (!this.messages.length) return 0

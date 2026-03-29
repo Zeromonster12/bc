@@ -24,6 +24,7 @@ export interface RealtimeReadPayload {
 }
 
 export interface RealtimeTypingPayload {
+  conversation_id?: number
   user?: {
     id?: number
     name?: string
