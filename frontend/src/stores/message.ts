@@ -82,7 +82,6 @@ export const useMessageStore = defineStore('message', {
       this.messages = msgResult.data
       this.messagesPagination = msgResult.meta ?? null
 
-      // Keep sidebar synchronized with server payload without flashing loading state.
       this.upsertConversation(openedConversation)
     },
 

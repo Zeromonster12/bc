@@ -1,3 +1,5 @@
+import type { RealtimeMessagePayload, RealtimeReadPayload } from '@/services/messages/MessageService'
+
 interface Participant {
   id?: number
   name?: string
@@ -16,6 +18,30 @@ export interface RecipientOption {
 export interface ProjectOption {
   id: number
   title: string
+}
+
+interface ConversationParticipant {
+  id?: number
+  is_admin?: boolean
+}
+
+interface ConversationPreviewMessage {
+  id?: number
+  body?: string
+  created_at?: string
+  read_at?: string | null
+  sender?: {
+    id?: number
+    name?: string
+    email?: string
+  }
+}
+
+interface ConversationPreview {
+  id: number
+  participants?: ConversationParticipant[]
+  unread_count?: number
+  last_message?: ConversationPreviewMessage | null
 }
 
 export const buildParticipantNames = (
@@ -110,6 +136,147 @@ export const normalizeProjectOptions = (source: unknown): ProjectOption[] => {
       }
     })
     .filter((item) => item.id > 0 && item.title.length > 0)
+}
+
+export const buildGroupAddCandidates = (
+  source: unknown,
+  participants: Array<{ id?: number }> = [],
+): RecipientOption[] => {
+  const existingIds = new Set(
+    participants
+      .map((participant) => Number(participant.id ?? 0))
+      .filter((id) => Number.isFinite(id) && id > 0),
+  )
+
+  return normalizeRecipientOptions(source)
+    .filter((item: RecipientOption) => item.id > 0 && !existingIds.has(item.id))
+}
+
+export const canDemoteGroupParticipant = (
+  participants: Array<{ id?: number; is_admin?: boolean }>,
+  participantUserId: number,
+): boolean => {
+  if (!Number.isFinite(participantUserId) || participantUserId <= 0) {
+    return false
+  }
+
+  const participant = participants.find(
+    (candidate) => Number(candidate.id ?? 0) === participantUserId,
+  )
+
+  if (!participant?.is_admin) {
+    return false
+  }
+
+  const adminCount = participants.filter((candidate) => Boolean(candidate.is_admin)).length
+  return adminCount > 1
+}
+
+export const applyRealtimeConversationMessagePreview = (
+  conversations: ConversationPreview[],
+  payload: RealtimeMessagePayload,
+  currentUserId: number,
+  openConversationId: number,
+): void => {
+  const conversationId = Number(payload?.conversation_id ?? 0)
+  const incomingMessage = payload?.message
+  if (!conversationId || !incomingMessage) return
+
+  const incomingMessageId = Number(incomingMessage.id ?? 0)
+  if (!Number.isFinite(incomingMessageId) || incomingMessageId <= 0) return
+
+  const normalizedMessage: NonNullable<ConversationPreview['last_message']> = {
+    id: incomingMessageId,
+    body: String(incomingMessage.body ?? ''),
+    created_at: String(incomingMessage.created_at ?? ''),
+    read_at: incomingMessage.read_at ?? null,
+    sender: {
+      id: Number(incomingMessage.sender?.id ?? 0) || undefined,
+      name: String(incomingMessage.sender?.name ?? ''),
+      email: String(incomingMessage.sender?.email ?? ''),
+    },
+  }
+
+  const index = conversations.findIndex(
+    (conversation) => Number(conversation.id) === conversationId,
+  )
+  if (index === -1) return
+
+  const conversation = conversations[index]
+  if (!conversation) return
+
+  conversation.last_message = normalizedMessage
+
+  const senderId = Number(normalizedMessage.sender?.id ?? 0)
+  const isCurrentUserSender = senderId === currentUserId
+  const isOpenConversation = openConversationId === conversationId
+
+  if (!isCurrentUserSender && !isOpenConversation) {
+    conversation.unread_count = Number(conversation.unread_count ?? 0) + 1
+  } else {
+    conversation.unread_count = 0
+  }
+
+  if (index > 0) {
+    const moved = conversations.splice(index, 1)[0]
+    if (moved) {
+      conversations.unshift(moved)
+    }
+  }
+}
+
+export const applyRealtimeConversationReadPreview = (
+  conversations: ConversationPreview[],
+  payload: RealtimeReadPayload,
+  currentUserId: number,
+): void => {
+  const conversationId = Number(payload?.conversation_id ?? 0)
+  const readerUserId = Number(payload?.reader_user_id ?? 0)
+  const lastReadMessageId = Number(payload?.last_read_message_id ?? 0)
+  const readAt = String(payload?.read_at ?? '')
+
+  if (!conversationId || !readerUserId || !lastReadMessageId || !readAt) return
+  if (readerUserId === currentUserId) return
+
+  const conversation = conversations.find((item) => Number(item.id) === conversationId)
+  if (!conversation?.last_message) return
+
+  const lastMessageId = Number(conversation.last_message.id ?? 0)
+  const lastMessageSenderId = Number(conversation.last_message.sender?.id ?? 0)
+  const isCurrentUserSender = lastMessageSenderId === currentUserId
+
+  if (!isCurrentUserSender || !lastMessageId || lastMessageId > lastReadMessageId) {
+    return
+  }
+
+  conversation.last_message.read_at = readAt
+}
+
+export const applyLocalConversationMessagePreview = (
+  conversations: ConversationPreview[],
+  conversationId: number,
+  message: ConversationPreview['last_message'] | undefined,
+): void => {
+  if (!conversationId || !message) return
+
+  const index = conversations.findIndex((item) => Number(item.id) === conversationId)
+  if (index === -1) return
+
+  const conversation = conversations[index]
+  if (!conversation) return
+
+  conversation.last_message = {
+    ...message,
+    read_at: message.read_at ?? null,
+  }
+  conversation.unread_count = 0
+
+  if (index > 0) {
+    const moved = conversations.splice(index, 1)[0]
+    if (moved) {
+      conversations.unshift(moved)
+    }
+  }
 }
 
 export const extractAcceptedApplicationProjects = (source: unknown): ProjectOption[] => {

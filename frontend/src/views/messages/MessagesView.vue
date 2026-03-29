@@ -107,153 +107,34 @@
         </div>
       </div>
 
-      <div
-        v-if="showGroupManageModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4"
-        @click.self="closeGroupManageModal"
-      >
-        <div class="w-full max-w-lg rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.12)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.45)]">
-          <div class="mb-4 flex items-start justify-between gap-3">
-            <div>
-              <h3 class="text-xl font-semibold text-[#1d1f31] dark:text-slate-100">{{ groupModalTitle }}</h3>
-              <p class="mt-1 text-sm font-medium text-[#7d8195] dark:text-slate-400">{{ groupModalSubtitle }}</p>
-            </div>
-            <button
-              class="rounded-xl p-2 text-[#686d84] transition hover:bg-[#f8f7fc] hover:text-[#474a61] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-              @click="closeGroupManageModal"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div v-if="groupManageMode === 'rename'" class="space-y-3">
-            <input
-              v-model="groupEditName"
-              type="text"
-              maxlength="160"
-              placeholder="Group name"
-              class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] placeholder:text-[#a3a7bb] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            />
-            <div class="flex justify-end gap-2">
-              <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Cancel</button>
-              <button
-                :disabled="groupManageSubmitting || !groupEditName.trim()"
-                class="rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:opacity-50"
-                @click="saveGroupName"
-              >
-                Save name
-              </button>
-            </div>
-          </div>
-
-          <div v-else-if="groupManageMode === 'avatar'" class="space-y-3">
-            <div class="flex items-center gap-3">
-              <div class="h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-slate-600 dark:bg-slate-800">
-                <img v-if="groupAvatarPreview" :src="groupAvatarPreview" alt="Group avatar preview" class="h-full w-full object-cover" />
-                <div v-else class="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-500 dark:text-slate-400">No photo</div>
-              </div>
-              <input type="file" accept="image/*" @change="onGroupAvatarSelected" class="block text-xs text-slate-500 dark:text-slate-300" />
-            </div>
-            <div class="flex justify-between gap-2">
-              <button
-                :disabled="groupManageSubmitting"
-                class="rounded-2xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/50 dark:bg-slate-800 dark:text-rose-400"
-                @click="removeGroupAvatar"
-              >
-                Remove photo
-              </button>
-              <div class="flex gap-2">
-                <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Cancel</button>
-                <button
-                  :disabled="groupManageSubmitting || !groupAvatarFile"
-                  class="rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:opacity-50"
-                  @click="saveGroupAvatar"
-                >
-                  Upload photo
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div v-else-if="groupManageMode === 'participants'" class="space-y-3">
-            <div class="max-h-52 space-y-2 overflow-y-auto rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] p-2 dark:border-slate-700 dark:bg-slate-800/40">
-              <div
-                v-for="participant in currentConversation?.participants ?? []"
-                :key="Number(participant.id ?? 0)"
-                class="flex items-center justify-between gap-2 rounded-xl border border-[#ebeaf2] bg-white px-2.5 py-2 dark:border-slate-700 dark:bg-slate-900"
-              >
-                <div class="min-w-0">
-                  <p class="truncate text-sm font-semibold text-[#474a61] dark:text-slate-100">
-                    {{ participant.name || 'Unknown user' }}
-                  </p>
-                  <p v-if="participant.is_admin" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">Admin</p>
-                </div>
-                <div class="flex items-center gap-1">
-                  <button
-                    v-if="!participant.is_admin"
-                    :disabled="groupManageSubmitting || !canManageCurrentGroup"
-                    class="rounded-xl border border-[#ebeaf2] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
-                    @click="promoteParticipantAdmin(Number(participant.id ?? 0))"
-                  >
-                    Make admin
-                  </button>
-                  <button
-                    v-else
-                    :disabled="groupManageSubmitting || !canDemoteParticipant(Number(participant.id ?? 0))"
-                    class="rounded-xl border border-rose-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/40 dark:bg-slate-800 dark:text-rose-400"
-                    @click="demoteParticipantAdmin(Number(participant.id ?? 0))"
-                  >
-                    Remove admin
-                  </button>
-                  <button
-                    :disabled="groupManageSubmitting || !canManageCurrentGroup || Number(participant.id ?? 0) <= 0"
-                    class="rounded-xl border border-rose-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/40 dark:bg-slate-800 dark:text-rose-400"
-                    @click="removeParticipantFromGroup(Number(participant.id ?? 0))"
-                  >
-                    Remove user
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <select
-              v-model="groupAddUserId"
-              class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            >
-              <option :value="null">Select user</option>
-              <option v-for="candidate in groupAddCandidates" :key="candidate.id" :value="candidate.id">
-                {{ candidate.name }} ({{ candidate.email }})
-              </option>
-            </select>
-            <div class="flex justify-end gap-2">
-              <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Close</button>
-              <button
-                :disabled="groupManageSubmitting || !groupAddUserId"
-                class="rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:opacity-50"
-                @click="addUserToGroup"
-              >
-                Add user
-              </button>
-            </div>
-          </div>
-
-          <div v-else class="space-y-3">
-            <p class="text-sm text-slate-700 dark:text-slate-200">This will permanently delete this group chat for all participants.</p>
-            <div class="flex justify-end gap-2">
-              <button class="rounded-2xl border border-[#ebeaf2] bg-white px-4 py-2 text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200" @click="closeGroupManageModal">Cancel</button>
-              <button
-                :disabled="groupManageSubmitting"
-                class="rounded-full bg-rose-600 px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(225,29,72,0.25)] transition hover:brightness-105 disabled:opacity-50"
-                @click="deleteCurrentGroup"
-              >
-                Delete group
-              </button>
-            </div>
-          </div>
-
-          <p v-if="groupManageError" class="mt-3 text-xs font-medium text-rose-600 dark:text-rose-400">{{ groupManageError }}</p>
-        </div>
-      </div>
+      <GroupManageModal
+        :visible="showGroupManageModal"
+        :mode="groupManageMode"
+        :title="groupModalTitle"
+        :subtitle="groupModalSubtitle"
+        :submitting="groupManageSubmitting"
+        :error-message="groupManageError"
+        :edit-name="groupEditName"
+        :avatar-preview="groupAvatarPreview"
+        :has-avatar-file="Boolean(groupAvatarFile)"
+        :participants="currentConversation?.participants ?? []"
+        :can-manage-current-group="canManageCurrentGroup"
+        :can-demote-participant="canDemoteParticipant"
+        :add-candidates="groupAddCandidates"
+        :add-user-id="groupAddUserId"
+        @close="closeGroupManageModal"
+        @update:edit-name="groupEditName = String($event ?? '')"
+        @save-name="saveGroupName"
+        @avatar-selected="onGroupAvatarSelected"
+        @remove-avatar="removeGroupAvatar"
+        @save-avatar="saveGroupAvatar"
+        @promote-admin="promoteParticipantAdmin"
+        @demote-admin="demoteParticipantAdmin"
+        @remove-user="removeParticipantFromGroup"
+        @update:add-user-id="groupAddUserId = Number($event ?? 0) > 0 ? Number($event) : null"
+        @add-user="addUserToGroup"
+        @delete-group="deleteCurrentGroup"
+      />
     </div>
   </AppLayout>
 </template>
@@ -269,7 +150,12 @@ import MessageService, {
 import ApplicationService from '@/services/applications/ApplicationService'
 import ProjectService from '@/services/projects/ProjectService'
 import {
+  applyLocalConversationMessagePreview,
+  applyRealtimeConversationMessagePreview,
+  applyRealtimeConversationReadPreview,
+  buildGroupAddCandidates,
   buildParticipantNames,
+  canDemoteGroupParticipant,
   extractAcceptedApplicationProjects,
   extractErrorMessage,
   normalizeProjectOptions,
@@ -286,6 +172,7 @@ import ConversationList from '@/components/messages/ConversationList.vue'
 import NewConversationForm from '@/components/messages/NewConversationForm.vue'
 import ConversationHeader from '@/components/messages/ConversationHeader.vue'
 import ChatComponent from '@/components/messages/ChatComponent.vue'
+import GroupManageModal from '@/components/messages/GroupManageModal.vue'
 
 interface MessageConversation {
   id: number
@@ -317,6 +204,7 @@ export default defineComponent({
     NewConversationForm,
     ConversationHeader,
     ChatComponent,
+    GroupManageModal,
   },
   setup() {
     return {
@@ -502,9 +390,6 @@ export default defineComponent({
         ),
       )
     },
-    currentConversationAdminCount(): number {
-      return (this.currentConversation?.participants ?? []).filter((participant) => Boolean(participant.is_admin)).length
-    },
     groupModalTitle(): string {
       if (this.groupManageMode === 'rename') return 'Rename Group'
       if (this.groupManageMode === 'avatar') return 'Group Photo'
@@ -661,14 +546,7 @@ export default defineComponent({
 
       try {
         const response = await MessageService.searchConversationUsers('', 100, projectParam)
-        const existingIds = new Set(
-          (conversation.participants ?? [])
-            .map((participant) => Number(participant.id ?? 0))
-            .filter((id) => Number.isFinite(id) && id > 0),
-        )
-
-        this.groupAddCandidates = normalizeRecipientOptions(response?.data)
-          .filter((item: RecipientOption) => item.id > 0 && !existingIds.has(item.id))
+        this.groupAddCandidates = buildGroupAddCandidates(response?.data, conversation.participants ?? [])
       } catch {
         this.groupAddCandidates = []
       }
@@ -695,19 +573,7 @@ export default defineComponent({
       }
     },
     canDemoteParticipant(participantUserId: number): boolean {
-      if (!Number.isFinite(participantUserId) || participantUserId <= 0) {
-        return false
-      }
-
-      const participant = (this.currentConversation?.participants ?? []).find(
-        (candidate) => Number(candidate.id ?? 0) === participantUserId,
-      )
-
-      if (!participant?.is_admin) {
-        return false
-      }
-
-      return this.currentConversationAdminCount > 1
+      return canDemoteGroupParticipant(this.currentConversation?.participants ?? [], participantUserId)
     },
     async promoteParticipantAdmin(participantUserId: number) {
       const conversationId = this.currentConversationId()
@@ -778,30 +644,6 @@ export default defineComponent({
       } finally {
         this.groupManageSubmitting = false
       }
-    },
-    groupParticipantsSummary(conversation: MessageConversation | null): string {
-      const participantIds = Array.from(
-        new Set(
-          (conversation?.participants ?? [])
-            .map((participant) => Number(participant.id ?? 0))
-            .filter((id) => Number.isFinite(id) && id > 0),
-        ),
-      )
-
-      if (!participantIds.length) {
-        return ''
-      }
-
-      const currentUserId = Number(this.auth.user?.id ?? 0)
-      const hasCurrentUser = currentUserId > 0 && participantIds.includes(currentUserId)
-
-      if (hasCurrentUser) {
-        const otherUsersCount = participantIds.filter((id) => id !== currentUserId).length
-
-        return otherUsersCount > 0 ? `You +${otherUsersCount}` : 'You'
-      }
-
-      return this.participantNames.trim()
     },
     onRecipientQueryChange(value: string) {
       this.newParticipantQuery = value
@@ -1038,99 +880,29 @@ export default defineComponent({
       this.subscribedConversationIds = []
     },
     onRealtimeMessage(payload: RealtimeMessagePayload) {
-      const conversationId = Number(payload?.conversation_id ?? 0)
-      const incomingMessage = payload?.message
-      if (!conversationId || !incomingMessage) return
-
-      const incomingMessageId = Number(incomingMessage.id ?? 0)
-      if (!Number.isFinite(incomingMessageId) || incomingMessageId <= 0) return
-
-      const normalizedMessage: NonNullable<MessageConversation['last_message']> = {
-        id: incomingMessageId,
-        body: String(incomingMessage.body ?? ''),
-        created_at: String(incomingMessage.created_at ?? ''),
-        read_at: incomingMessage.read_at ?? null,
-        sender: {
-          id: Number(incomingMessage.sender?.id ?? 0) || undefined,
-          name: String(incomingMessage.sender?.name ?? ''),
-          email: String(incomingMessage.sender?.email ?? ''),
-        },
-      }
-
       const conversations = this.messageStore.conversations as MessageConversation[]
-      const index = conversations.findIndex(
-        (conversation) => Number(conversation.id) === conversationId,
+
+      applyRealtimeConversationMessagePreview(
+        conversations,
+        payload,
+        Number(this.auth.user?.id ?? 0),
+        Number(this.currentConversation?.id ?? 0),
       )
-      if (index === -1) return
-
-      const conversation = conversations[index]
-      if (!conversation) return
-
-      conversation.last_message = normalizedMessage
-
-      const senderId = Number(normalizedMessage.sender?.id ?? 0)
-      const isCurrentUserSender = senderId === Number(this.auth.user?.id ?? 0)
-      const isOpenConversation = Number(this.currentConversation?.id ?? 0) === conversationId
-
-      if (!isCurrentUserSender && !isOpenConversation) {
-        conversation.unread_count = Number(conversation.unread_count ?? 0) + 1
-      } else {
-        conversation.unread_count = 0
-      }
-
-      if (index > 0) {
-        const moved = conversations.splice(index, 1)[0]
-        if (moved) {
-          conversations.unshift(moved)
-        }
-      }
     },
     onRealtimeRead(payload: RealtimeReadPayload) {
-      const conversationId = Number(payload?.conversation_id ?? 0)
-      const readerUserId = Number(payload?.reader_user_id ?? 0)
-      const lastReadMessageId = Number(payload?.last_read_message_id ?? 0)
-      const readAt = String(payload?.read_at ?? '')
-
-      if (!conversationId || !readerUserId || !lastReadMessageId || !readAt) return
-      if (readerUserId === Number(this.auth.user?.id ?? 0)) return
-
       const conversations = this.messageStore.conversations as MessageConversation[]
-      const conversation = conversations.find((item) => Number(item.id) === conversationId)
-      if (!conversation?.last_message) return
 
-      const lastMessageId = Number(conversation.last_message.id ?? 0)
-      const lastMessageSenderId = Number(conversation.last_message.sender?.id ?? 0)
-      const isCurrentUserSender = lastMessageSenderId === Number(this.auth.user?.id ?? 0)
-
-      if (!isCurrentUserSender || !lastMessageId || lastMessageId > lastReadMessageId) {
-        return
-      }
-
-      conversation.last_message.read_at = readAt
+      applyRealtimeConversationReadPreview(
+        conversations,
+        payload,
+        Number(this.auth.user?.id ?? 0),
+      )
     },
     onLocalMessageSent(message: MessageConversation['last_message']) {
       const conversationId = Number(this.currentConversation?.id ?? 0)
-      if (!conversationId || !message) return
-
       const conversations = this.messageStore.conversations as MessageConversation[]
-      const index = conversations.findIndex((item) => Number(item.id) === conversationId)
-      if (index === -1) return
 
-      const conversation = conversations[index]
-      if (!conversation) return
-
-      conversation.last_message = {
-        ...message,
-        read_at: message.read_at ?? null,
-      }
-      conversation.unread_count = 0
-
-      if (index > 0) {
-        const moved = conversations.splice(index, 1)[0]
-        if (moved) {
-          conversations.unshift(moved)
-        }
-      }
+      applyLocalConversationMessagePreview(conversations, conversationId, message)
     },
     async openConversation(id: number) {
       await this.messageStore.openConversation(id)

@@ -4,46 +4,15 @@
       <div
         class="grid h-full min-h-0 items-stretch gap-2 xl:grid-cols-[260px_minmax(0,1fr)]"
       >
-        <aside
-          class="flex h-full flex-col overflow-hidden rounded-3xl border border-[#ddd7ea] bg-[#efedf5] shadow-[0_10px_24px_rgba(77,55,197,0.08)] backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/95 dark:shadow-[0_10px_24px_rgba(2,6,23,0.45)]"
-        >
-          <div class="border-b border-[#dfd9ee] px-4 py-3 dark:border-slate-700/70">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#77718f] dark:text-slate-400">Task board</p>
-            <h2 class="mt-1 text-sm font-semibold text-[#343047] dark:text-slate-100">
-              {{ auth.isStudent ? 'My accepted projects' : 'Company projects' }}
-            </h2>
-          </div>
-          <div class="flex-1 space-y-1 overflow-auto p-2">
-            <button
-              v-for="project in companyProjects"
-              :key="project.id"
-              type="button"
-              :class="[
-                'flex w-full items-center justify-between rounded-2xl border px-3 py-2.5 text-left transition',
-                selectedProjectId === project.id
-                  ? 'border-[#5a42e5] bg-white text-[#2f2952] shadow-[0_8px_18px_rgba(77,55,197,0.18)] dark:border-indigo-400 dark:bg-slate-800 dark:text-slate-100'
-                  : 'border-[#ddd7ea] bg-white/90 text-[#3f3a56] hover:border-[#cfc7e4] hover:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-500',
-              ]"
-              @click="selectProject(project.id)"
-            >
-              <span class="truncate text-xs font-semibold">{{ project.title }}</span>
-              <span
-                :class="[
-                  'ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-semibold',
-                  selectedProjectId === project.id
-                    ? 'bg-[#ede8ff] text-[#4526c9] dark:bg-indigo-500/20 dark:text-indigo-300'
-                    : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
-                ]"
-              >
-                {{
-                  selectedProjectId === project.id
-                    ? statusCount('todo') + statusCount('in_progress') + statusCount('complete')
-                    : '.'
-                }}
-              </span>
-            </button>
-          </div>
-        </aside>
+        <TaskBoardProjectSidebar
+          :is-student="auth.isStudent"
+          :projects="companyProjects"
+          :selected-project-id="selectedProjectId"
+          :selected-project-task-count="
+            statusCount('todo') + statusCount('in_progress') + statusCount('complete')
+          "
+          @select-project="selectProject"
+        />
 
         <div class="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
           <BaseAlert
@@ -975,166 +944,41 @@
         </div>
       </div>
 
-      <div
-        v-if="canManageTasks && openCreateFolder"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
-      >
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create folder</h3>
-          <select
-            v-model="createFolderStatus"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-          >
-            <option value="todo">TO DO</option>
-            <option value="in_progress">IN PROGRESS</option>
-            <option value="complete">COMPLETED</option>
-          </select>
-          <input
-            v-model="newFolderName"
-            type="text"
-            maxlength="120"
-            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-            placeholder="Folder name"
-          />
-          <div class="mt-4 flex justify-end gap-2">
-            <BaseButton variant="secondary" class="rounded-xl!" @click="openCreateFolder = false">
-              Cancel
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              class="rounded-xl!"
-              :loading="submitting"
-              @click="createFolder"
-            >
-              Create
-            </BaseButton>
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="canManageTasks && openCreateCategory"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
-      >
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create subfolder</h3>
-
-          <select
-            v-model="createCategoryStatus"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-          >
-            <option value="todo">TO DO</option>
-            <option value="in_progress">IN PROGRESS</option>
-            <option value="complete">COMPLETED</option>
-          </select>
-
-          <select
-            v-if="!createCategoryFolderLocked"
-            v-model="selectedFolderId"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-          >
-            <option :value="null">Select folder</option>
-            <option
-              v-for="folder in availableFoldersForCreateCategory"
-              :key="folder.id"
-              :value="folder.id"
-            >
-              {{ folder.name }}
-            </option>
-          </select>
-
-          <div
-            v-else
-            class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-          >
-            {{ folderOptions.find((folder) => folder.id === selectedFolderId)?.name || 'Selected folder' }}
-          </div>
-
-          <input
-            v-model="newCategoryName"
-            type="text"
-            maxlength="120"
-            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-            placeholder="Category name"
-          />
-
-          <div class="mt-4 flex justify-end gap-2">
-            <BaseButton variant="secondary" class="rounded-xl!" @click="closeCreateCategoryModal">
-              Cancel
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              class="rounded-xl!"
-              :loading="submitting"
-              @click="createCategory"
-            >
-              Create
-            </BaseButton>
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="canManageTasks && openCreateTask"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
-      >
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-          <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create task</h3>
-
-          <select
-            v-model="createTaskStatus"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-          >
-            <option value="todo">TO DO</option>
-            <option value="in_progress">IN PROGRESS</option>
-            <option value="complete">COMPLETED</option>
-          </select>
-
-          <select
-            v-model="selectedTaskApplicationId"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-          >
-            <option v-if="acceptedApplications.length === 0" :value="null" disabled>
-              No confirmed students on this project
-            </option>
-            <option v-for="app in acceptedApplications" :key="app.id" :value="app.id">
-              {{ app.student_name }}
-            </option>
-          </select>
-
-          <input
-            v-model="newTaskTitle"
-            type="text"
-            maxlength="160"
-            class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-            placeholder="Task title"
-          />
-
-          <select
-            v-model="newTaskPriority"
-            class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-
-          <div class="mt-4 flex justify-end gap-2">
-            <BaseButton variant="secondary" class="rounded-xl!" @click="openCreateTask = false">
-              Cancel
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              class="rounded-xl!"
-              :loading="submitting"
-              @click="createTask"
-            >
-              Create
-            </BaseButton>
-          </div>
-        </div>
-      </div>
+      <TaskBoardCreateModals
+        :can-manage-tasks="canManageTasks"
+        :submitting="submitting"
+        :open-create-folder="openCreateFolder"
+        :open-create-category="openCreateCategory"
+        :open-create-task="openCreateTask"
+        :create-folder-status="createFolderStatus"
+        :create-category-status="createCategoryStatus"
+        :create-task-status="createTaskStatus"
+        :create-category-folder-locked="createCategoryFolderLocked"
+        :selected-folder-id="selectedFolderId"
+        :selected-task-application-id="selectedTaskApplicationId"
+        :new-folder-name="newFolderName"
+        :new-category-name="newCategoryName"
+        :new-task-title="newTaskTitle"
+        :new-task-priority="newTaskPriority"
+        :folder-options="folderOptions"
+        :available-folders-for-create-category="availableFoldersForCreateCategory"
+        :accepted-applications="acceptedApplications"
+        @update:openCreateFolder="openCreateFolder = $event"
+        @update:openCreateTask="openCreateTask = $event"
+        @update:createFolderStatus="createFolderStatus = $event"
+        @update:createCategoryStatus="createCategoryStatus = $event"
+        @update:createTaskStatus="createTaskStatus = $event"
+        @update:selectedFolderId="selectedFolderId = $event"
+        @update:selectedTaskApplicationId="selectedTaskApplicationId = $event"
+        @update:newFolderName="newFolderName = $event"
+        @update:newCategoryName="newCategoryName = $event"
+        @update:newTaskTitle="newTaskTitle = $event"
+        @update:newTaskPriority="newTaskPriority = $event"
+        @close-create-category="closeCreateCategoryModal"
+        @create-folder="createFolder"
+        @create-category="createCategory"
+        @create-task="createTask"
+      />
     </div>
   </AppLayout>
 </template>
@@ -1151,13 +995,13 @@ import {
   FolderPlus,
   Pencil,
   Plus,
-  SlidersHorizontal,
   Trash2,
   X,
 } from 'lucide-vue-next'
 import AppLayout from '@/layouts/AppLayout.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import TaskBoardProjectSidebar from '@/components/applications/TaskBoardProjectSidebar.vue'
+import TaskBoardCreateModals from '@/components/applications/TaskBoardCreateModals.vue'
 import { useProjectStore } from '@/stores/project'
 import { useAuthStore } from '@/stores/auth'
 import ApplicationService, {
@@ -1165,7 +1009,7 @@ import ApplicationService, {
   type ProjectTaskBoardFolder,
   type ProjectTaskBoardTask,
 } from '@/services/applications/ApplicationService'
-import { taskPriorityLabel, taskStatusLabel } from '@/services/applications/TaskBoardLabelService'
+import { useTaskBoardLabels } from '@/composables/applications/useTaskBoardLabels'
 
 type SectionMap = Record<ApplicationTaskStatus, ProjectTaskBoardFolder[]>
 
@@ -1230,17 +1074,19 @@ interface InlineTaskDraft {
   priority: 'low' | 'medium' | 'high' | 'urgent'
 }
 
+const taskBoardLabels = useTaskBoardLabels()
+
 export default defineComponent({
   name: 'CompanyTaskBoardView',
   components: {
     AppLayout,
     BaseAlert,
-    BaseButton,
+    TaskBoardProjectSidebar,
+    TaskBoardCreateModals,
     Check,
     Pencil,
     FolderPlus,
     Plus,
-    SlidersHorizontal,
     Trash2,
     Folder,
     FolderOpen,
@@ -1559,41 +1405,22 @@ export default defineComponent({
       return this.sections[status].reduce((sum, folder) => sum + this.folderTaskCount(folder), 0)
     },
     statusLabel(status: ApplicationTaskStatus): string {
-      return taskStatusLabel(status)
+      return taskBoardLabels.statusLabel(status)
     },
-    statusIcon(status: ApplicationTaskStatus) {
-      if (status === 'todo') return 'Folder'
-      if (status === 'in_progress') return 'Pencil'
-      return 'CheckCircle2'
+    statusIcon(status: ApplicationTaskStatus): 'Folder' | 'Pencil' | 'CheckCircle2' {
+      return taskBoardLabels.statusIcon(status)
     },
     statusIconClass(status: ApplicationTaskStatus): string {
-      if (status === 'todo') return 'h-4 w-4 text-[#4e3aba]'
-      if (status === 'in_progress') return 'h-4 w-4 text-amber-600 dark:text-amber-400'
-      return 'h-4 w-4 text-emerald-600 dark:text-emerald-400'
+      return taskBoardLabels.statusIconClass(status)
     },
     priorityLabel(priority: string): string {
-      return taskPriorityLabel(priority)
+      return taskBoardLabels.priorityLabel(priority)
     },
     priorityPillClass(priority: string): string {
-      if (priority === 'urgent') {
-        return 'inline-flex items-center rounded-full bg-rose-100 px-2 py-1 text-[11px] font-semibold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300'
-      }
-      if (priority === 'high') {
-        return 'inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-[11px] font-semibold text-orange-700 dark:bg-orange-950/40 dark:text-orange-300'
-      }
-      if (priority === 'medium') {
-        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
-      }
-      return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+      return taskBoardLabels.priorityPillClass(priority)
     },
     statusPillClass(status: ApplicationTaskStatus): string {
-      if (status === 'todo') {
-        return 'inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-300'
-      }
-      if (status === 'in_progress') {
-        return 'inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
-      }
-      return 'inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+      return taskBoardLabels.statusPillClass(status)
     },
     onFolderDragStart(status: ApplicationTaskStatus, folderId: number, event: DragEvent) {
       this.closeActionMenu()
