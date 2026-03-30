@@ -1,102 +1,119 @@
 <template>
-  <AuthLayout>
-    <h2 class="mb-2 text-center text-2xl font-bold text-slate-900 dark:text-slate-100">Verify your email</h2>
-    <p class="mb-6 text-center text-sm text-slate-500 dark:text-slate-400">
-      We sent a 6-digit code to <strong>{{ email }}</strong
-      >. Enter it below to unlock your workspace.
-    </p>
+  <AuthPageFrame prompt-text="Don't have an account?" link-text="Sign up" link-to="/register">
+    <template #top-nav>
+      <LandingTopBar />
+    </template>
 
-    <BaseAlert
-      v-if="successMessage"
-      type="success"
-      class="mb-4"
-      :message="successMessage"
-      :dismissible="false"
-    />
+    <template #left>
+      <AuthPromoPanel
+        title-line1="Continue your"
+        title-line2="curated"
+        title-line3="professional"
+        description="Pick up where you left off. Access opportunities, projects and conversations in one focused student workspace."
+        footer-lead="Trusted by"
+        footer-highlight="2,400+"
+        footer-tail="active users"
+      />
+    </template>
 
-    <BaseAlert
-      v-if="errorMessage"
-      type="error"
-      class="mb-4"
-      :message="errorMessage"
-      dismissible
-      @dismiss="errorMessage = ''"
-    />
-
-    <BaseAlert
-      v-if="turnstileError"
-      type="error"
-      class="mb-4"
-      :message="turnstileError"
-      dismissible
-      @dismiss="turnstileError = ''"
-    />
-
-    <form v-if="!verificationCompleted" @submit.prevent="handleVerify" novalidate>
-      <div>
-        <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
-          Verification code
+    <template #right>
+      <section class="rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] dark:border-slate-800 dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.5)] sm:rounded-4xl sm:p-10 lg:p-16">
+        <h2 class="text-3xl font-semibold text-[#1d1f31] dark:text-slate-100 sm:text-4xl">Verify your email</h2>
+        <p class="mt-2 text-sm font-medium text-[#7d8195] dark:text-slate-400">
+          We sent a 6-digit code to <strong>{{ email }}</strong
+          >. Enter it below to unlock your workspace.
         </p>
-        <div class="grid grid-cols-6 gap-2 sm:gap-3">
-          <input
-            v-for="(_, index) in codeDigits"
-            :key="`code-digit-${index}`"
-            ref="otpInputs"
-            :value="codeDigits[index]"
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            maxlength="1"
-            :autocomplete="index === 0 ? 'one-time-code' : 'off'"
-            class="h-12 w-full rounded-xl border border-amber-100 bg-white text-center text-lg font-semibold text-slate-900 shadow-sm transition focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 dark:border-amber-800/60 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-amber-500 dark:focus:ring-amber-500/40"
-            :aria-label="`Verification code digit ${index + 1}`"
-            @input="handleDigitInput(index, ($event.target as HTMLInputElement).value)"
-            @keydown="handleDigitKeydown(index, $event)"
-            @focus="handleDigitFocus(index)"
-            @paste="handleDigitPaste($event)"
-          />
+
+        <BaseAlert
+          v-if="successMessage"
+          type="success"
+          class="mt-5"
+          :message="successMessage"
+          :dismissible="false"
+        />
+
+        <BaseAlert
+          v-if="errorMessage"
+          type="error"
+          class="mt-4"
+          :message="errorMessage"
+          dismissible
+          @dismiss="errorMessage = ''"
+        />
+
+        <BaseAlert
+          v-if="turnstileError"
+          type="error"
+          class="mt-4"
+          :message="turnstileError"
+          dismissible
+          @dismiss="turnstileError = ''"
+        />
+
+        <form v-if="!verificationCompleted" @submit.prevent="handleVerify" novalidate class="mt-5 sm:mt-6">
+          <div>
+            <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.08em] text-[#2f334f] dark:text-slate-300">
+              Verification code
+            </p>
+            <div class="grid grid-cols-6 gap-2 sm:gap-3">
+              <input
+                v-for="(_, index) in codeDigits"
+                :key="`code-digit-${index}`"
+                ref="otpInputs"
+                :value="codeDigits[index]"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="1"
+                :autocomplete="index === 0 ? 'one-time-code' : 'off'"
+                class="h-12 w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] text-center text-lg font-semibold text-[#23253a] transition focus:border-[#8e84db] focus:outline-none focus:ring-2 focus:ring-[#c9c3ef] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/30"
+                :aria-label="`Verification code digit ${index + 1}`"
+                @input="handleDigitInput(index, ($event.target as HTMLInputElement).value)"
+                @keydown="handleDigitKeydown(index, $event)"
+                @focus="handleDigitFocus(index)"
+                @paste="handleDigitPaste($event)"
+              />
+            </div>
+            <p v-if="codeError" class="mt-2 text-xs text-red-600">{{ codeError }}</p>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="loading"
+            class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-6 py-3 text-base font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <svg v-if="loading" class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25" />
+              <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="3" class="opacity-90" />
+            </svg>
+            Verify email
+          </button>
+        </form>
+
+        <div v-if="!verificationCompleted" class="mt-4 text-center">
+          <div class="mb-3 text-left">
+            <TurnstileWidget ref="turnstileWidget" v-model="turnstileToken" class="pt-2" />
+          </div>
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#4b35cb] transition hover:text-[#3d28b2] disabled:cursor-not-allowed disabled:opacity-60 dark:text-indigo-300 dark:hover:text-indigo-200"
+            :disabled="resendLoading"
+            @click="handleResend"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+              <path d="M21 3v6h-6" />
+            </svg>
+            <span>{{ resendLoading ? 'Sending...' : 'Resend code' }}</span>
+          </button>
         </div>
-        <p v-if="codeError" class="mt-2 text-xs text-red-600 dark:text-red-400">{{ codeError }}</p>
-      </div>
 
-      <BaseButton
-        type="submit"
-        variant="primary"
-        size="lg"
-        :loading="loading"
-        class="mt-6 w-full rounded-xl! bg-amber-300! font-semibold! text-amber-900! hover:bg-amber-400! focus:ring-amber-300! dark:bg-amber-400! dark:text-amber-950! dark:hover:bg-amber-300!"
-      >
-        Verify email
-      </BaseButton>
-    </form>
-
-    <div v-if="!verificationCompleted" class="mt-4 text-center">
-      <div class="mb-3 text-left">
-        <TurnstileWidget ref="turnstileWidget" v-model="turnstileToken" />
-      </div>
-      <button
-        type="button"
-        class="mx-auto inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600 transition hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-60 dark:text-amber-300 dark:hover:text-amber-200"
-        :disabled="resendLoading"
-        @click="handleResend"
-      >
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-          <path d="M21 3v6h-6" />
-        </svg>
-        <span>{{ resendLoading ? 'Sending...' : 'Resend code' }}</span>
-      </button>
-    </div>
-
-    <p class="mt-6 text-center text-sm text-gray-600 dark:text-slate-300">
-      <RouterLink
-        to="/login"
-        class="font-medium text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200"
-      >
-        Back to sign in
-      </RouterLink>
-    </p>
-  </AuthLayout>
+        <p class="mt-5 text-center text-sm text-[#686d84] dark:text-slate-400 sm:mt-6">
+          <RouterLink to="/login" class="font-semibold text-[#4b35cb] hover:text-[#3d28b2] dark:text-indigo-300 dark:hover:text-indigo-200">Back to sign in</RouterLink>
+        </p>
+      </section>
+    </template>
+  </AuthPageFrame>
 </template>
 
 <script lang="ts">
@@ -107,10 +124,11 @@ import {
   resolveErrorMessage,
   resolveSingleFieldError,
 } from '@/services/auth/AuthViewService'
-import AuthLayout from '@/layouts/AuthLayout.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
 import TurnstileWidget from '@/components/ui/TurnstileWidget.vue'
+import AuthPageFrame from '@/components/auth/AuthPageFrame.vue'
+import AuthPromoPanel from '@/components/auth/AuthPromoPanel.vue'
+import LandingTopBar from '@/components/landing/LandingTopBar.vue'
 
 interface ResettableWidgetRef {
   reset?: () => void
@@ -118,7 +136,7 @@ interface ResettableWidgetRef {
 
 export default defineComponent({
   name: 'VerifyEmailCodeView',
-  components: { AuthLayout, BaseButton, BaseAlert, TurnstileWidget },
+  components: { BaseAlert, TurnstileWidget, AuthPageFrame, AuthPromoPanel, LandingTopBar },
   data() {
     return {
       email: (this.$route.query.email as string) ?? '',
