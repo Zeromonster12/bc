@@ -176,6 +176,59 @@ class ProjectTaskBoardTest extends TestCase
         ]);
     }
 
+    public function test_accepted_student_can_move_folder_under_another_folder(): void
+    {
+        $company = User::factory()->create(['role' => 'company']);
+        $student = User::factory()->create(['role' => 'student']);
+
+        $project = Project::query()->create([
+            'company_user_id' => $company->id,
+            'title' => 'Board project',
+            'description' => 'Description',
+            'status' => 'open',
+            'max_students' => 1,
+        ]);
+
+        Application::query()->create([
+            'project_id' => $project->id,
+            'student_user_id' => $student->id,
+            'cover_letter' => str_repeat('X', 80),
+            'status' => 'accepted',
+        ]);
+
+        $parentFolder = ApplicationTaskFolder::query()->create([
+            'project_id' => $project->id,
+            'created_by_user_id' => $company->id,
+            'name' => 'Parent',
+            'position' => 1,
+            'status' => 'todo',
+        ]);
+
+        $childFolder = ApplicationTaskFolder::query()->create([
+            'project_id' => $project->id,
+            'created_by_user_id' => $company->id,
+            'name' => 'Child',
+            'position' => 2,
+            'status' => 'todo',
+        ]);
+
+        Sanctum::actingAs($student);
+
+        $response = $this->patchJson('/api/projects/' . $project->id . '/task-folders/' . $childFolder->id, [
+            'parent_folder_id' => $parentFolder->id,
+            'position' => 1,
+            'status' => 'todo',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('data.parent_folder_id', $parentFolder->id);
+
+        $this->assertDatabaseHas('application_task_folders', [
+            'id' => $childFolder->id,
+            'parent_folder_id' => $parentFolder->id,
+        ]);
+    }
+
     public function test_company_can_move_task_to_folder_without_category(): void
     {
         $company = User::factory()->create(['role' => 'company']);

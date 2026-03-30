@@ -167,33 +167,49 @@ class ProjectTaskBoardController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        if (! $this->canManageProjectTasks($project, $user->id, $user->role)) {
-            return response()->json(['message' => 'You are not allowed to manage folders for this project.'], 403);
+        $canManageFolders = $this->canManageProjectTasks($project, $user->id, $user->role);
+        $canMoveFolders = $this->canViewProjectTasks($project, $user->id, $user->role);
+
+        if (! $canManageFolders && ! $canMoveFolders) {
+            return response()->json(['message' => 'You are not allowed to move folders for this project.'], 403);
         }
 
         if ((int) $folder->project_id !== (int) $project->id) {
             return response()->json(['message' => 'Folder does not belong to this project.'], 404);
         }
 
-        $validated = $request->validate([
-            'name' => [
-                'sometimes',
-                'string',
-                'max:120',
-                Rule::unique('application_task_folders', 'name')
-                    ->where(fn($query) => $query->where('project_id', $project->id))
-                    ->ignore($folder->id),
-            ],
-            'color' => ['nullable', 'string', 'max:20'],
-            'position' => ['nullable', 'integer', 'min:0'],
-            'parent_folder_id' => [
-                'nullable',
-                'integer',
-                (new Exists('application_task_folders', 'id'))
-                    ->where(fn($query) => $query->where('project_id', $project->id)),
-            ],
-            'status' => ['sometimes', 'nullable', Rule::in(self::BOARD_STATUSES)],
-        ]);
+        $validated = $request->validate(
+            $canManageFolders
+                ? [
+                    'name' => [
+                        'sometimes',
+                        'string',
+                        'max:120',
+                        Rule::unique('application_task_folders', 'name')
+                            ->where(fn($query) => $query->where('project_id', $project->id))
+                            ->ignore($folder->id),
+                    ],
+                    'color' => ['nullable', 'string', 'max:20'],
+                    'position' => ['nullable', 'integer', 'min:0'],
+                    'parent_folder_id' => [
+                        'nullable',
+                        'integer',
+                        (new Exists('application_task_folders', 'id'))
+                            ->where(fn($query) => $query->where('project_id', $project->id)),
+                    ],
+                    'status' => ['sometimes', 'nullable', Rule::in(self::BOARD_STATUSES)],
+                ]
+                : [
+                    'position' => ['nullable', 'integer', 'min:0'],
+                    'parent_folder_id' => [
+                        'nullable',
+                        'integer',
+                        (new Exists('application_task_folders', 'id'))
+                            ->where(fn($query) => $query->where('project_id', $project->id)),
+                    ],
+                    'status' => ['sometimes', 'nullable', Rule::in(self::BOARD_STATUSES)],
+                ]
+        );
 
         if (
             array_key_exists('parent_folder_id', $validated)

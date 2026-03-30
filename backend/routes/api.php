@@ -62,6 +62,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('/projects/{project}/task-board', [ProjectTaskBoardController::class, 'show']);
     Route::get('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'listFolders']);
+    Route::patch('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'updateFolder']);
 
     Route::get('/users/{user}/avatar', [StudentProfileController::class, 'userAvatar'])
         ->middleware('throttle:60,1')
@@ -116,7 +117,6 @@ Route::middleware(['auth:sanctum', 'role:company,admin'])->group(function (): vo
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
 
     Route::post('/projects/{project}/task-folders', [ProjectTaskBoardController::class, 'storeFolder']);
-    Route::patch('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'updateFolder']);
     Route::delete('/projects/{project}/task-folders/{folder}', [ProjectTaskBoardController::class, 'destroyFolder']);
     Route::post('/projects/{project}/task-folders/{folder}/categories', [ProjectTaskBoardController::class, 'storeCategory']);
     Route::patch('/projects/{project}/task-folders/{folder}/categories/{category}', [ProjectTaskBoardController::class, 'updateCategory']);
