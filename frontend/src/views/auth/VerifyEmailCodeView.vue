@@ -1,9 +1,9 @@
 <template>
   <AuthLayout>
-    <h2 class="mb-2 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">Verify your email</h2>
-    <p class="mb-6 text-center text-sm text-gray-500 dark:text-slate-400">
-      Enter the 6-digit code sent to <strong>{{ email }}</strong
-      >.
+    <h2 class="mb-2 text-center text-2xl font-bold text-slate-900 dark:text-slate-100">Verify your email</h2>
+    <p class="mb-6 text-center text-sm text-slate-500 dark:text-slate-400">
+      We sent a 6-digit code to <strong>{{ email }}</strong
+      >. Enter it below to unlock your workspace.
     </p>
 
     <BaseAlert
@@ -33,17 +33,39 @@
     />
 
     <form v-if="!verificationCompleted" @submit.prevent="handleVerify" novalidate>
-      <BaseInput
-        v-model="code"
-        label="Verification code"
-        type="text"
-        autocomplete="one-time-code"
-        :error="codeError"
-        placeholder="123456"
-        required
-      />
+      <div>
+        <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+          Verification code
+        </p>
+        <div class="grid grid-cols-6 gap-2 sm:gap-3">
+          <input
+            v-for="(_, index) in codeDigits"
+            :key="`code-digit-${index}`"
+            ref="otpInputs"
+            :value="codeDigits[index]"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="1"
+            :autocomplete="index === 0 ? 'one-time-code' : 'off'"
+            class="h-12 w-full rounded-xl border border-amber-100 bg-white text-center text-lg font-semibold text-slate-900 shadow-sm transition focus:border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-200 dark:border-amber-800/60 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-amber-500 dark:focus:ring-amber-500/40"
+            :aria-label="`Verification code digit ${index + 1}`"
+            @input="handleDigitInput(index, ($event.target as HTMLInputElement).value)"
+            @keydown="handleDigitKeydown(index, $event)"
+            @focus="handleDigitFocus(index)"
+            @paste="handleDigitPaste($event)"
+          />
+        </div>
+        <p v-if="codeError" class="mt-2 text-xs text-red-600 dark:text-red-400">{{ codeError }}</p>
+      </div>
 
-      <BaseButton type="submit" variant="primary" size="lg" :loading="loading" class="w-full mt-6">
+      <BaseButton
+        type="submit"
+        variant="primary"
+        size="lg"
+        :loading="loading"
+        class="mt-6 w-full rounded-xl! bg-amber-300! font-semibold! text-amber-900! hover:bg-amber-400! focus:ring-amber-300! dark:bg-amber-400! dark:text-amber-950! dark:hover:bg-amber-300!"
+      >
         Verify email
       </BaseButton>
     </form>
@@ -54,18 +76,22 @@
       </div>
       <button
         type="button"
-        class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+        class="mx-auto inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600 transition hover:text-amber-700 disabled:cursor-not-allowed disabled:opacity-60 dark:text-amber-300 dark:hover:text-amber-200"
         :disabled="resendLoading"
         @click="handleResend"
       >
-        {{ resendLoading ? 'Sending...' : 'Resend code' }}
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+          <path d="M21 3v6h-6" />
+        </svg>
+        <span>{{ resendLoading ? 'Sending...' : 'Resend code' }}</span>
       </button>
     </div>
 
     <p class="mt-6 text-center text-sm text-gray-600 dark:text-slate-300">
       <RouterLink
         to="/login"
-        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+        class="font-medium text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200"
       >
         Back to sign in
       </RouterLink>
@@ -82,7 +108,6 @@ import {
   resolveSingleFieldError,
 } from '@/services/auth/AuthViewService'
 import AuthLayout from '@/layouts/AuthLayout.vue'
-import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
 import TurnstileWidget from '@/components/ui/TurnstileWidget.vue'
@@ -93,11 +118,11 @@ interface ResettableWidgetRef {
 
 export default defineComponent({
   name: 'VerifyEmailCodeView',
-  components: { AuthLayout, BaseInput, BaseButton, BaseAlert, TurnstileWidget },
+  components: { AuthLayout, BaseButton, BaseAlert, TurnstileWidget },
   data() {
     return {
       email: (this.$route.query.email as string) ?? '',
-      code: '',
+      codeDigits: Array.from({ length: 6 }, () => ''),
       codeError: '',
       errorMessage: '',
       turnstileError: '',
@@ -111,10 +136,134 @@ export default defineComponent({
   mounted() {
     if (!this.email) {
       this.$router.replace({ name: 'register' })
+      return
     }
+
+    this.$nextTick(() => this.focusDigit(0))
   },
   methods: {
+    getOtpInputs(): HTMLInputElement[] {
+      const refs = this.$refs.otpInputs
+      if (!refs) {
+        return []
+      }
+
+      return Array.isArray(refs) ? (refs as HTMLInputElement[]) : [refs as HTMLInputElement]
+    },
+
+    focusDigit(index: number) {
+      const inputs = this.getOtpInputs()
+      const target = inputs[index]
+      if (!target) {
+        return
+      }
+
+      target.focus()
+      target.select()
+    },
+
+    applyPastedCode(rawValue: string) {
+      const digits = rawValue.replace(/\D/g, '').slice(0, this.codeDigits.length).split('')
+      if (!digits.length) {
+        return
+      }
+
+      this.codeDigits = this.codeDigits.map((_, index) => digits[index] ?? '')
+      const targetIndex = Math.min(digits.length, this.codeDigits.length - 1)
+      this.$nextTick(() => this.focusDigit(targetIndex))
+    },
+
+    handleDigitInput(index: number, rawValue: string) {
+      const sanitized = rawValue.replace(/\D/g, '')
+      this.codeError = ''
+
+      if (!sanitized) {
+        this.codeDigits[index] = ''
+        return
+      }
+
+      if (sanitized.length > 1) {
+        this.applyPastedCode(sanitized)
+        return
+      }
+
+      this.codeDigits[index] = sanitized
+
+      if (index < this.codeDigits.length - 1) {
+        this.$nextTick(() => this.focusDigit(index + 1))
+      }
+    },
+
+    handleDigitKeydown(index: number, event: KeyboardEvent) {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        if (index > 0) {
+          this.focusDigit(index - 1)
+        }
+        return
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        if (index < this.codeDigits.length - 1) {
+          this.focusDigit(index + 1)
+        }
+        return
+      }
+
+      if (event.key === 'Backspace') {
+        event.preventDefault()
+        if (this.codeDigits[index]) {
+          this.codeDigits[index] = ''
+          return
+        }
+
+        if (index > 0) {
+          this.codeDigits[index - 1] = ''
+          this.$nextTick(() => this.focusDigit(index - 1))
+        }
+        return
+      }
+
+      if (event.key === 'Delete') {
+        event.preventDefault()
+        this.codeDigits[index] = ''
+        return
+      }
+
+      if (event.key === 'Tab' || event.key === 'Shift') {
+        return
+      }
+
+      if (!/^\d$/.test(event.key)) {
+        event.preventDefault()
+      }
+    },
+
+    handleDigitFocus(index: number) {
+      if (!this.codeDigits[index]) {
+        return
+      }
+
+      this.$nextTick(() => this.focusDigit(index))
+    },
+
+    handleDigitPaste(event: ClipboardEvent) {
+      event.preventDefault()
+      const pastedText = event.clipboardData?.getData('text') ?? ''
+      this.applyPastedCode(pastedText)
+      this.codeError = ''
+    },
+
     async handleVerify() {
+      const code = this.codeDigits.join('').trim()
+      if (code.length !== this.codeDigits.length) {
+        this.codeError = 'Enter the 6-digit verification code.'
+        const firstEmptyIndex = this.codeDigits.findIndex((digit) => !digit)
+        this.$nextTick(() => this.focusDigit(firstEmptyIndex >= 0 ? firstEmptyIndex : 0))
+        return
+      }
+
       this.codeError = ''
       this.errorMessage = ''
       this.loading = true
@@ -122,7 +271,7 @@ export default defineComponent({
       try {
         const result = await AuthService.verifyEmailCode({
           email: this.email,
-          code: this.code.trim(),
+          code,
         })
 
         this.successMessage = result?.message ?? 'Email verified. You can now continue.'
@@ -171,6 +320,8 @@ export default defineComponent({
           turnstile_token: this.turnstileToken,
         })
         this.successMessage = result?.message ?? 'Verification code sent.'
+        this.codeDigits = Array.from({ length: 6 }, () => '')
+        this.$nextTick(() => this.focusDigit(0))
       } catch (e: unknown) {
         const err = e as { response?: { status?: number } }
         if (err?.response?.status === 422) {
