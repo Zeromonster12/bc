@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectTaskBoardController;
 use App\Http\Controllers\Profile\CompanyProfileController;
 use App\Http\Controllers\Profile\StudentCvController;
@@ -34,6 +35,15 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 });
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->middleware('throttle:60,1');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])
+        ->middleware('throttle:120,1');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])
+        ->middleware('throttle:120,1');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])
+        ->middleware('throttle:60,1');
+
     // Shared authenticated endpoints (authorization still enforced in controllers where needed).
     Route::get('/conversation-users', [MessageController::class, 'searchableUsers']);
     Route::get('/conversations', [MessageController::class, 'indexConversations']);

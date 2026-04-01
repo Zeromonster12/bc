@@ -103,6 +103,49 @@
       <button
         type="button"
         :class="[
+          'group relative flex items-center rounded-2xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
+          collapsed && !mobile
+            ? isHoverExpanded
+              ? 'h-9 w-full justify-start px-3'
+              : 'mx-auto h-9 w-9 justify-center overflow-visible p-0'
+            : 'w-full gap-2.5 px-3 py-2',
+        ]"
+        @click="toggleNotifications"
+        :aria-label="notificationsOpen ? 'Close notifications' : 'Open notifications'"
+      >
+        <span class="inline-flex h-7 w-7 items-center justify-center text-slate-500 group-hover:text-[#4e3aba] dark:text-slate-400 dark:group-hover:text-[#a895ff]">
+          <Bell class="h-4 w-4" />
+        </span>
+        <span
+          :class="[
+            'truncate whitespace-nowrap transition-all duration-200',
+            collapsed && !mobile
+              ? isHoverExpanded
+                ? 'ml-2 max-w-42 opacity-100'
+                : 'max-w-0 opacity-0'
+              : '',
+          ]"
+        >
+          Notifications
+        </span>
+        <span
+          v-if="notificationUnreadCount > 0"
+          class="inline-flex items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"
+          :class="
+            collapsed && !mobile && !isHoverExpanded
+              ? 'absolute -right-1 -top-1 h-4 min-w-4 px-1 text-[10px]'
+              : 'ml-auto h-5 min-w-5 px-1.5 text-[11px]'
+          "
+        >
+          {{ notificationUnreadCount > 99 ? '99+' : notificationUnreadCount }}
+        </span>
+      </button>
+    </div>
+
+    <div class="px-3 pb-0">
+      <button
+        type="button"
+        :class="[
           'group flex items-center rounded-2xl text-sm font-medium transition-all duration-200 text-slate-600 hover:bg-slate-100 hover:text-[#4e3aba] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#a895ff]',
           collapsed && !mobile
             ? isHoverExpanded
@@ -205,6 +248,47 @@
         </div>
       </Transition>
     </div>
+
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="notificationsOpen"
+          class="fixed inset-0 z-70 bg-slate-900/40 dark:bg-slate-950/60"
+          @click="closeNotifications"
+        />
+      </Transition>
+
+      <Transition
+        enter-active-class="transition-transform duration-200"
+        enter-from-class="translate-x-full"
+        enter-to-class="translate-x-0"
+        leave-active-class="transition-transform duration-150"
+        leave-from-class="translate-x-0"
+        leave-to-class="translate-x-full"
+      >
+        <NotificationPanel
+          v-if="notificationsOpen"
+          class="z-80"
+          :notifications="notificationStore.notifications"
+          :unread-count="notificationUnreadCount"
+          :loading="notificationStore.loading"
+          :loading-more="notificationStore.loadingMore"
+          :has-more="hasMoreNotifications"
+          @close="closeNotifications"
+          @mark-read="markNotificationRead"
+          @mark-all-read="markAllNotificationsRead"
+          @load-more="loadMoreNotifications"
+          @open-notification="openNotification"
+        />
+      </Transition>
+    </Teleport>
   </nav>
 </template>
 
@@ -212,6 +296,7 @@
 import { defineComponent } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 import {
+  Bell,
   BriefcaseBusiness,
   Building2,
   CheckCircle2,
@@ -225,9 +310,16 @@ import {
   User,
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import { useMessageStore } from '@/stores/message'
+import { useNotificationStore } from '@/stores/notification'
+import {
+  resolveNotificationAction,
+  type AppNotification,
+} from '@/services/notifications/NotificationService'
 import ProfileService from '@/services/profile/ProfileService'
 import { resolveAssetUrl } from '@/services/core/url'
 import { useThemeStore } from '@/stores/theme'
+import NotificationPanel from '@/components/layout/NotificationPanel.vue'
 
 interface NavLink {
   name: string
@@ -241,6 +333,8 @@ interface NavLink {
 export default defineComponent({
   name: 'Sidebar',
   components: {
+    NotificationPanel,
+    Bell,
     LayoutDashboard,
     FolderKanban,
     BriefcaseBusiness,
@@ -267,6 +361,8 @@ export default defineComponent({
   setup() {
     return {
       auth: useAuthStore(),
+      messageStore: useMessageStore(),
+      notificationStore: useNotificationStore(),
       themeStore: useThemeStore(),
     }
   },
@@ -276,6 +372,7 @@ export default defineComponent({
     hoverCloseTimeoutId: number | null
     hoverCloseDelayMs: number
     profileMenuOpen: boolean
+    notificationsOpen: boolean
     avatarRefreshAttempted: boolean
     avatarLoadFailed: boolean
     companyLogoUrl: string
@@ -286,6 +383,7 @@ export default defineComponent({
       hoverCloseTimeoutId: null,
       hoverCloseDelayMs: 420,
       profileMenuOpen: false,
+      notificationsOpen: false,
       avatarRefreshAttempted: false,
       avatarLoadFailed: false,
       companyLogoUrl: '',
@@ -418,6 +516,18 @@ export default defineComponent({
 
       return ''
     },
+    notificationUnreadCount(): number {
+      return Math.max(0, Number(this.notificationStore.unreadCount ?? 0))
+    },
+    hasMoreNotifications(): boolean {
+      const pagination = this.notificationStore.pagination
+
+      if (!pagination) {
+        return false
+      }
+
+      return pagination.current_page < pagination.last_page
+    },
     profileRoute(): string {
       if (this.auth.isStudent) return '/profile/student'
       if (this.auth.isCompany) return '/profile/company'
@@ -470,6 +580,67 @@ export default defineComponent({
     toggleTheme(): void {
       this.themeStore.toggleTheme()
     },
+    async initializeNotifications(): Promise<void> {
+      const userId = Number(this.auth.user?.id ?? 0)
+
+      if (!Number.isFinite(userId) || userId <= 0) {
+        this.notificationStore.reset()
+        return
+      }
+
+      await this.notificationStore.initialize(userId)
+    },
+    async toggleNotifications(): Promise<void> {
+      this.notificationsOpen = !this.notificationsOpen
+
+      if (this.notificationsOpen) {
+        await this.initializeNotifications()
+      }
+    },
+    closeNotifications(): void {
+      this.notificationsOpen = false
+    },
+    async markNotificationRead(notificationId: string): Promise<void> {
+      await this.notificationStore.markRead(notificationId)
+    },
+    async markAllNotificationsRead(): Promise<void> {
+      await this.notificationStore.markAllRead()
+    },
+    async loadMoreNotifications(): Promise<void> {
+      await this.notificationStore.loadMore()
+    },
+    async openNotification(notification: AppNotification): Promise<void> {
+      this.closeNotifications()
+
+      const action = resolveNotificationAction(notification)
+
+      if (action.kind === 'none') {
+        return
+      }
+
+      if (action.kind === 'company-profile') {
+        await this.$router.push({
+          name: 'profile.company',
+          query: {
+            approval: action.approvalStatus,
+          },
+        })
+
+        return
+      }
+
+      const normalizedConversationId = Number(action.conversationId)
+      if (!Number.isFinite(normalizedConversationId) || normalizedConversationId <= 0) {
+        return
+      }
+
+      if (this.$route.name !== 'messages') {
+        await this.$router.push({ name: 'messages' })
+      }
+
+      await this.messageStore.fetchConversations()
+      await this.messageStore.openConversation(normalizedConversationId)
+    },
     isActive(routeName: string): boolean {
       return this.$route.name === routeName
     },
@@ -507,6 +678,8 @@ export default defineComponent({
     },
     async handleLogout(): Promise<void> {
       this.profileMenuOpen = false
+      this.notificationsOpen = false
+      this.notificationStore.reset()
       await this.auth.logout()
       this.$router.push({ name: 'login' })
     },
@@ -530,15 +703,18 @@ export default defineComponent({
   mounted() {
     document.addEventListener('click', this.handleOutsideClick)
     void this.loadCompanyLogo()
+    void this.initializeNotifications()
   },
   watch: {
     'auth.user.id'() {
       this.companyLogoLoadedForUserId = null
       void this.loadCompanyLogo()
+      void this.initializeNotifications()
     },
     'auth.user.role'() {
       this.companyLogoLoadedForUserId = null
       void this.loadCompanyLogo()
+      void this.initializeNotifications()
     },
     'auth.user.avatar_url'() {
       this.avatarRefreshAttempted = false

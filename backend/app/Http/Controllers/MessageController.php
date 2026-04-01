@@ -11,10 +11,12 @@ use App\Models\ConversationParticipant;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\User;
+use App\Notifications\NewMessageReceivedNotification;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
@@ -681,6 +683,30 @@ class MessageController extends Controller
         $conversation->load([
             'participantRecords:id,conversation_id,user_id,is_admin,last_read_message_id,last_read_at',
         ]);
+
+        $recipientIds = ConversationParticipant::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('user_id', '!=', $user->id)
+            ->pluck('user_id')
+            ->map(fn($id) => (int) $id)
+            ->filter(fn(int $id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($recipientIds !== []) {
+            $recipients = User::query()
+                ->whereIn('id', $recipientIds)
+                ->get();
+
+            Notification::send($recipients, new NewMessageReceivedNotification(
+                (int) $conversation->id,
+                (int) $message->id,
+                (int) $user->id,
+                (string) $user->name,
+                (string) $message->body,
+            ));
+        }
 
         broadcast(new MessageSent($conversation, $message))->toOthers();
 

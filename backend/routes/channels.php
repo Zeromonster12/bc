@@ -13,3 +13,7 @@ Broadcast::channel('conversations.{conversationId}', function ($user, int $conve
         ->where('user_id', $user->id)
         ->exists();
 });
+
+Broadcast::channel('users.{id}', function ($user, int $id): bool {
+    return (int) $user->id === $id;
+});

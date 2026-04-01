@@ -174,4 +174,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return null;
     }
+
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'users.' . $this->id;
+    }
 }

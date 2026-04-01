@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\CompanyApprovalStatusNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminUserController extends Controller
 {
@@ -96,19 +97,46 @@ class AdminUserController extends Controller
             ], 422);
         }
 
-        $user->update([
-            'company_verification_status' => User::COMPANY_STATUS_APPROVED,
-            'company_verified_at' => now(),
-        ]);
+        $transition = DB::transaction(function () use ($user): array {
+            /** @var User $lockedUser */
+            $lockedUser = User::query()
+                ->whereKey($user->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        try {
-            $user->notify(new CompanyApprovalStatusNotification(true));
-        } catch (\Throwable $e) {
-            report($e);
+            if ($lockedUser->company_verification_status === User::COMPANY_STATUS_APPROVED) {
+                return [
+                    'changed' => false,
+                    'user' => $lockedUser->fresh(),
+                ];
+            }
+
+            $lockedUser->update([
+                'company_verification_status' => User::COMPANY_STATUS_APPROVED,
+                'company_verified_at' => now(),
+            ]);
+
+            return [
+                'changed' => true,
+                'user' => $lockedUser->fresh(),
+            ];
+        });
+
+        /** @var User $updatedUser */
+        $updatedUser = $transition['user'];
+        $changed = (bool) ($transition['changed'] ?? false);
+
+        if ($changed) {
+            try {
+                $updatedAtIso = $updatedUser->company_verified_at?->toIso8601String();
+                $updatedUser->notify(new CompanyApprovalStatusNotification(true, $updatedAtIso));
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return response()->json([
-            'data' => $user->fresh(),
+            'data' => $updatedUser,
         ]);
     }
 
@@ -120,19 +148,52 @@ class AdminUserController extends Controller
             ], 422);
         }
 
-        $user->update([
-            'company_verification_status' => User::COMPANY_STATUS_REJECTED,
-            'company_verified_at' => null,
-        ]);
+        $transition = DB::transaction(function () use ($user): array {
+            /** @var User $lockedUser */
+            $lockedUser = User::query()
+                ->whereKey($user->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        try {
-            $user->notify(new CompanyApprovalStatusNotification(false));
-        } catch (\Throwable $e) {
-            report($e);
+            if ($lockedUser->company_verification_status === User::COMPANY_STATUS_REJECTED) {
+                return [
+                    'changed' => false,
+                    'user' => $lockedUser->fresh(),
+                    'changed_at' => null,
+                ];
+            }
+
+            $changedAt = now()->toIso8601String();
+
+            $lockedUser->update([
+                'company_verification_status' => User::COMPANY_STATUS_REJECTED,
+                'company_verified_at' => null,
+            ]);
+
+            return [
+                'changed' => true,
+                'user' => $lockedUser->fresh(),
+                'changed_at' => $changedAt,
+            ];
+        });
+
+        /** @var User $updatedUser */
+        $updatedUser = $transition['user'];
+        $changed = (bool) ($transition['changed'] ?? false);
+
+        if ($changed) {
+            try {
+                $changedAt = is_string($transition['changed_at'] ?? null)
+                    ? $transition['changed_at']
+                    : now()->toIso8601String();
+                $updatedUser->notify(new CompanyApprovalStatusNotification(false, $changedAt));
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return response()->json([
-            'data' => $user->fresh(),
+            'data' => $updatedUser,
         ]);
     }
 }
