@@ -46,7 +46,13 @@ export const useNotificationStore = defineStore('notification', {
         return
       }
 
-      if (this.initialized && this.subscribedUserId === normalizedUserId) {
+      const hasActiveRealtimeSubscription = realtimeTeardown !== null
+
+      if (
+        this.initialized &&
+        this.subscribedUserId === normalizedUserId &&
+        hasActiveRealtimeSubscription
+      ) {
         return
       }
 
@@ -54,8 +60,12 @@ export const useNotificationStore = defineStore('notification', {
       this.subscribedUserId = normalizedUserId
       this.initialized = true
 
-      await Promise.all([this.fetchUnreadCount(), this.fetchNotifications(1)])
-      this.startRealtime(normalizedUserId)
+      try {
+        await Promise.all([this.fetchUnreadCount(), this.fetchNotifications(1)])
+      } catch {
+      } finally {
+        this.startRealtime(normalizedUserId)
+      }
     },
 
     startRealtime(userId: number): void {
@@ -159,6 +169,7 @@ export const useNotificationStore = defineStore('notification', {
 
       if (!incoming) {
         void this.fetchUnreadCount()
+        void this.fetchNotifications(1)
         return
       }
 

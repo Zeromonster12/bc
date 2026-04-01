@@ -77,6 +77,12 @@ const NOTIFICATION_UI_META_MAP: Record<string, NotificationUiMeta> = {
 const USER_NOTIFICATION_EVENT = '.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated'
 const USER_NOTIFICATION_EVENT_ALT = 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated'
 
+type NotificationChannel = {
+  listen: (event: string, callback: (payload: unknown) => void) => NotificationChannel
+  stopListening: (event: string, callback?: (payload: unknown) => void) => NotificationChannel
+  notification?: (callback: (payload: unknown) => void) => NotificationChannel
+}
+
 const toRecord = (value: unknown): Record<string, unknown> | null => {
   if (typeof value !== 'object' || value === null) {
     return null
@@ -190,11 +196,44 @@ const normalizeNotificationInternal = (raw: unknown): AppNotification | null => 
   }
 }
 
+const realtimePayloadCandidates = (raw: unknown): unknown[] => {
+  const root = toRecord(raw)
+
+  if (!root) {
+    return [raw]
+  }
+
+  const candidates: unknown[] = [root]
+
+  if (root.notification !== undefined) {
+    candidates.push(root.notification)
+  }
+
+  const nestedData = toRecord(root.data)
+
+  if (nestedData?.notification !== undefined) {
+    candidates.push(nestedData.notification)
+  }
+
+  return candidates
+}
+
 export const normalizeApiNotification = (raw: unknown): AppNotification | null =>
   normalizeNotificationInternal(raw)
 
-export const normalizeRealtimeNotification = (raw: unknown): AppNotification | null =>
-  normalizeNotificationInternal(raw)
+export const normalizeRealtimeNotification = (raw: unknown): AppNotification | null => {
+  const candidates = realtimePayloadCandidates(raw)
+
+  for (const candidate of candidates) {
+    const normalized = normalizeNotificationInternal(candidate)
+
+    if (normalized) {
+      return normalized
+    }
+  }
+
+  return null
+}
 
 export const normalizeMeta = (raw: unknown): NotificationMeta | null => {
   const meta = toRecord(raw)
@@ -252,10 +291,14 @@ const NotificationService = {
     const channelName = `users.${normalizedUserId}`
 
     const echo = getEcho()
-    const channel = echo.private(channelName)
+    const channel = echo.private(channelName) as unknown as NotificationChannel
 
     const handler = (payload: unknown): void => {
       onNotification(payload)
+    }
+
+    if (typeof channel.notification === 'function') {
+      channel.notification(handler)
     }
 
     channel.listen(USER_NOTIFICATION_EVENT, handler)
