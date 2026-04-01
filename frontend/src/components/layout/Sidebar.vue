@@ -371,6 +371,7 @@ export default defineComponent({
     hoveredLink: string | null
     hoverCloseTimeoutId: number | null
     hoverCloseDelayMs: number
+    notificationPanelSyncTimeoutId: number | null
     profileMenuOpen: boolean
     notificationsOpen: boolean
     avatarRefreshAttempted: boolean
@@ -382,6 +383,7 @@ export default defineComponent({
       hoveredLink: null,
       hoverCloseTimeoutId: null,
       hoverCloseDelayMs: 420,
+      notificationPanelSyncTimeoutId: null,
       profileMenuOpen: false,
       notificationsOpen: false,
       avatarRefreshAttempted: false,
@@ -595,6 +597,10 @@ export default defineComponent({
 
       if (this.notificationsOpen) {
         await this.initializeNotifications()
+        await Promise.all([
+          this.notificationStore.fetchNotifications(1),
+          this.notificationStore.fetchUnreadCount(),
+        ])
       }
     },
     closeNotifications(): void {
@@ -608,6 +614,21 @@ export default defineComponent({
     },
     async loadMoreNotifications(): Promise<void> {
       await this.notificationStore.loadMore()
+    },
+    scheduleOpenPanelNotificationsRefresh(delayMs = 120): void {
+      if (this.notificationPanelSyncTimeoutId !== null) {
+        window.clearTimeout(this.notificationPanelSyncTimeoutId)
+      }
+
+      this.notificationPanelSyncTimeoutId = window.setTimeout(() => {
+        this.notificationPanelSyncTimeoutId = null
+
+        if (!this.notificationsOpen) {
+          return
+        }
+
+        void this.notificationStore.fetchNotifications(1)
+      }, Math.max(0, Math.trunc(delayMs)))
     },
     async openNotification(notification: AppNotification): Promise<void> {
       this.closeNotifications()
@@ -704,26 +725,38 @@ export default defineComponent({
   mounted() {
     document.addEventListener('click', this.handleOutsideClick)
     void this.loadCompanyLogo()
-    void this.initializeNotifications()
   },
   watch: {
     'auth.user.id'() {
       this.companyLogoLoadedForUserId = null
       void this.loadCompanyLogo()
-      void this.initializeNotifications()
     },
     'auth.user.role'() {
       this.companyLogoLoadedForUserId = null
       void this.loadCompanyLogo()
-      void this.initializeNotifications()
     },
     'auth.user.avatar_url'() {
       this.avatarRefreshAttempted = false
       this.avatarLoadFailed = false
     },
+    notificationUnreadCount(newCount: number, oldCount: number) {
+      if (!this.notificationsOpen) {
+        return
+      }
+
+      if (newCount === oldCount) {
+        return
+      }
+
+      this.scheduleOpenPanelNotificationsRefresh(90)
+    },
   },
   beforeUnmount() {
     this.clearHoverCloseTimeout()
+    if (this.notificationPanelSyncTimeoutId !== null) {
+      window.clearTimeout(this.notificationPanelSyncTimeoutId)
+      this.notificationPanelSyncTimeoutId = null
+    }
     document.removeEventListener('click', this.handleOutsideClick)
   },
 })

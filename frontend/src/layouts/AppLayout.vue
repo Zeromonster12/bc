@@ -71,22 +71,67 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import Sidebar from '@/components/layout/Sidebar.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 
 export default defineComponent({
   name: 'AppLayout',
   components: { Sidebar },
+  setup() {
+    return {
+      auth: useAuthStore(),
+      notificationStore: useNotificationStore(),
+    }
+  },
   data() {
     return {
       sidebarOpen: false,
     }
   },
+  methods: {
+    async initializeNotifications(): Promise<void> {
+      const userId = Number(this.auth.user?.id ?? 0)
+
+      if (!Number.isFinite(userId) || userId <= 0) {
+        this.notificationStore.reset()
+        return
+      }
+
+      await this.notificationStore.initialize(userId)
+    },
+    async reconnectNotificationsIfVisible(): Promise<void> {
+      if (document.visibilityState !== 'visible') {
+        return
+      }
+
+      await this.notificationStore.reconnectRealtime()
+    },
+    async reconnectNotifications(): Promise<void> {
+      await this.notificationStore.reconnectRealtime()
+    },
+  },
+  mounted() {
+    void this.initializeNotifications()
+    document.addEventListener('visibilitychange', this.reconnectNotificationsIfVisible)
+    window.addEventListener('focus', this.reconnectNotifications)
+    window.addEventListener('online', this.reconnectNotifications)
+  },
   watch: {
     sidebarOpen(isOpen: boolean) {
       document.body.classList.toggle('overflow-hidden', isOpen)
     },
+    'auth.user.id'() {
+      void this.initializeNotifications()
+    },
+    'auth.user.role'() {
+      void this.initializeNotifications()
+    },
   },
   beforeUnmount() {
     document.body.classList.remove('overflow-hidden')
+    document.removeEventListener('visibilitychange', this.reconnectNotificationsIfVisible)
+    window.removeEventListener('focus', this.reconnectNotifications)
+    window.removeEventListener('online', this.reconnectNotifications)
   },
 })
 </script>

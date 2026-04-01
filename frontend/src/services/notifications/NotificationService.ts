@@ -1,5 +1,6 @@
 import http from '@/services/core/http'
 import { getEcho } from '@/services/core/echo'
+import { backendOrigin } from '@/services/core/url'
 
 export interface NotificationData {
   [key: string]: unknown
@@ -76,6 +77,8 @@ const NOTIFICATION_UI_META_MAP: Record<string, NotificationUiMeta> = {
 
 const USER_NOTIFICATION_EVENT = '.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated'
 const USER_NOTIFICATION_EVENT_ALT = 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated'
+
+let csrfWarmupPromise: Promise<void> | null = null
 
 type NotificationChannel = {
   listen: (event: string, callback: (payload: unknown) => void) => NotificationChannel
@@ -317,6 +320,19 @@ export const normalizeMeta = (raw: unknown): NotificationMeta | null => {
 }
 
 const NotificationService = {
+  async ensureCsrfCookie(): Promise<void> {
+    if (!csrfWarmupPromise) {
+      csrfWarmupPromise = http
+        .get(`${backendOrigin}/sanctum/csrf-cookie`)
+        .then(() => undefined)
+        .finally(() => {
+          csrfWarmupPromise = null
+        })
+    }
+
+    await csrfWarmupPromise
+  },
+
   async getNotifications(params: NotificationListParams = {}) {
     const { data } = await http.get('/notifications', { params })
     return data
@@ -340,12 +356,14 @@ const NotificationService = {
     return data
   },
 
-  subscribeToUserNotifications(
+  async subscribeToUserNotifications(
     userId: number,
     onNotification: (payload: unknown) => void,
-  ): () => void {
+  ): Promise<() => void> {
     const normalizedUserId = Math.trunc(Number(userId))
     const channelName = `users.${normalizedUserId}`
+
+    await this.ensureCsrfCookie()
 
     const echo = getEcho()
     const channel = echo.private(channelName) as unknown as NotificationChannel

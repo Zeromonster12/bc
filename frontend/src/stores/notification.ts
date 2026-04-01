@@ -11,6 +11,62 @@ import NotificationService, {
 const DEFAULT_PER_PAGE = 20
 
 let realtimeTeardown: (() => void) | null = null
+let realtimeStartPromise: Promise<void> | null = null
+let syncTimeoutId: ReturnType<typeof setTimeout> | null = null
+let latestRefreshRequestId = 0
+
+const toPositiveInt = (value: unknown): number | null => {
+  const numeric = Number(value)
+
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return null
+  }
+
+  return Math.trunc(numeric)
+}
+
+const notificationSemanticKey = (notification: AppNotification): string => {
+  const messageId = toPositiveInt(notification.data.message_id)
+
+  if (notification.type === 'message.received' && messageId) {
+    return `message.received:${messageId}`
+  }
+
+  const changedAt = String(notification.data.changed_at ?? '').trim()
+
+  if (
+    (notification.type === 'company.approved' || notification.type === 'company.rejected') &&
+    changedAt !== ''
+  ) {
+    const userId = toPositiveInt(notification.data.user_id) ?? 0
+    return `${notification.type}:${userId}:${changedAt}`
+  }
+
+  return `id:${notification.id}`
+}
+
+const mergeNotifications = (
+  incomingRows: AppNotification[],
+  existingRows: AppNotification[],
+): AppNotification[] => {
+  const merged = new Map<string, AppNotification>()
+
+  incomingRows.forEach((row) => {
+    merged.set(notificationSemanticKey(row), row)
+  })
+
+  existingRows.forEach((row) => {
+    const key = notificationSemanticKey(row)
+
+    if (!merged.has(key)) {
+      merged.set(key, row)
+    }
+  })
+
+  return Array.from(merged.values())
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 100)
+}
 
 interface NotificationState {
   notifications: AppNotification[]
@@ -64,16 +120,41 @@ export const useNotificationStore = defineStore('notification', {
         await Promise.all([this.fetchUnreadCount(), this.fetchNotifications(1)])
       } catch {
       } finally {
-        this.startRealtime(normalizedUserId)
+        await this.startRealtime(normalizedUserId)
       }
     },
 
-    startRealtime(userId: number): void {
-      this.teardownRealtime()
+    async startRealtime(userId: number): Promise<void> {
+      const normalizedUserId = Math.trunc(Number(userId))
 
-      realtimeTeardown = NotificationService.subscribeToUserNotifications(userId, (payload) => {
-        this.handleRealtimeNotification(payload)
-      })
+      if (!Number.isFinite(normalizedUserId) || normalizedUserId <= 0) {
+        return
+      }
+
+      if (realtimeStartPromise) {
+        await realtimeStartPromise
+      }
+
+      realtimeStartPromise = (async () => {
+        this.teardownRealtime()
+
+        try {
+          realtimeTeardown = await NotificationService.subscribeToUserNotifications(
+            normalizedUserId,
+            (payload) => {
+              this.handleRealtimeNotification(payload)
+            },
+          )
+        } catch {
+          realtimeTeardown = null
+        }
+      })()
+
+      try {
+        await realtimeStartPromise
+      } finally {
+        realtimeStartPromise = null
+      }
     },
 
     teardownRealtime(): void {
@@ -85,6 +166,10 @@ export const useNotificationStore = defineStore('notification', {
 
     reset(): void {
       this.teardownRealtime()
+      if (syncTimeoutId) {
+        clearTimeout(syncTimeoutId)
+        syncTimeoutId = null
+      }
       this.notifications = []
       this.pagination = null
       this.unreadCount = 0
@@ -94,8 +179,31 @@ export const useNotificationStore = defineStore('notification', {
       this.subscribedUserId = null
     },
 
+    async reconnectRealtime(): Promise<void> {
+      const userId = Number(this.subscribedUserId ?? 0)
+
+      if (!Number.isFinite(userId) || userId <= 0) {
+        return
+      }
+
+      await this.startRealtime(userId)
+      void this.fetchUnreadCount()
+    },
+
+    scheduleListSync(delayMs = 250): void {
+      if (syncTimeoutId) {
+        clearTimeout(syncTimeoutId)
+      }
+
+      syncTimeoutId = setTimeout(() => {
+        syncTimeoutId = null
+        void Promise.all([this.fetchNotifications(1), this.fetchUnreadCount()])
+      }, Math.max(0, Math.trunc(delayMs)))
+    },
+
     async fetchNotifications(page = 1): Promise<void> {
       const append = page > 1
+      const refreshRequestId = append ? 0 : ++latestRefreshRequestId
 
       if (append) {
         if (this.loadingMore) {
@@ -121,18 +229,14 @@ export const useNotificationStore = defineStore('notification', {
           .map((row) => normalizeApiNotification(row))
           .filter((row): row is AppNotification => row !== null)
 
+        if (!append && refreshRequestId !== latestRefreshRequestId) {
+          return
+        }
+
         if (!append) {
-          this.notifications = rows
+          this.notifications = mergeNotifications(rows, this.notifications)
         } else {
-          const merged = new Map(this.notifications.map((row) => [row.id, row] as const))
-
-          rows.forEach((row) => {
-            merged.set(row.id, row)
-          })
-
-          this.notifications = Array.from(merged.values()).sort((a, b) =>
-            b.created_at.localeCompare(a.created_at),
-          )
+          this.notifications = mergeNotifications(rows, this.notifications)
         }
 
         this.pagination = normalizeMeta((response as { meta?: unknown }).meta)
@@ -168,8 +272,7 @@ export const useNotificationStore = defineStore('notification', {
       const incoming = normalizeRealtimeNotification(payload)
 
       if (!incoming) {
-        void this.fetchUnreadCount()
-        void this.fetchNotifications(1)
+        this.scheduleListSync(120)
         return
       }
 
@@ -194,14 +297,20 @@ export const useNotificationStore = defineStore('notification', {
           void this.markRead(incoming.id, true)
         }
 
+        this.scheduleListSync(250)
+
         return
       }
 
       this.upsertNotification(incoming, incoming.read_at === null)
+      this.scheduleListSync(250)
     },
 
     upsertNotification(notification: AppNotification, bumpUnread: boolean): void {
-      const index = this.notifications.findIndex((row) => row.id === notification.id)
+      const notificationKey = notificationSemanticKey(notification)
+      const index = this.notifications.findIndex(
+        (row) => notificationSemanticKey(row) === notificationKey,
+      )
 
       if (index === -1) {
         this.notifications.unshift(notification)
@@ -227,6 +336,10 @@ export const useNotificationStore = defineStore('notification', {
       const updated: AppNotification = {
         ...current,
         ...notification,
+        id:
+          !notification.id.startsWith('realtime-') || current.id.startsWith('realtime-')
+            ? notification.id
+            : current.id,
         data: {
           ...current.data,
           ...notification.data,
