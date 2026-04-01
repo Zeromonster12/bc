@@ -143,6 +143,7 @@
 import { defineComponent } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useMessageStore } from '@/stores/message'
+import { useNotificationStore } from '@/stores/notification'
 import MessageService, {
   type RealtimeMessagePayload,
   type RealtimeReadPayload,
@@ -210,6 +211,7 @@ export default defineComponent({
     return {
       auth: useAuthStore(),
       messageStore: useMessageStore(),
+      notificationStore: useNotificationStore(),
     }
   },
   data() {
@@ -906,6 +908,7 @@ export default defineComponent({
     },
     async openConversation(id: number) {
       await this.messageStore.openConversation(id)
+      await this.notificationStore.markConversationRead(id)
     },
     backToList() {
       this.messageStore.currentConversation = null

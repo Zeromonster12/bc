@@ -319,5 +319,31 @@ export const useNotificationStore = defineStore('notification', {
         void this.fetchUnreadCount()
       }
     },
+
+    async markConversationRead(conversationId: number): Promise<void> {
+      const normalizedConversationId = Math.trunc(Number(conversationId))
+
+      if (!Number.isFinite(normalizedConversationId) || normalizedConversationId <= 0) {
+        return
+      }
+
+      const unreadConversationNotifications = this.notifications.filter((notification) => {
+        if (notification.type !== 'message.received' || notification.read_at !== null) {
+          return false
+        }
+
+        return Number(notification.data.conversation_id ?? 0) === normalizedConversationId
+      })
+
+      if (unreadConversationNotifications.length === 0) {
+        return
+      }
+
+      await Promise.all(
+        unreadConversationNotifications.map((notification) => this.markRead(notification.id, true)),
+      )
+
+      void this.fetchUnreadCount()
+    },
   },
 })

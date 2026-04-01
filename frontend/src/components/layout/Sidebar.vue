@@ -640,6 +640,7 @@ export default defineComponent({
 
       await this.messageStore.fetchConversations()
       await this.messageStore.openConversation(normalizedConversationId)
+      await this.notificationStore.markConversationRead(normalizedConversationId)
     },
     isActive(routeName: string): boolean {
       return this.$route.name === routeName

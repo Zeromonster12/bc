@@ -158,6 +158,24 @@ const normalizeNotificationInternal = (raw: unknown): AppNotification | null => 
   const nestedData = toRecord(root.data)
   const data = (nestedData ?? root) as NotificationData
 
+  const hasTopLevelNotificationShape =
+    root.id !== undefined ||
+    root.type !== undefined ||
+    root.read_at !== undefined ||
+    root.created_at !== undefined
+
+  const hasPayloadNotificationShape =
+    data.kind !== undefined ||
+    data.title !== undefined ||
+    data.body !== undefined ||
+    data.conversation_id !== undefined ||
+    data.message_id !== undefined ||
+    data.company_verification_status !== undefined
+
+  if (!hasTopLevelNotificationShape && !hasPayloadNotificationShape) {
+    return null
+  }
+
   const explicitId = root.id
   const nestedId = data.id
   const rawId =
@@ -203,7 +221,7 @@ const realtimePayloadCandidates = (raw: unknown): unknown[] => {
     return [raw]
   }
 
-  const candidates: unknown[] = [root]
+  const candidates: unknown[] = []
 
   if (root.notification !== undefined) {
     candidates.push(root.notification)
@@ -211,11 +229,43 @@ const realtimePayloadCandidates = (raw: unknown): unknown[] => {
 
   const nestedData = toRecord(root.data)
 
+  if (nestedData) {
+    candidates.push(nestedData)
+  }
+
   if (nestedData?.notification !== undefined) {
     candidates.push(nestedData.notification)
   }
 
+  candidates.push(root)
+
   return candidates
+}
+
+const scoreRealtimeCandidate = (notification: AppNotification): number => {
+  let score = 0
+
+  if (!notification.id.startsWith('realtime-')) {
+    score += 4
+  }
+
+  if (notification.type !== 'notification') {
+    score += 3
+  }
+
+  if (
+    notification.data.kind !== undefined ||
+    notification.data.title !== undefined ||
+    notification.data.body !== undefined
+  ) {
+    score += 2
+  }
+
+  if (notification.data.conversation_id !== undefined) {
+    score += 1
+  }
+
+  return score
 }
 
 export const normalizeApiNotification = (raw: unknown): AppNotification | null =>
@@ -223,16 +273,23 @@ export const normalizeApiNotification = (raw: unknown): AppNotification | null =
 
 export const normalizeRealtimeNotification = (raw: unknown): AppNotification | null => {
   const candidates = realtimePayloadCandidates(raw)
+  let best: AppNotification | null = null
+  let bestScore = -1
 
   for (const candidate of candidates) {
     const normalized = normalizeNotificationInternal(candidate)
 
     if (normalized) {
-      return normalized
+      const score = scoreRealtimeCandidate(normalized)
+
+      if (score > bestScore) {
+        best = normalized
+        bestScore = score
+      }
     }
   }
 
-  return null
+  return best
 }
 
 export const normalizeMeta = (raw: unknown): NotificationMeta | null => {
