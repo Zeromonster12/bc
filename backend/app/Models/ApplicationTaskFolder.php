@@ -16,7 +16,6 @@ class ApplicationTaskFolder extends Model
         'created_by_user_id',
         'parent_folder_id',
         'name',
-        'color',
         'position',
         'status',
     ];

@@ -131,7 +131,6 @@ const ApplicationService = {
     projectId: number,
     payload: {
       name: string
-      color?: string
       position?: number
       status?: ApplicationTaskStatus
     },
@@ -157,7 +156,6 @@ const ApplicationService = {
     folderId: number,
     payload: {
       name?: string
-      color?: string | null
       position?: number
       parent_folder_id?: number | null
       status?: ApplicationTaskStatus | null

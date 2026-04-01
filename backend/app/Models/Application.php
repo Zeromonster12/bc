@@ -40,11 +40,6 @@ class Application extends Model
         return $this->belongsTo(User::class, 'student_user_id');
     }
 
-    public function progressUpdates(): HasMany
-    {
-        return $this->hasMany(ApplicationProgressUpdate::class)->latest('id');
-    }
-
     public function tasks(): HasMany
     {
         return $this->hasMany(ApplicationTask::class)->latest('id');

@@ -92,7 +92,6 @@ class ProjectTaskBoardController extends Controller
             'data' => $folders->map(fn(ApplicationTaskFolder $folder) => [
                 'id' => $folder->id,
                 'name' => $folder->name,
-                'color' => $folder->color,
                 'position' => $folder->position,
                 'status' => $folder->status,
                 'parent_folder_id' => $folder->parent_folder_id,
@@ -126,7 +125,6 @@ class ProjectTaskBoardController extends Controller
                 Rule::unique('application_task_folders', 'name')
                     ->where(fn($query) => $query->where('project_id', $project->id)),
             ],
-            'color' => ['nullable', 'string', 'max:20'],
             'position' => ['nullable', 'integer', 'min:0'],
             'parent_folder_id' => [
                 'nullable',
@@ -141,7 +139,6 @@ class ProjectTaskBoardController extends Controller
             'project_id' => $project->id,
             'created_by_user_id' => $user->id,
             'name' => $validated['name'],
-            'color' => $validated['color'] ?? null,
             'position' => $validated['position'] ?? 0,
             'parent_folder_id' => $validated['parent_folder_id'] ?? null,
             'status' => $validated['status'] ?? 'todo',
@@ -151,7 +148,6 @@ class ProjectTaskBoardController extends Controller
             'data' => [
                 'id' => $folder->id,
                 'name' => $folder->name,
-                'color' => $folder->color,
                 'position' => $folder->position,
                 'status' => $folder->status,
                 'parent_folder_id' => $folder->parent_folder_id,
@@ -189,7 +185,6 @@ class ProjectTaskBoardController extends Controller
                             ->where(fn($query) => $query->where('project_id', $project->id))
                             ->ignore($folder->id),
                     ],
-                    'color' => ['nullable', 'string', 'max:20'],
                     'position' => ['nullable', 'integer', 'min:0'],
                     'parent_folder_id' => [
                         'nullable',
@@ -267,7 +262,6 @@ class ProjectTaskBoardController extends Controller
             'data' => [
                 'id' => $folder->id,
                 'name' => $folder->name,
-                'color' => $folder->color,
                 'position' => $folder->position,
                 'status' => $folder->status,
                 'parent_folder_id' => $folder->parent_folder_id,

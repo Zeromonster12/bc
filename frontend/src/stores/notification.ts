@@ -233,11 +233,7 @@ export const useNotificationStore = defineStore('notification', {
           return
         }
 
-        if (!append) {
-          this.notifications = mergeNotifications(rows, this.notifications)
-        } else {
-          this.notifications = mergeNotifications(rows, this.notifications)
-        }
+        this.notifications = mergeNotifications(rows, this.notifications)
 
         this.pagination = normalizeMeta((response as { meta?: unknown }).meta)
       } finally {

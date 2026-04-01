@@ -16,6 +16,8 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public const MORPH_ALIAS = 'user';
+
     public const COMPANY_STATUS_PENDING = 'pending';
     public const COMPANY_STATUS_APPROVED = 'approved';
     public const COMPANY_STATUS_REJECTED = 'rejected';

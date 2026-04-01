@@ -11,6 +11,8 @@ class NewMessageReceivedNotification extends Notification
 {
     use Queueable;
 
+    public const DATABASE_TYPE = 'message.received';
+
     public function __construct(
         private readonly int $conversationId,
         private readonly int $messageId,
@@ -35,7 +37,7 @@ class NewMessageReceivedNotification extends Notification
         $sender = trim($this->senderName) !== '' ? $this->senderName : 'New message';
 
         return [
-            'kind' => 'message.received',
+            'kind' => $this->broadcastType(),
             'title' => 'New message',
             'body' => $sender . ': ' . Str::limit(trim($this->messageBody), 120),
             'conversation_id' => $this->conversationId,
@@ -45,6 +47,11 @@ class NewMessageReceivedNotification extends Notification
         ];
     }
 
+    public function databaseType(object $notifiable): string
+    {
+        return self::DATABASE_TYPE;
+    }
+
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toArray($notifiable));
@@ -52,6 +59,6 @@ class NewMessageReceivedNotification extends Notification
 
     public function broadcastType(): string
     {
-        return 'message.received';
+        return self::DATABASE_TYPE;
     }
 }

@@ -11,6 +11,9 @@ class CompanyApprovalStatusNotification extends Notification
 {
     use Queueable;
 
+    public const DATABASE_TYPE_APPROVED = 'company.approved';
+    public const DATABASE_TYPE_REJECTED = 'company.rejected';
+
     public function __construct(
         private readonly bool $approved,
         private readonly ?string $changedAt = null,
@@ -55,6 +58,11 @@ class CompanyApprovalStatusNotification extends Notification
         ];
     }
 
+    public function databaseType(object $notifiable): string
+    {
+        return $this->resolvedType();
+    }
+
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toArray($notifiable));
@@ -62,6 +70,13 @@ class CompanyApprovalStatusNotification extends Notification
 
     public function broadcastType(): string
     {
-        return $this->approved ? 'company.approved' : 'company.rejected';
+        return $this->resolvedType();
+    }
+
+    private function resolvedType(): string
+    {
+        return $this->approved
+            ? self::DATABASE_TYPE_APPROVED
+            : self::DATABASE_TYPE_REJECTED;
     }
 }
