@@ -3,7 +3,7 @@
     class="relative z-30"
     :class="
       isSidebar
-        ? 'rounded-3xl border border-[#ddd7ea] bg-[#efedf5] p-6 shadow-[0_10px_24px_rgba(77,55,197,0.08)] dark:border-slate-700 dark:bg-slate-900/95'
+        ? 'rounded-3xl border border-[#e3ddef] bg-white p-6 shadow-[0_14px_30px_rgba(77,55,197,0.10)] dark:border-slate-700 dark:bg-slate-900/95'
         : 'rounded-2xl border border-slate-200/80 bg-white/95 p-3 shadow-[0_6px_18px_rgba(15,23,42,0.05)] backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/90 dark:shadow-[0_8px_20px_rgba(2,6,23,0.3)] sm:p-4'
     "
   >
@@ -14,11 +14,11 @@
       <div>
         <p
           class="text-xs font-semibold uppercase tracking-[0.12em]"
-          :class="isSidebar ? 'text-[#77718f] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
+          :class="isSidebar ? 'text-[#66628b] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
         >
           {{ isSidebar ? 'Project filters' : 'Project Discovery' }}
         </p>
-        <h3 class="text-xs font-semibold" :class="isSidebar ? 'text-[#343047] dark:text-slate-100' : 'text-slate-900 dark:text-slate-100'">
+        <h3 class="text-xs font-semibold" :class="isSidebar ? 'text-[#2f2a4b] dark:text-slate-100' : 'text-slate-900 dark:text-slate-100'">
           {{ isSidebar ? 'Refine opportunities' : 'Filter opportunities' }}
         </h3>
       </div>
@@ -29,14 +29,23 @@
 
     <div class="flex flex-wrap items-end gap-3" :class="isSidebar ? 'space-y-1' : ''">
       <div :class="isSidebar ? 'w-full' : 'w-full sm:w-75'">
-        <label class="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Search</label>
+        <label
+          class="mb-1 block text-[11px] font-semibold"
+          :class="isSidebar ? 'text-[#595576] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
+        >
+          Search
+        </label>
         <div class="relative">
           <input
             v-model="localFilters.search"
             type="text"
             placeholder="Search by title or description"
-            class="w-full border border-slate-300 bg-white px-3 py-2 pl-9 text-xs text-slate-900 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400"
-            :class="isSidebar ? 'rounded-full' : 'rounded-lg'"
+            class="w-full px-3 py-2 pl-9 text-xs text-slate-900 transition focus:outline-none"
+            :class="
+              isSidebar
+                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
+                : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
+            "
             @input="debouncedEmit"
           />
           <svg viewBox="0 0 24 24" class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -46,12 +55,21 @@
       </div>
 
       <div :class="isSidebar ? 'w-full' : 'w-full sm:w-60'">
-        <label class="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Technologies</label>
+        <label
+          class="mb-1 block text-[11px] font-semibold"
+          :class="isSidebar ? 'text-[#595576] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
+        >
+          Technologies
+        </label>
         <div ref="techDropdown" class="relative">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-between border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-900 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            :class="isSidebar ? 'rounded-full' : 'rounded-lg'"
+            class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
+            :class="
+              isSidebar
+                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+                : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+            "
             :aria-expanded="techMenuOpen"
             aria-haspopup="listbox"
             @click="toggleTechMenu"
@@ -110,26 +128,44 @@
       </div>
 
       <div :class="isSidebar ? 'w-full' : 'w-full sm:w-47.5'">
-        <label class="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Location</label>
+        <label
+          class="mb-1 block text-[11px] font-semibold"
+          :class="isSidebar ? 'text-[#595576] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
+        >
+          Location
+        </label>
         <div class="relative">
           <input
             v-model="localFilters.location"
             type="text"
             placeholder="City / region"
-            class="w-full border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400"
-            :class="isSidebar ? 'rounded-full' : 'rounded-lg'"
+            class="w-full px-3 py-2 text-xs text-slate-900 transition focus:outline-none"
+            :class="
+              isSidebar
+                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
+                : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
+            "
             @input="debouncedEmit"
           />
         </div>
       </div>
 
       <div :class="isSidebar ? 'w-full' : 'w-full sm:w-45'">
-        <label class="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Status</label>
+        <label
+          class="mb-1 block text-[11px] font-semibold"
+          :class="isSidebar ? 'text-[#595576] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
+        >
+          Status
+        </label>
         <div ref="statusDropdown" class="relative w-full">
             <button
               type="button"
-              class="inline-flex w-full items-center justify-between border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-900 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-              :class="isSidebar ? 'rounded-full' : 'rounded-lg'"
+              class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
+              :class="
+                isSidebar
+                    ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+                  : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+              "
               :aria-expanded="statusMenuOpen"
               aria-haspopup="listbox"
               @click="toggleStatusMenu"
@@ -176,12 +212,21 @@
       </div>
 
       <div :class="isSidebar ? 'w-full' : 'w-full sm:w-42.5'">
-        <label class="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Sort by date</label>
+        <label
+          class="mb-1 block text-[11px] font-semibold"
+          :class="isSidebar ? 'text-[#595576] dark:text-slate-400' : 'text-slate-500 dark:text-slate-400'"
+        >
+          Sort by date
+        </label>
         <div ref="sortDropdown" class="relative w-full">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-between border border-slate-300 bg-white px-3 py-2 text-left text-xs text-slate-900 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            :class="isSidebar ? 'rounded-full' : 'rounded-lg'"
+            class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
+            :class="
+              isSidebar
+                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+                : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+            "
             :aria-expanded="sortMenuOpen"
             aria-haspopup="listbox"
             @click="toggleSortMenu"
@@ -229,8 +274,12 @@
 
       <div class="w-full" :class="isSidebar ? 'mt-1 space-y-2' : 'sm:w-auto'">
         <button
-          class="inline-flex w-full items-center justify-center border border-[#ebeaf2] bg-white px-3 py-2 text-xs font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-          :class="isSidebar ? 'rounded-full' : 'rounded-lg sm:w-auto'"
+          class="inline-flex w-full items-center justify-center px-3 py-2 text-xs font-semibold transition"
+          :class="
+            isSidebar
+              ? 'rounded-full bg-[#3f34a6] text-white shadow-[0_8px_20px_rgba(63,52,166,0.35)] hover:brightness-105 dark:bg-indigo-600 dark:text-white'
+              : 'rounded-lg border border-[#ebeaf2] bg-white text-[#474a61] hover:bg-[#f8f7fc] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:w-auto'
+          "
           @click="resetFilters"
         >
           Reset filters

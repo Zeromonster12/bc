@@ -3,7 +3,7 @@
     <div class="space-y-8">
       <!-- Student dashboard -->
       <template v-if="auth.isStudent">
-        <section class="rounded-3xl border border-slate-200 bg-linear-to-br from-white via-indigo-50/40 to-purple-50/30 p-6 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 sm:p-8">
+        <section class="rounded-3xl border border-slate-200/80 bg-linear-to-br from-[#f8f6ff] via-[#f4f0ff] to-[#eef5ff] p-6 shadow-[0_20px_45px_rgba(30,27,53,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:shadow-[0_20px_45px_rgba(2,6,23,0.45)] sm:p-8">
           <div class="grid gap-6 lg:grid-cols-[1.6fr_0.8fr] lg:items-center">
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600 dark:text-indigo-300">Student Overview</p>
@@ -16,7 +16,7 @@
               <div class="mt-5 flex flex-wrap gap-3">
                 <RouterLink
                   to="/applications"
-                  class="inline-flex items-center rounded-full bg-linear-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_26px_rgba(79,70,229,0.35)] hover:brightness-105"
+                  class="inline-flex items-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] hover:brightness-105"
                 >
                   Manage Applications
                 </RouterLink>
@@ -29,7 +29,7 @@
               </div>
             </div>
 
-            <div class="rounded-2xl border border-indigo-200/70 bg-white/90 p-5 dark:border-indigo-500/30 dark:bg-slate-900/80">
+            <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
               <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Completion Pulse</p>
               <p class="mt-2 text-4xl font-black text-indigo-700 dark:text-indigo-300">{{ profileStrength }}%</p>
               <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Derived from accepted applications and active conversations.</p>
@@ -44,22 +44,22 @@
         </section>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Open Projects</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.openProjects }}</p>
             <p class="mt-1 text-xs text-emerald-600 dark:text-emerald-400">Available right now</p>
           </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Applications Sent</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.myApplications }}</p>
             <p class="mt-1 text-xs text-indigo-600 dark:text-indigo-400">{{ pendingApplicationsCount }} pending review</p>
           </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Accepted</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.acceptedApplications }}</p>
             <p class="mt-1 text-xs text-violet-600 dark:text-violet-400">Projects where you are in</p>
           </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Unread Messages</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ unreadMessages }}</p>
             <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">Across all conversations</p>
@@ -79,7 +79,7 @@
               <div
                 v-for="n in 4"
                 :key="n"
-                class="h-56 rounded-2xl bg-gray-100 animate-pulse dark:bg-slate-800"
+                class="h-56 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800"
               />
             </div>
 
@@ -87,7 +87,7 @@
               <article
                 v-for="project in recentProjects"
                 :key="project.id"
-                class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+                class="group rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)] dark:border-slate-700/70 dark:bg-slate-900/90"
               >
                 <div class="flex items-center justify-between gap-3">
                   <span class="inline-flex rounded-full bg-indigo-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
@@ -110,7 +110,7 @@
               </article>
             </div>
 
-            <div v-else class="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+            <div v-else class="rounded-3xl border border-dashed border-slate-300/80 bg-white/95 p-8 text-center text-sm text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/90 dark:text-slate-400">
               No open projects right now. Check back later.
             </div>
           </section>
@@ -124,7 +124,7 @@
                 </RouterLink>
               </div>
 
-              <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
                 <div class="space-y-3">
                 <div
                   v-for="activity in recentActivities"
@@ -146,7 +146,7 @@
                 </span>
               </div>
 
-              <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
                 <ul class="space-y-2.5">
                   <li
                     v-for="item in checklistItems"
@@ -170,7 +170,7 @@
 
                 <RouterLink
                   to="/profile/student"
-                  class="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                  class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-slate-300/90 bg-white/95 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Manage Profile
                 </RouterLink>
@@ -190,7 +190,7 @@
             <div
               v-for="n in 3"
               :key="n"
-              class="h-40 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800"
+              class="h-40 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800"
             />
           </div>
           <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -207,7 +207,7 @@
 
       <!-- Company dashboard -->
       <template v-else-if="auth.isCompany">
-        <section class="rounded-3xl border border-white/90 bg-linear-to-br from-white via-indigo-50/45 to-violet-50/35 p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 dark:shadow-[0_10px_30px_rgba(2,6,23,0.5)] sm:p-8">
+        <section class="rounded-3xl border border-slate-200/80 bg-linear-to-br from-[#f8f6ff] via-[#f4f0ff] to-[#eef5ff] p-6 shadow-[0_20px_45px_rgba(30,27,53,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:shadow-[0_20px_45px_rgba(2,6,23,0.45)] sm:p-8">
           <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#4b35cb] dark:text-indigo-300">Company Workspace</p>
@@ -224,19 +224,19 @@
         </section>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">My Projects</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.myProjects }}</p>
           </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Open Projects</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.openProjects }}</p>
           </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Applications</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.totalApplications }}</p>
           </div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Unread Messages</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ unreadMessages }}</p>
           </div>
@@ -249,7 +249,7 @@
               <RouterLink to="/projects" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">View all</RouterLink>
             </div>
             <div v-if="projectStore.loading" class="grid gap-4 md:grid-cols-2">
-              <div v-for="n in 4" :key="n" class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+              <div v-for="n in 4" :key="n" class="h-48 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
             </div>
             <div v-else class="grid gap-4 md:grid-cols-2">
               <ProjectCard
@@ -267,7 +267,7 @@
               <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Application Pipeline</h2>
             </div>
 
-            <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
               <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="rounded-xl bg-amber-50 p-2.5 dark:bg-amber-900/20">
                   <p class="text-xl font-black text-amber-700 dark:text-amber-300">{{ companyPendingApplications }}</p>
@@ -300,7 +300,7 @@
 
       <!-- Admin dashboard -->
       <template v-else-if="auth.isAdmin">
-        <section class="rounded-3xl border border-white/90 bg-linear-to-br from-white via-indigo-50/45 to-violet-50/35 p-6 shadow-[0_10px_30px_rgba(30,27,53,0.08)] dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/20 dark:shadow-[0_10px_30px_rgba(2,6,23,0.5)] sm:p-8">
+        <section class="rounded-3xl border border-slate-200/80 bg-linear-to-br from-[#f8f6ff] via-[#f4f0ff] to-[#eef5ff] p-6 shadow-[0_20px_45px_rgba(30,27,53,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:shadow-[0_20px_45px_rgba(2,6,23,0.45)] sm:p-8">
           <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#4b35cb] dark:text-indigo-300">Administration</p>
@@ -314,15 +314,15 @@
         </section>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Total Users</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.totalUsers }}</p></div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Total Projects</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.totalProjects }}</p></div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Open Projects</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.openProjects }}</p></div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Pending Companies</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ pendingCompaniesCount }}</p></div>
-          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Unread Messages</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ unreadMessages }}</p></div>
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Total Users</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.totalUsers }}</p></div>
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Total Projects</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.totalProjects }}</p></div>
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Open Projects</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.openProjects }}</p></div>
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Pending Companies</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ pendingCompaniesCount }}</p></div>
+          <div class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90"><p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Unread Messages</p><p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ unreadMessages }}</p></div>
         </div>
 
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <section class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Latest Users</h2>
             <div class="mt-4 space-y-2">
               <div v-for="item in adminLatestUsers" :key="item.id" class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 dark:border-slate-700 dark:bg-slate-800/60">
@@ -335,7 +335,7 @@
             </div>
           </section>
 
-          <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <section class="rounded-3xl border border-slate-200/90 bg-white/95 p-5 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
             <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Recent Projects</h2>
             <div class="mt-4 space-y-2">
               <div v-for="project in adminRecentProjects" :key="project.id" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 dark:border-slate-700 dark:bg-slate-800/60">

@@ -3,11 +3,6 @@
     <nav class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
       <RouterLink to="/" class="text-lg font-extrabold tracking-tight text-indigo-700 sm:text-2xl dark:text-indigo-300">Project Linker</RouterLink>
 
-      <div class="hidden items-center gap-8 md:flex">
-        <a href="#" class="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-300">Students</a>
-        <a href="#" class="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-300">Companies</a>
-        <a href="#" class="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-300">About Us</a>
-      </div>
 
       <div class="flex items-center gap-3 sm:gap-4">
         <RouterLink

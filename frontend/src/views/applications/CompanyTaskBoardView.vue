@@ -2,17 +2,20 @@
   <AppLayout>
     <div class="h-full overflow-hidden space-y-3 lg:my-0 xl:ml-0" @click="closeActionMenu">
       <div
-        class="grid h-full min-h-0 items-stretch gap-2 xl:grid-cols-[260px_minmax(0,1fr)]"
+        class="grid h-full min-h-0 items-stretch gap-6 lg:min-h-[calc(100vh-11rem)] lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]"
       >
-        <TaskBoardProjectSidebar
-          :is-student="auth.isStudent"
-          :projects="companyProjects"
-          :selected-project-id="selectedProjectId"
-          :selected-project-task-count="
-            statusCount('todo') + statusCount('in_progress') + statusCount('complete')
-          "
-          @select-project="selectProject"
-        />
+        <aside class="flex h-full flex-col gap-4 lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)]">
+          <TaskBoardProjectSidebar
+            class="flex-1"
+            :is-student="auth.isStudent"
+            :projects="companyProjects"
+            :selected-project-id="selectedProjectId"
+            :selected-project-task-count="
+              statusCount('todo') + statusCount('in_progress') + statusCount('complete')
+            "
+            @select-project="selectProject"
+          />
+        </aside>
 
         <div class="flex min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
           <BaseAlert

@@ -9,7 +9,7 @@
       <div class="grid gap-6 md:grid-cols-3">
         <article class="rounded-3xl bg-[#f0ecf9] p-6 dark:bg-slate-900 sm:p-8">
           <p class="leading-relaxed text-[#1c1a24] dark:text-slate-100">
-            "Scholar Slate didn't just find me a job; they curated a role that perfectly matched my
+            "Project Linker didn't just find me a job, they curated a role that perfectly matched my
             research interests in AI ethics."
           </p>
           <p class="mt-6 text-sm font-semibold text-[#474555] dark:text-slate-400">Leo Henderson · Intern @ Anthropic</p>

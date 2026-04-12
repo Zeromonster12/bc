@@ -36,7 +36,7 @@
         </div>
         <div class="overflow-hidden rounded-2xl border border-[#c8c4d8] bg-white shadow-xl dark:border-slate-700 dark:bg-slate-800">
           <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF_kh_4Qmio_wIPH-a98jogZ-mcxVdvd7tq4RtZVVLnxk4ir6SITVmEeEaayEyncPZE-q_P-9p8IuFtWSHSQJP0cHUQGhR_6xZB8HemS7FFNM47uPf3H2Fy4KUJMIylUnldHITdqk7ZeRnHrayqRuRsHkCgWPhKU-sKx4x5PUNMP6SvmG4j6U4rLZ9OCsh9MhrX8KQP33yWdqFfP2SOdoWxKug2WBFVZvghxZ06Uy23-pLxl1ml3Qi5SnjKkq70KUrHEfxsblKxgPk"
+            src="/images/image1.png"
             alt="Portfolio UI preview"
             class="h-full w-full object-cover"
           />
