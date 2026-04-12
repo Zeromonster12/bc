@@ -1,13 +1,13 @@
 <template>
-  <div class="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
+  <div class="mx-3 mt-3 flex items-center gap-3 rounded-2xl bg-[#e8e3f2] px-4 py-3 dark:bg-slate-800">
     <button
-      class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+      class="rounded-full p-2 text-[#5b5676] hover:bg-[#d7d1ec] hover:text-[#3f34a6] md:hidden dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
       @click="$emit('back')"
     >
       &larr;
     </button>
     <div
-      class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+      class="flex h-10 w-10 items-center justify-center rounded-full bg-[#d2cce8] text-xs font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200"
     >
       <img
         v-if="avatarUrl"
@@ -27,17 +27,15 @@
           v-if="participantsExtraCount > 0"
           class="group relative shrink-0"
         >
-          <span
-            class="inline-flex cursor-help items-center rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
-          >
+          <span class="inline-flex cursor-help items-center rounded-full bg-[#d7d1ec] px-1.5 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200">
             +{{ participantsExtraCount }}
           </span>
           <span
             v-if="participantsTooltip"
-            class="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max max-w-[18rem] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-medium leading-4 text-slate-700 opacity-0 shadow-lg transition-all duration-150 group-hover:opacity-100 group-focus-within:opacity-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+            class="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max max-w-[18rem] -translate-x-1/2 rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-medium leading-4 text-slate-700 opacity-0 shadow-lg transition-all duration-150 group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-800 dark:text-slate-200"
           >
             <span
-              class="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-l border-t border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-800"
+              class="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-white dark:bg-slate-800"
             />
             {{ participantsTooltip }}
           </span>
@@ -49,11 +47,11 @@
     </div>
     <details v-if="showGroupActions" class="relative shrink-0">
       <summary
-        class="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-2xl border border-[#ebeaf2] bg-white text-[#474a61] shadow-[0_4px_14px_rgba(30,27,53,0.08)] transition hover:bg-[#f8f7fc] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:shadow-none dark:hover:bg-slate-700"
+        class="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-2xl bg-[#d7d1ec] text-[#474a61] transition hover:bg-[#ccc4e8] dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
       >
         <span class="text-lg leading-none">...</span>
       </summary>
-      <div class="absolute right-0 top-full z-30 mt-2 w-52 rounded-2xl border border-white/90 bg-white p-1.5 shadow-[0_10px_30px_rgba(30,27,53,0.12)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-[0_10px_30px_rgba(2,6,23,0.45)]">
+      <div class="absolute right-0 top-full z-30 mt-2 w-52 rounded-2xl bg-white p-1.5 dark:bg-slate-900">
         <button
           class="w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-[#474a61] transition hover:bg-[#f8f7fc] dark:text-slate-200 dark:hover:bg-slate-800"
           @click="$emit('rename-group')"

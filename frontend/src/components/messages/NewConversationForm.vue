@@ -1,13 +1,13 @@
 <template>
   <div
     v-if="visible"
-    class="space-y-2 border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800/80"
+    class="space-y-4 bg-white px-8 pb-8 pt-2 dark:bg-slate-900"
   >
-    <div class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-700 dark:bg-slate-900">
+    <div class="grid grid-cols-2 rounded-full bg-[#e8e3f2] p-1 dark:bg-slate-900">
       <button
         type="button"
         class="rounded-full px-3 py-1.5 text-xs font-semibold transition"
-        :class="mode === 'direct' ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100' : 'text-[#5f6078] dark:text-slate-300'"
+        :class="mode === 'direct' ? 'bg-white text-[#201f35] dark:bg-slate-700 dark:text-slate-100' : 'text-[#5f6078] dark:text-slate-300'"
         @click="$emit('update:mode', 'direct')"
       >
         Direct
@@ -15,14 +15,14 @@
       <button
         type="button"
         class="rounded-full px-3 py-1.5 text-xs font-semibold transition"
-        :class="mode === 'group' ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100' : 'text-[#5f6078] dark:text-slate-300'"
+        :class="mode === 'group' ? 'bg-white text-[#201f35] dark:bg-slate-700 dark:text-slate-100' : 'text-[#5f6078] dark:text-slate-300'"
         @click="$emit('update:mode', 'group')"
       >
         Group
       </button>
     </div>
 
-    <div v-if="mode === 'group'" class="space-y-2">
+    <div v-if="mode === 'group'" class="space-y-3">
       <BaseInput
         :model-value="groupSubject"
         label="Group name"
@@ -35,7 +35,12 @@
         <div class="relative">
           <button
             type="button"
-            class="flex w-full items-center justify-between rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ece6f7] focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400"
+            :class="[
+              'flex w-full items-center justify-between rounded-full bg-[#e8e3f2] px-4 py-2.5 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ddd7f6] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400',
+              projectDropdownOpen
+                ? 'bg-[#ddd7f6] ring-2 ring-[#cfc3ee] dark:bg-slate-700 dark:ring-indigo-500/40'
+                : '',
+            ]"
             @click="projectDropdownOpen = !projectDropdownOpen"
           >
             <span class="truncate">{{ projectDropdownLabel }}</span>
@@ -44,14 +49,14 @@
 
           <div
             v-if="projectDropdownOpen"
-            class="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+            class="absolute z-40 mt-2 max-h-56 w-full overflow-y-auto rounded-2xl border border-[#d8d1ec] bg-white p-1 ring-1 ring-[#ece7f8] dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700/60"
           >
-            <div class="sticky top-0 z-10 border-b border-slate-100 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+            <div class="sticky top-0 z-10 border-b border-[#ece7f8] bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
               <input
                 v-model="projectSearchQuery"
                 type="text"
                 placeholder="Search project"
-                class="w-full rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-indigo-400 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
+                class="w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
               />
             </div>
 
@@ -62,7 +67,7 @@
               v-for="project in filteredProjectOptions"
               :key="project.id"
               type="button"
-              class="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+              class="block w-full rounded-xl px-3 py-2 text-left transition hover:bg-[#f1edf8] dark:hover:bg-slate-800"
               @click="onSelectProjectOption(project)"
             >
               <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ project.title }}</p>
@@ -72,12 +77,17 @@
       </div>
     </div>
 
-    <div v-if="mode === 'direct'" class="space-y-1">
+    <div v-if="mode === 'direct'" class="space-y-2">
       <label class="mb-1 block text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300">Recipient</label>
       <div class="relative">
         <button
           type="button"
-          class="flex w-full items-center justify-between rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ece6f7] focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400"
+          :class="[
+            'flex w-full items-center justify-between rounded-full bg-[#e8e3f2] px-4 py-2.5 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ddd7f6] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400',
+            directDropdownOpen
+              ? 'bg-[#ddd7f6] ring-2 ring-[#cfc3ee] dark:bg-slate-700 dark:ring-indigo-500/40'
+              : '',
+          ]"
           @click="directDropdownOpen = !directDropdownOpen"
         >
           <span class="truncate">{{ directDropdownLabel }}</span>
@@ -86,14 +96,14 @@
 
         <div
           v-if="directDropdownOpen"
-          class="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          class="absolute z-40 mt-2 max-h-56 w-full overflow-y-auto rounded-2xl border border-[#d8d1ec] bg-white p-1 ring-1 ring-[#ece7f8] dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700/60"
         >
-          <div class="sticky top-0 z-10 border-b border-slate-100 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+          <div class="sticky top-0 z-10 border-b border-[#ece7f8] bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
             <input
               :value="recipientQuery"
               type="text"
               placeholder="Search by name or email"
-              class="w-full rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-indigo-400 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
+              class="w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
               @input="$emit('update:recipientQuery', ($event.target as HTMLInputElement).value)"
             />
           </div>
@@ -109,7 +119,7 @@
             v-for="option in recipientOptions"
             :key="option.id"
             type="button"
-            class="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            class="block w-full rounded-xl px-3 py-2 text-left transition hover:bg-[#f1edf8] dark:hover:bg-slate-800"
             @click="onSelectDirectOption(option)"
           >
             <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ option.name }}</p>
@@ -119,12 +129,17 @@
       </div>
     </div>
 
-    <div v-if="mode === 'group'" class="space-y-2">
+    <div v-if="mode === 'group'" class="space-y-3">
       <label class="mb-1 block text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300">Participants</label>
       <div class="relative">
         <button
           type="button"
-          class="flex w-full items-center justify-between rounded-lg border-0 bg-[#f1edf8] px-3 py-2 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ece6f7] focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400"
+          :class="[
+            'flex w-full items-center justify-between rounded-full bg-[#e8e3f2] px-4 py-2.5 text-left text-sm text-slate-900 outline-none transition hover:bg-[#ddd7f6] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 dark:focus:ring-indigo-400',
+            groupDropdownOpen
+              ? 'bg-[#ddd7f6] ring-2 ring-[#cfc3ee] dark:bg-slate-700 dark:ring-indigo-500/40'
+              : '',
+          ]"
           @click="groupDropdownOpen = !groupDropdownOpen"
         >
           <span class="truncate">{{ groupDropdownLabel }}</span>
@@ -133,14 +148,14 @@
 
         <div
           v-if="groupDropdownOpen"
-          class="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          class="absolute z-40 mt-2 max-h-56 w-full overflow-y-auto rounded-2xl border border-[#d8d1ec] bg-white p-1 ring-1 ring-[#ece7f8] dark:border-slate-700 dark:bg-slate-900 dark:ring-slate-700/60"
         >
-          <div class="sticky top-0 z-10 border-b border-slate-100 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+          <div class="sticky top-0 z-10 border-b border-[#ece7f8] bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
             <input
               v-model="groupSearchQuery"
               type="text"
               placeholder="Search project member"
-              class="w-full rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-sm text-slate-800 outline-none focus:border-indigo-400 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
+              class="w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-900"
             />
           </div>
 
@@ -152,7 +167,7 @@
             v-for="option in groupFilteredRecipientOptions"
             :key="option.id"
             type="button"
-            class="block w-full border-b border-slate-100 px-3 py-2 text-left last:border-b-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            class="block w-full rounded-xl px-3 py-2 text-left transition hover:bg-[#f1edf8] dark:hover:bg-slate-800"
             @click="onSelectGroupOption(option)"
           >
             <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ option.name }}</p>
@@ -164,13 +179,13 @@
 
     <p
       v-if="mode === 'direct' && selectedRecipient"
-      class="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
+      class="rounded-2xl bg-[#e8e3f2] px-4 py-2.5 text-xs text-[#3f365e] dark:bg-slate-800 dark:text-slate-200"
     >
       Selected: <strong>{{ selectedRecipient.name }}</strong>
-      <span class="text-emerald-600 dark:text-emerald-400">({{ selectedRecipient.email }})</span>
+      <span class="text-[#5c4b9f] dark:text-indigo-300">({{ selectedRecipient.email }})</span>
       <button
         type="button"
-        class="ml-2 text-emerald-700 underline underline-offset-2 hover:text-emerald-900 dark:text-emerald-300 dark:hover:text-emerald-200"
+        class="ml-2 text-[#4b3e8f] underline underline-offset-2 hover:text-[#2f2568] dark:text-indigo-300 dark:hover:text-indigo-200"
         @click="$emit('clearRecipient')"
       >
         Clear
@@ -179,17 +194,17 @@
 
     <div
       v-if="mode === 'group' && selectedParticipants.length"
-      class="flex flex-wrap gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-2 dark:border-indigo-500/30 dark:bg-indigo-500/10"
+      class="flex flex-wrap gap-2 rounded-2xl bg-[#e8e3f2] px-3 py-3 dark:bg-slate-800"
     >
       <span
         v-for="participant in selectedParticipants"
         :key="participant.id"
-        class="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-xs font-medium text-indigo-700 dark:bg-slate-800 dark:text-indigo-300"
+        class="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-[#4b3e8f] dark:bg-slate-700 dark:text-indigo-200"
       >
         {{ participant.name }}
         <button
           type="button"
-          class="text-indigo-500 transition hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-100"
+          class="text-[#6a5ab5] transition hover:text-[#3c2f82] dark:text-indigo-300 dark:hover:text-indigo-100"
           @click="$emit('removeParticipant', participant.id)"
         >
           x
@@ -202,7 +217,7 @@
       variant="primary"
       :loading="creating"
       @click="$emit('submit')"
-      class="w-full"
+      class="w-full rounded-full! bg-[#3f34a6]! px-4! py-2.5! text-sm! font-semibold! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
     >
       {{ mode === 'group' ? 'Create group chat' : 'Start conversation' }}
     </BaseButton>

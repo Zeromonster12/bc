@@ -6,21 +6,21 @@
     <div v-else-if="!conversations.length" class="flex h-full items-center justify-center px-4">
       <p class="text-center text-sm text-slate-400 dark:text-slate-500">No conversations yet</p>
     </div>
-    <ul v-else class="divide-y divide-slate-100 dark:divide-slate-700/60">
+    <ul v-else class="space-y-3 px-8 pb-8 pt-2">
       <li
         v-for="convo in conversations"
         :key="convo.id"
         :class="[
-          'cursor-pointer px-4 py-3 transition',
+          'cursor-pointer rounded-2xl px-5 py-3.5 transition',
           activeId === convo.id
-            ? 'bg-indigo-50/70 dark:bg-indigo-500/15'
-            : 'hover:bg-slate-50 dark:hover:bg-slate-800/70',
+            ? 'bg-[#e8e3f2] dark:bg-indigo-500/15'
+            : 'bg-[#f1edf8] dark:bg-slate-800/70 dark:hover:bg-slate-800',
         ]"
         @click="$emit('select', convo.id)"
       >
         <div class="flex items-start gap-3">
           <div
-            class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+            class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#d7d1ec] text-xs font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200"
           >
             <img
               v-if="directConversationAvatarUrl(convo)"
@@ -35,12 +35,12 @@
               <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {{ conversationTitle(convo) }}
               </p>
-              <span class="ml-auto shrink-0 text-[11px] text-slate-400 dark:text-slate-500">
+              <span class="ml-auto shrink-0 text-[11px] text-slate-500 dark:text-slate-500">
                 {{ formatConversationTime(convo.last_message?.created_at || convo.created_at) }}
               </span>
             </div>
             <div class="mt-0.5 flex items-center gap-2">
-              <p class="truncate text-xs text-slate-500 dark:text-slate-400">
+              <p class="truncate text-xs text-[#5b5676] dark:text-slate-400">
                 {{ lastMessagePreview(convo) }}
               </p>
               <span
@@ -56,7 +56,7 @@
               </span>
               <span
                 v-if="(convo.unread_count ?? 0) > 0"
-                class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-[11px] font-semibold text-white"
+                class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#5a42e5] px-1.5 text-[11px] font-semibold text-white"
               >
                 {{ convo.unread_count ?? 0 }}
               </span>

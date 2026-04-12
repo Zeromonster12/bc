@@ -1,11 +1,11 @@
 <template>
-  <div class="flex h-full min-h-0 flex-col">
-    <div ref="threadRef" class="message-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4">
+  <div class="flex h-full min-h-0 flex-col bg-[#e8e3f2] dark:bg-slate-900">
+    <div ref="threadRef" class="message-scrollbar min-h-0 flex-1 overflow-y-auto bg-white px-4 py-4 dark:bg-slate-950">
       <div
         v-for="message in messages"
         :key="String(message.id)"
         :class="[
-          'mb-2 flex',
+          'mb-3 flex',
           Number(message.sender?.id) === currentUserId ? 'justify-end' : 'justify-start',
         ]"
       >
@@ -18,7 +18,7 @@
           >
             <div
               :class="[
-                'h-6 w-6 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-[10px] font-semibold text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300',
+                'h-6 w-6 shrink-0 overflow-hidden rounded-full bg-[#d7d1ec] text-[10px] font-semibold text-[#4d466b] dark:bg-slate-800 dark:text-slate-300',
                 Number(message.sender?.id) === currentUserId ? 'order-2' : '',
               ]"
             >
@@ -34,7 +34,7 @@
             </div>
             <p
               :class="[
-                'truncate text-[11px] font-semibold text-slate-600 dark:text-slate-300',
+                'truncate text-[11px] font-semibold text-[#5b5676] dark:text-slate-300',
                 Number(message.sender?.id) === currentUserId ? 'order-1' : '',
               ]"
             >
@@ -44,10 +44,10 @@
 
           <div
             :class="[
-              'rounded-2xl px-4 py-2 text-sm shadow-sm',
+              'rounded-2xl px-4 py-2.5 text-sm',
               Number(message.sender?.id) === currentUserId
-                ? 'rounded-br-sm bg-indigo-600 text-white'
-                : 'rounded-bl-sm border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
+                ? 'rounded-br-sm bg-linear-to-r from-[#4526c9] to-[#5b45f0] text-white'
+                : 'rounded-bl-sm bg-[#f1edf8] text-[#2f2952] dark:bg-slate-900 dark:text-slate-100',
             ]"
           >
             <p>{{ message.body }}</p>
@@ -75,26 +75,26 @@
       </div>
     </div>
 
-    <div v-if="typingNames.length" class="px-4 pb-2 text-xs text-slate-500 dark:text-slate-400">
+    <div v-if="typingNames.length" class="px-4 pb-2 text-xs text-[#66628b] dark:text-slate-400">
       {{ typingText }}
     </div>
 
-    <div class="sticky bottom-0 z-10 border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
-      <div class="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-slate-700 dark:bg-slate-800">
+    <div class="sticky bottom-0 z-10 bg-white px-3 pb-3 pt-2 dark:bg-slate-900">
+      <div class="flex items-center gap-2 rounded-full bg-[#e8e3f2] p-2 dark:bg-slate-800">
         <textarea
           ref="textareaRef"
           v-model="body"
           rows="1"
           :disabled="sending"
           placeholder="Type a message"
-          class="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-2 py-2 text-sm leading-5 text-slate-800 placeholder:text-slate-400 focus:border-transparent focus:outline-none disabled:opacity-50 dark:text-slate-100 dark:placeholder:text-slate-500"
+          class="flex-1 resize-none rounded-full bg-transparent px-2 py-2 text-sm leading-5 text-slate-800 placeholder:text-slate-500 focus:outline-none disabled:opacity-50 dark:text-slate-100 dark:placeholder:text-slate-500"
           @keydown.enter.exact.prevent="send"
           @input="handleTypingInput"
         />
         <button
           :disabled="sending || !body.trim()"
           @click="send"
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white transition-colors hover:bg-indigo-700 disabled:opacity-40"
+          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3f34a6] text-white transition hover:brightness-105 disabled:opacity-40"
         >
           <svg v-if="!sending" class="h-5 w-5 rotate-90" fill="currentColor" viewBox="0 0 20 20">
             <path
