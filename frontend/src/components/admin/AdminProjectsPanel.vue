@@ -53,22 +53,35 @@
           <tr v-for="project in visibleProjects" :key="project.id" class="hover:bg-[#f7f4fc] dark:hover:bg-slate-800/70">
             <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{ project.title }}</td>
             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
-              <RouterLink
-                v-if="project.company?.user_id"
-                :to="`/companies/${project.company.user_id}/profile`"
-                class="transition hover:text-indigo-600 dark:hover:text-indigo-300"
-              >
-                {{ project.company?.name }}
-              </RouterLink>
-              <span v-else>{{ project.company?.name }}</span>
+              <div class="flex items-center gap-3">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#ddd7ef] text-[11px] font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200">
+                  <img
+                    v-if="companyAvatarUrl(project)"
+                    :src="companyAvatarUrl(project)"
+                    :alt="`${project.company?.name ?? 'Company'} avatar`"
+                    class="h-full w-full object-cover"
+                  >
+                  <span v-else>{{ companyInitials(project.company?.name) }}</span>
+                </div>
+
+                <RouterLink
+                  v-if="project.company?.user_id"
+                  :to="`/companies/${project.company.user_id}/profile`"
+                  class="transition hover:text-indigo-600 dark:hover:text-indigo-300"
+                >
+                  {{ project.company?.name }}
+                </RouterLink>
+                <span v-else>{{ project.company?.name }}</span>
+              </div>
             </td>
             <td class="px-4 py-3"><ProjectStatusBadge :status="project.status ?? 'draft'" /></td>
             <td class="px-4 py-3 text-xs text-slate-500 dark:text-slate-500">{{ formatDate(project.created_at ?? '') }}</td>
             <td class="px-4 py-3">
               <button
                 @click="$emit('delete-project', project.id)"
-                class="text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/30"
               >
+                <Trash2 class="h-3.5 w-3.5" />
                 Delete
               </button>
             </td>
@@ -91,9 +104,10 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
+import { ChevronDown, Trash2 } from 'lucide-vue-next'
 import ProjectStatusBadge from '@/components/projects/ProjectStatusBadge.vue'
 import BasePagination from '@/components/ui/BasePagination.vue'
+import { resolveAssetUrl } from '@/services/core/url'
 
 interface Pagination {
   current_page: number
@@ -109,12 +123,13 @@ interface AdminProjectRow {
   company?: {
     user_id?: number
     name?: string
+    avatar_url?: string | null
   }
 }
 
 export default defineComponent({
   name: 'AdminProjectsPanel',
-  components: { ProjectStatusBadge, BasePagination, ChevronDown },
+  components: { ProjectStatusBadge, BasePagination, ChevronDown, Trash2 },
   props: {
     projects: {
       type: Array as PropType<AdminProjectRow[]>,
@@ -179,6 +194,21 @@ export default defineComponent({
       const target = event.target as HTMLElement | null
       if (target?.closest('.admin-projects-dropdown')) return
       this.closeDropdowns()
+    },
+    companyAvatarUrl(project: AdminProjectRow): string {
+      return resolveAssetUrl(project.company?.avatar_url)
+    },
+    companyInitials(name?: string): string {
+      const safe = String(name ?? '').trim()
+      if (!safe) return 'CO'
+
+      return safe
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase()
     },
     formatDate(date: string): string {
       if (!date) return 'Unknown'

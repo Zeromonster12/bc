@@ -19,7 +19,7 @@ class AdminProjectController extends Controller
         $perPage = $validated['per_page'] ?? 10;
 
         $projects = Project::query()
-            ->with('companyUser:id,name')
+            ->with('companyUser:id,name,avatar_url')
             ->latest('id')
             ->paginate($perPage);
 
@@ -33,6 +33,7 @@ class AdminProjectController extends Controller
                     'company' => [
                         'user_id' => $project->company_user_id,
                         'name' => $project->companyUser?->name,
+                        'avatar_url' => $project->companyUser?->avatar_url,
                     ],
                 ];
             })->values(),

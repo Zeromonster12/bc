@@ -74,22 +74,37 @@
             <td colspan="6" class="px-4 py-10 text-center text-slate-400 dark:text-slate-500">No users found.</td>
           </tr>
           <tr v-for="user in users" :key="user.id" class="hover:bg-[#f7f4fc] dark:hover:bg-slate-800/70">
-            <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
-              <RouterLink
-                v-if="user.role === 'student'"
-                :to="{ name: 'students.profile', params: { id: user.id } }"
-                class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200"
-              >
-                {{ user.name }}
-              </RouterLink>
-              <RouterLink
-                v-else-if="user.role === 'company'"
-                :to="{ name: 'companies.profile', params: { id: user.id } }"
-                class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200"
-              >
-                {{ user.name }}
-              </RouterLink>
-              <span v-else>{{ user.name }}</span>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#ddd7ef] text-xs font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200">
+                  <img
+                    v-if="userAvatarUrl(user)"
+                    :src="userAvatarUrl(user)"
+                    :alt="`${user.name ?? 'User'} avatar`"
+                    class="h-full w-full object-cover"
+                  >
+                  <span v-else>{{ userInitials(user.name) }}</span>
+                </div>
+
+                <div class="min-w-0">
+                  <RouterLink
+                    v-if="user.role === 'student'"
+                    :to="{ name: 'students.profile', params: { id: user.id } }"
+                    class="block truncate font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200"
+                  >
+                    {{ user.name }}
+                  </RouterLink>
+                  <RouterLink
+                    v-else-if="user.role === 'company'"
+                    :to="{ name: 'companies.profile', params: { id: user.id } }"
+                    class="block truncate font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-200"
+                  >
+                    {{ user.name }}
+                  </RouterLink>
+                  <span v-else class="block truncate font-medium text-slate-900 dark:text-slate-100">{{ user.name }}</span>
+                  <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">ID {{ user.id }}</p>
+                </div>
+              </div>
             </td>
             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ user.email }}</td>
             <td class="px-4 py-3">
@@ -106,15 +121,11 @@
               </span>
             </td>
             <td class="px-4 py-3">
-              <span
-                :class="user.email_verified_at ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-slate-500'"
-                class="text-xs"
-              >
-                {{ user.email_verified_at ? 'Yes' : 'No' }}
-              </span>
+              <CheckCircle2 v-if="user.email_verified_at" class="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <XCircle v-else class="h-5 w-5 text-rose-600 dark:text-rose-400" />
             </td>
             <td class="px-4 py-3">
-              <div class="relative flex gap-2 admin-users-dropdown">
+              <div class="relative flex flex-wrap items-center gap-2 admin-users-dropdown">
                 <button
                   type="button"
                   class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-3 py-1.5 text-xs font-semibold text-[#4d466b] dark:bg-slate-800 dark:text-slate-200"
@@ -133,22 +144,25 @@
                 </div>
                 <button
                   @click="$emit('delete-user', user.id)"
-                  class="text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-200 dark:bg-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/30"
                 >
+                  <Trash2 class="h-3.5 w-3.5" />
                   Delete
                 </button>
                 <button
                   v-if="user.role === 'company' && user.company_verification_status !== 'approved'"
                   @click="$emit('approve-company', user.id)"
-                  class="text-xs font-medium text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-300 dark:hover:bg-emerald-500/30"
                 >
+                  <CheckCircle2 class="h-3.5 w-3.5" />
                   Approve
                 </button>
                 <button
                   v-if="user.role === 'company' && user.company_verification_status !== 'rejected'"
                   @click="$emit('reject-company', user.id)"
-                  class="text-xs font-medium text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-200 dark:bg-red-500/20 dark:text-red-300 dark:hover:bg-red-500/30"
                 >
+                  <XCircle class="h-3.5 w-3.5" />
                   Reject
                 </button>
               </div>
@@ -172,8 +186,9 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
+import { CheckCircle2, ChevronDown, Trash2, XCircle } from 'lucide-vue-next'
 import BasePagination from '@/components/ui/BasePagination.vue'
+import { resolveAssetUrl } from '@/services/core/url'
 
 interface Pagination {
   current_page: number
@@ -186,13 +201,14 @@ interface AdminUserRow {
   name?: string
   email?: string
   role?: string
+  avatar_url?: string | null
   email_verified_at?: string | null
   company_verification_status?: 'pending' | 'approved' | 'rejected'
 }
 
 export default defineComponent({
   name: 'AdminUsersPanel',
-  components: { BasePagination, ChevronDown },
+  components: { BasePagination, CheckCircle2, ChevronDown, Trash2, XCircle },
   props: {
     users: {
       type: Array as PropType<AdminUserRow[]>,
@@ -254,6 +270,21 @@ export default defineComponent({
       const target = event.target as HTMLElement | null
       if (target?.closest('.admin-users-dropdown')) return
       this.closeAllDropdowns()
+    },
+    userAvatarUrl(user: AdminUserRow): string {
+      return resolveAssetUrl(user.avatar_url)
+    },
+    userInitials(name?: string): string {
+      const safe = String(name ?? '').trim()
+      if (!safe) return 'U'
+
+      return safe
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase()
     },
     setRoleFilter(value: string) {
       this.closeAllDropdowns()
