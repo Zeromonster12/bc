@@ -94,7 +94,7 @@
                 <article
                   v-for="project in recommendedProjects"
                   :key="project.id"
-                  class="group flex min-h-36 flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800"
+                  class="group flex min-h-44 flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800"
                 >
                   <div class="flex items-center justify-between gap-3">
                     <span class="inline-flex rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
@@ -111,12 +111,47 @@
                     {{ project.description || 'No description available.' }}
                   </p>
 
-                  <p class="mt-2 truncate text-[11px] text-slate-500 dark:text-slate-400">
-                    {{ formatTechStack(project.tech_stack) }}
-                  </p>
+                  <div class="mt-3 flex h-6 items-center gap-1.5 overflow-hidden">
+                    <span
+                      v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 2)"
+                      :key="`${project.id}-recommended-${tech}`"
+                      class="inline-flex max-w-24 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                      :class="dashboardTechChipClass(index)"
+                    >
+                      <span class="truncate">{{ tech }}</span>
+                    </span>
+                    <span
+                      v-if="(project.tech_stack ?? []).length > 2"
+                      class="inline-flex items-center rounded-full bg-[#ddd7f6] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
+                    >
+                      +{{ (project.tech_stack ?? []).length - 2 }}
+                    </span>
+                    <span
+                      v-if="!(project.tech_stack ?? []).length"
+                      class="inline-flex items-center rounded-full bg-[#e8e3f2] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
+                    >
+                      General
+                    </span>
+                  </div>
 
                   <div class="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-slate-500 dark:text-slate-400">
-                    <span class="truncate pr-2 text-[11px] font-medium text-slate-600 dark:text-slate-300">{{ companyName(project) }}</span>
+                    <div class="flex min-w-0 items-center gap-2">
+                      <img
+                        v-if="companyAvatarUrl(project)"
+                        :src="companyAvatarUrl(project)"
+                        :alt="`${companyName(project)} logo`"
+                        class="h-6 w-6 shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                        loading="lazy"
+                      >
+                      <span
+                        v-else
+                        class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e3f2] text-[10px] font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200"
+                      >
+                        {{ companyInitials(project) }}
+                      </span>
+
+                      <span class="truncate pr-2 text-[11px] font-medium text-slate-600 dark:text-slate-300">{{ companyName(project) }}</span>
+                    </div>
                     <RouterLink :to="`/projects/${project.id}`" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
                       Open
                     </RouterLink>
@@ -124,7 +159,7 @@
                 </article>
               </div>
 
-              <div v-else class="rounded-3xl bg-white p-8 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+              <div v-else class="rounded-2xl bg-white p-8 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">
                 No open projects right now. Check back later.
               </div>
             </section>
