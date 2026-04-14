@@ -14,35 +14,36 @@
       {{ project.description }}
     </p>
 
-    <p
-      v-if="project.location"
-      class="mb-4 inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#e8e3f2] px-2.5 py-1 text-xs font-medium text-[#4d466b] dark:bg-slate-800 dark:text-slate-300 sm:mb-5"
-    >
-      <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-      </svg>
-      <span class="truncate">{{ project.location }}</span>
-    </p>
+    <div class="mt-auto space-y-3 sm:space-y-4">
+      <p
+        class="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#e8e3f2] px-2.5 py-1 text-xs font-medium text-[#4d466b] dark:bg-slate-800 dark:text-slate-300"
+      >
+        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+        </svg>
+        <span class="truncate">{{ project.location || 'Location not specified' }}</span>
+      </p>
 
-    <div class="mb-5 flex flex-wrap gap-2 sm:mb-6">
-      <span
-        v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 4)"
-        :key="tech"
-        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-        :class="techChipClass(index)"
-      >
-        {{ tech }}
-      </span>
-      <span
-        v-if="(project.tech_stack ?? []).length > 4"
-        class="inline-flex items-center rounded-full bg-[#ddd7f6] px-2.5 py-1 text-xs font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
-      >
-        +{{ (project.tech_stack ?? []).length - 4 }} more
-      </span>
+      <div class="flex flex-wrap gap-2">
+        <span
+          v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 4)"
+          :key="tech"
+          class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+          :class="techChipClass(index)"
+        >
+          {{ tech }}
+        </span>
+        <span
+          v-if="(project.tech_stack ?? []).length > 4"
+          class="inline-flex items-center rounded-full bg-[#ddd7f6] px-2.5 py-1 text-xs font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
+        >
+          +{{ (project.tech_stack ?? []).length - 4 }} more
+        </span>
+      </div>
     </div>
 
-    <div class="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4 text-xs sm:flex-nowrap sm:pt-5">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4 text-xs sm:flex-nowrap sm:pt-5">
       <div class="flex min-w-0 items-center gap-2 text-slate-600 dark:text-slate-300">
         <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e3f2] text-[10px] font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200">
           {{ companyInitials(project.company?.name) }}
