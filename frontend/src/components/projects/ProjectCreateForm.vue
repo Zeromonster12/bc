@@ -28,7 +28,7 @@
             <div class="project-custom-dropdown relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                class="flex w-full items-center justify-between rounded-xl bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                 @click="toggleDropdown('industry')"
               >
                 <span>{{ form.industry }}</span>
@@ -37,7 +37,7 @@
 
               <div
                 v-if="openDropdown === 'industry'"
-                class="absolute z-20 mt-2 w-full rounded-xl border border-[#ddd7ef] bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
+                class="absolute z-20 mt-2 w-full rounded-xl bg-white p-1 dark:bg-slate-900"
               >
                 <button
                   v-for="option in industryOptions"
@@ -57,7 +57,7 @@
             <div class="project-custom-dropdown relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                class="flex w-full items-center justify-between rounded-xl bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                 @click="toggleDropdown('duration')"
               >
                 <span>{{ form.internship_duration || 'Select duration' }}</span>
@@ -66,7 +66,7 @@
 
               <div
                 v-if="openDropdown === 'duration'"
-                class="absolute z-20 mt-2 w-full rounded-xl border border-[#ddd7ef] bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
+                class="absolute z-20 mt-2 w-full rounded-xl bg-white p-1 dark:bg-slate-900"
               >
                 <button
                   v-for="option in durationOptions"
@@ -93,7 +93,7 @@
               v-if="isCustomDuration"
               :value="form.internship_duration"
               type="text"
-              class="mt-2 w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+              class="mt-2 w-full rounded-xl bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
               placeholder="Type custom duration"
               @input="
                 $emit('update-field', {
@@ -110,11 +110,11 @@
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <button
               type="button"
-              class="rounded-xl border px-4 py-3 text-center transition"
+              class="rounded-xl px-4 py-3 text-center transition"
               :class="
                 form.location_strategy === 'remote'
-                  ? 'border-[#cbc0f4] bg-[#ece5ff] text-[#4533a2] dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
-                  : 'border-transparent bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
+                  ? 'bg-[#ece5ff] text-[#4533a2] dark:bg-indigo-500/20 dark:text-indigo-200'
+                  : 'bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
               "
               @click="$emit('update-field', { field: 'location_strategy', value: 'remote' })"
             >
@@ -124,11 +124,11 @@
 
             <button
               type="button"
-              class="rounded-xl border px-4 py-3 text-center transition"
+              class="rounded-xl px-4 py-3 text-center transition"
               :class="
                 form.location_strategy === 'onsite'
-                  ? 'border-[#cbc0f4] bg-[#ece5ff] text-[#4533a2] dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
-                  : 'border-transparent bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
+                  ? 'bg-[#ece5ff] text-[#4533a2] dark:bg-indigo-500/20 dark:text-indigo-200'
+                  : 'bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
               "
               @click="$emit('update-field', { field: 'location_strategy', value: 'onsite' })"
             >
@@ -138,11 +138,11 @@
 
             <button
               type="button"
-              class="rounded-xl border px-4 py-3 text-center transition"
+              class="rounded-xl px-4 py-3 text-center transition"
               :class="
                 form.location_strategy === 'hybrid'
-                  ? 'border-[#cbc0f4] bg-[#ece5ff] text-[#4533a2] dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
-                  : 'border-transparent bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
+                  ? 'bg-[#ece5ff] text-[#4533a2] dark:bg-indigo-500/20 dark:text-indigo-200'
+                  : 'bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
               "
               @click="$emit('update-field', { field: 'location_strategy', value: 'hybrid' })"
             >
@@ -158,7 +158,7 @@
             <div class="project-custom-dropdown relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-left text-sm text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                class="flex w-full items-center justify-between rounded-xl bg-[#f1edf8] px-4 py-3 text-left text-sm text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                 @click="toggleDropdown('status')"
               >
                 <span class="capitalize">{{ form.status }}</span>
@@ -167,7 +167,7 @@
 
               <div
                 v-if="openDropdown === 'status'"
-                class="absolute z-20 mt-2 w-full rounded-xl border border-[#ddd7ef] bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
+                class="absolute z-20 mt-2 w-full rounded-xl bg-white p-1 dark:bg-slate-900"
               >
                 <button
                   v-for="option in statusOptions"
@@ -189,7 +189,7 @@
               type="number"
               min="1"
               max="20"
-              class="w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+              class="w-full rounded-xl bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
               @input="
                 $emit('update-field', {
                   field: 'max_students',
@@ -243,7 +243,7 @@
           <div
             ref="descriptionTextarea"
             contenteditable="true"
-            class="wysiwyg-editor min-h-36 w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+            class="wysiwyg-editor min-h-36 w-full rounded-xl bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
             data-placeholder="Describe the project goals, outcomes and expected day-to-day work."
             @input="onEditorInput('description')"
             @focus="activeEditor = 'description'"
@@ -299,7 +299,7 @@
           <div
             ref="requirementsTextarea"
             contenteditable="true"
-            class="wysiwyg-editor min-h-36 w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+            class="wysiwyg-editor min-h-36 w-full rounded-xl bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
             data-placeholder="List required skills, expected experience and preferred tools."
             @input="onEditorInput('requirements')"
             @focus="activeEditor = 'requirements'"
@@ -327,11 +327,11 @@
                 </button>
               </span>
 
-              <div class="inline-flex items-center gap-1 rounded-full border border-[#d8d0ec] bg-white px-2 py-1 dark:border-slate-600 dark:bg-slate-900">
+              <div class="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 dark:bg-slate-900">
                 <input
                   :value="techInput"
                   type="text"
-                  class="w-28 border-0 bg-transparent px-1 py-0.5 text-xs text-[#4a4464] outline-none placeholder:text-[#8d87aa] dark:text-slate-200 dark:placeholder:text-slate-500"
+                  class="w-28 bg-transparent px-1 py-0.5 text-xs text-[#4a4464] outline-none placeholder:text-[#8d87aa] dark:text-slate-200 dark:placeholder:text-slate-500"
                   placeholder="Add skill..."
                   @input="$emit('update:techInput', ($event.target as HTMLInputElement).value)"
                   @keydown.enter.prevent="$emit('add-tech')"
@@ -356,7 +356,7 @@
         <button
           v-if="showSaveDraft"
           type="button"
-          class="inline-flex items-center justify-center rounded-full border border-[#d9d2f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#4b35cb] transition hover:bg-[#f7f3ff] dark:border-slate-600 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
+          class="inline-flex items-center justify-center rounded-full bg-[#f1edf8] px-5 py-2.5 text-sm font-semibold text-[#4b35cb] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
           @click="$emit('save-draft')"
         >
           <Save class="mr-1.5 h-4 w-4" />
@@ -364,7 +364,7 @@
         </button>
         <button
           type="button"
-          class="inline-flex items-center justify-center rounded-full border border-[#d9d2f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#4b35cb] transition hover:bg-[#f7f3ff] dark:border-slate-600 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
+          class="inline-flex items-center justify-center rounded-full bg-[#f1edf8] px-5 py-2.5 text-sm font-semibold text-[#4b35cb] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700"
           @click="$emit('cancel')"
         >
           Cancel
