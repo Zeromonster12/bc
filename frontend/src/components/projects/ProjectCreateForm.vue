@@ -1,22 +1,21 @@
 <template>
-  <form @submit.prevent="$emit('submit')" novalidate class="space-y-8">
-    <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_18px_45px_rgba(20,24,38,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-10">
-      <div class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-indigo-200/40 blur-2xl dark:bg-indigo-500/20" />
-      <div class="relative space-y-6">
+  <form @submit.prevent="$emit('submit')" novalidate class="space-y-6">
+    <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90 sm:p-8">
+      <div class="space-y-6">
         <div class="flex items-center gap-3">
-          <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
+          <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8e1ff] text-[#4b35cb] dark:bg-indigo-500/20 dark:text-indigo-200">
             <FileText class="h-5 w-5" />
           </div>
           <div>
-            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Project overview</h2>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Define the core details students will see first.</p>
+            <h2 class="text-lg font-bold text-[#1f1a38] dark:text-slate-100">Project overview</h2>
+            <p class="text-sm text-[#6c6786] dark:text-slate-400">Define the core details students will see first.</p>
           </div>
         </div>
 
         <BaseInput
           :model-value="form.title"
           label="Project title"
-          label-class="text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300"
+          label-class="text-sm font-semibold tracking-normal text-[#433d5c] dark:text-slate-300"
           :error="errors.title"
           required
           placeholder="e.g. AI-supported Quality Assurance Dashboard"
@@ -25,11 +24,11 @@
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
-            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Industry<span class="ml-0.5 text-red-500">*</span></label>
+            <label class="mb-2 block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Industry<span class="ml-0.5 text-red-500">*</span></label>
             <div class="project-custom-dropdown relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-slate-800 transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                class="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                 @click="toggleDropdown('industry')"
               >
                 <span>{{ form.industry }}</span>
@@ -38,13 +37,13 @@
 
               <div
                 v-if="openDropdown === 'industry'"
-                class="absolute z-20 mt-2 w-full rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                class="absolute z-20 mt-2 w-full rounded-xl border border-[#ddd7ef] bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
               >
                 <button
                   v-for="option in industryOptions"
                   :key="option"
                   type="button"
-                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-indigo-50 dark:hover:bg-slate-800"
+                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-[#f3eeff] dark:hover:bg-slate-800"
                   @click="selectIndustry(option)"
                 >
                   <span>{{ option }}</span>
@@ -54,11 +53,11 @@
             </div>
           </div>
           <div>
-            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Internship duration<span class="ml-0.5 text-red-500">*</span></label>
+            <label class="mb-2 block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Internship duration<span class="ml-0.5 text-red-500">*</span></label>
             <div class="project-custom-dropdown relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-slate-800 transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                class="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-left text-sm font-medium text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                 @click="toggleDropdown('duration')"
               >
                 <span>{{ form.internship_duration || 'Select duration' }}</span>
@@ -67,13 +66,13 @@
 
               <div
                 v-if="openDropdown === 'duration'"
-                class="absolute z-20 mt-2 w-full rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                class="absolute z-20 mt-2 w-full rounded-xl border border-[#ddd7ef] bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
               >
                 <button
                   v-for="option in durationOptions"
                   :key="option"
                   type="button"
-                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-indigo-50 dark:hover:bg-slate-800"
+                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-[#f3eeff] dark:hover:bg-slate-800"
                   @click="selectDuration(option)"
                 >
                   <span>{{ option }}</span>
@@ -81,7 +80,7 @@
                 </button>
                 <button
                   type="button"
-                  class="mt-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-indigo-50 dark:hover:bg-slate-800"
+                  class="mt-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition hover:bg-[#f3eeff] dark:hover:bg-slate-800"
                   @click="selectDurationCustom()"
                 >
                   <span>Custom</span>
@@ -94,7 +93,7 @@
               v-if="isCustomDuration"
               :value="form.internship_duration"
               type="text"
-              class="mt-2 w-full rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+              class="mt-2 w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
               placeholder="Type custom duration"
               @input="
                 $emit('update-field', {
@@ -107,15 +106,15 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Location strategy<span class="ml-0.5 text-red-500">*</span></label>
+          <label class="mb-2 block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Location strategy<span class="ml-0.5 text-red-500">*</span></label>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <button
               type="button"
-              class="rounded-xl border-2 px-4 py-3 text-center transition"
+              class="rounded-xl border px-4 py-3 text-center transition"
               :class="
                 form.location_strategy === 'remote'
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
-                  : 'border-transparent bg-[#f1edf8] text-slate-700 hover:border-indigo-200 dark:bg-slate-800 dark:text-slate-300'
+                  ? 'border-[#cbc0f4] bg-[#ece5ff] text-[#4533a2] dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
+                  : 'border-transparent bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
               "
               @click="$emit('update-field', { field: 'location_strategy', value: 'remote' })"
             >
@@ -125,11 +124,11 @@
 
             <button
               type="button"
-              class="rounded-xl border-2 px-4 py-3 text-center transition"
+              class="rounded-xl border px-4 py-3 text-center transition"
               :class="
                 form.location_strategy === 'onsite'
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
-                  : 'border-transparent bg-[#f1edf8] text-slate-700 hover:border-indigo-200 dark:bg-slate-800 dark:text-slate-300'
+                  ? 'border-[#cbc0f4] bg-[#ece5ff] text-[#4533a2] dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
+                  : 'border-transparent bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
               "
               @click="$emit('update-field', { field: 'location_strategy', value: 'onsite' })"
             >
@@ -139,11 +138,11 @@
 
             <button
               type="button"
-              class="rounded-xl border-2 px-4 py-3 text-center transition"
+              class="rounded-xl border px-4 py-3 text-center transition"
               :class="
                 form.location_strategy === 'hybrid'
-                  ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
-                  : 'border-transparent bg-[#f1edf8] text-slate-700 hover:border-indigo-200 dark:bg-slate-800 dark:text-slate-300'
+                  ? 'border-[#cbc0f4] bg-[#ece5ff] text-[#4533a2] dark:border-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-200'
+                  : 'border-transparent bg-[#f1edf8] text-[#4d4766] hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-300'
               "
               @click="$emit('update-field', { field: 'location_strategy', value: 'hybrid' })"
             >
@@ -155,11 +154,11 @@
 
         <div class="grid gap-4" :class="showStatusField ? 'sm:grid-cols-2' : 'sm:grid-cols-1'">
           <div v-if="showStatusField">
-            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Project status<span class="ml-0.5 text-red-500">*</span></label>
+            <label class="mb-2 block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Project status<span class="ml-0.5 text-red-500">*</span></label>
             <div class="project-custom-dropdown relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-left text-sm text-slate-900 transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                class="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-left text-sm text-[#2f2a47] transition hover:bg-[#e8e2f3] dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                 @click="toggleDropdown('status')"
               >
                 <span class="capitalize">{{ form.status }}</span>
@@ -168,13 +167,13 @@
 
               <div
                 v-if="openDropdown === 'status'"
-                class="absolute z-20 mt-2 w-full rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                class="absolute z-20 mt-2 w-full rounded-xl border border-[#ddd7ef] bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
               >
                 <button
                   v-for="option in statusOptions"
                   :key="option"
                   type="button"
-                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm capitalize transition hover:bg-indigo-50 dark:hover:bg-slate-800"
+                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm capitalize transition hover:bg-[#f3eeff] dark:hover:bg-slate-800"
                   @click="selectStatus(option)"
                 >
                   <span>{{ option }}</span>
@@ -184,13 +183,13 @@
             </div>
           </div>
           <div>
-            <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Max students<span class="ml-0.5 text-red-500">*</span></label>
+            <label class="mb-2 block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Max students<span class="ml-0.5 text-red-500">*</span></label>
             <input
               :value="form.max_students"
               type="number"
               min="1"
               max="20"
-              class="w-full rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+              class="w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
               @input="
                 $emit('update-field', {
                   field: 'max_students',
@@ -205,7 +204,7 @@
         <BaseInput
           :model-value="form.location"
           label="Full address"
-          label-class="text-sm font-semibold tracking-normal text-slate-700 dark:text-slate-300"
+          label-class="text-sm font-semibold tracking-normal text-[#433d5c] dark:text-slate-300"
           :error="errors.location"
           placeholder="e.g. Mlynske nivy 16, 821 09 Bratislava"
           @update:modelValue="$emit('update-field', { field: 'location', value: $event })"
@@ -213,7 +212,7 @@
 
         <div>
           <div class="mb-2 flex items-center justify-between gap-3">
-            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Project description<span class="ml-0.5 text-red-500">*</span></label>
+            <label class="block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Project description<span class="ml-0.5 text-red-500">*</span></label>
             <div class="flex items-center gap-1.5">
               <button
                 type="button"
@@ -244,7 +243,7 @@
           <div
             ref="descriptionTextarea"
             contenteditable="true"
-            class="wysiwyg-editor min-h-36 w-full rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+            class="wysiwyg-editor min-h-36 w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
             data-placeholder="Describe the project goals, outcomes and expected day-to-day work."
             @input="onEditorInput('description')"
             @focus="activeEditor = 'description'"
@@ -255,21 +254,21 @@
       </div>
     </section>
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_14px_35px_rgba(20,24,38,0.07)] dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-10">
+    <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90 sm:p-8">
       <div class="space-y-6">
         <div class="flex items-center gap-3">
-          <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-200">
+          <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8e1ff] text-[#4b35cb] dark:bg-violet-500/20 dark:text-violet-200">
             <BriefcaseBusiness class="h-5 w-5" />
           </div>
           <div>
-            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Role and requirements</h2>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Set clear expectations to attract the right candidates.</p>
+            <h2 class="text-lg font-bold text-[#1f1a38] dark:text-slate-100">Role and requirements</h2>
+            <p class="text-sm text-[#6c6786] dark:text-slate-400">Set clear expectations to attract the right candidates.</p>
           </div>
         </div>
 
         <div>
           <div class="mb-2 flex items-center justify-between gap-3">
-            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Requirements</label>
+            <label class="block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Requirements</label>
             <div class="flex items-center gap-1.5">
               <button
                 type="button"
@@ -300,7 +299,7 @@
           <div
             ref="requirementsTextarea"
             contenteditable="true"
-            class="wysiwyg-editor min-h-36 w-full rounded-xl border-0 bg-[#f1edf8] px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
+            class="wysiwyg-editor min-h-36 w-full rounded-xl border border-transparent bg-[#f1edf8] px-4 py-3 text-sm text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-slate-100"
             data-placeholder="List required skills, expected experience and preferred tools."
             @input="onEditorInput('requirements')"
             @focus="activeEditor = 'requirements'"
@@ -310,13 +309,13 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">Required skills</label>
+          <label class="mb-2 block text-sm font-semibold text-[#433d5c] dark:text-slate-300">Required skills</label>
           <div class="rounded-2xl bg-[#f1edf8] p-5 dark:bg-slate-800">
             <div class="flex flex-wrap items-center gap-2">
               <span
                 v-for="(tag, index) in form.tech_stack"
                 :key="tag + '-' + index"
-                class="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200"
+                class="inline-flex items-center gap-1 rounded-full bg-[#e6deff] px-3 py-1 text-xs font-semibold text-[#4735a3] dark:bg-indigo-500/20 dark:text-indigo-200"
               >
                 {{ tag }}
                 <button
@@ -328,11 +327,11 @@
                 </button>
               </span>
 
-              <div class="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-2 py-1 dark:border-slate-600 dark:bg-slate-900">
+              <div class="inline-flex items-center gap-1 rounded-full border border-[#d8d0ec] bg-white px-2 py-1 dark:border-slate-600 dark:bg-slate-900">
                 <input
                   :value="techInput"
                   type="text"
-                  class="w-28 border-0 bg-transparent px-1 py-0.5 text-xs text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-200 dark:placeholder:text-slate-500"
+                  class="w-28 border-0 bg-transparent px-1 py-0.5 text-xs text-[#4a4464] outline-none placeholder:text-[#8d87aa] dark:text-slate-200 dark:placeholder:text-slate-500"
                   placeholder="Add skill..."
                   @input="$emit('update:techInput', ($event.target as HTMLInputElement).value)"
                   @keydown.enter.prevent="$emit('add-tech')"
@@ -374,7 +373,7 @@
       <button
         type="submit"
         :disabled="loading"
-        class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-7 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+        class="inline-flex items-center justify-center rounded-full bg-[#4b35cb] px-7 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3f2cb0] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <svg v-if="loading" class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25" />
@@ -618,7 +617,7 @@ export default defineComponent({
 <style scoped>
 .wysiwyg-editor:empty::before {
   content: attr(data-placeholder);
-  color: rgb(148 163 184);
+  color: rgb(141 135 170);
   pointer-events: none;
 }
 
