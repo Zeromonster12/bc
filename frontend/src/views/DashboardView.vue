@@ -203,9 +203,6 @@
                   <path d="m7.5 15.5 5.5-5.5-5.5-5.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
-              <RouterLink to="/projects" class="ml-1 text-sm text-indigo-600 hover:underline dark:text-indigo-400">
-                View all →
-              </RouterLink>
             </div>
           </div>
 
@@ -213,7 +210,7 @@
             <div
               v-for="n in 4"
               :key="n"
-              class="h-36 w-55 shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-60"
+              class="h-36 w-64 shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
             />
           </div>
 
@@ -225,7 +222,7 @@
             <article
               v-for="project in recentProjects"
               :key="project.id"
-              class="group w-55 shrink-0 cursor-pointer rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-60"
+              class="group flex min-h-49 w-64 shrink-0 cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72"
               @click="$router.push('/projects/' + project.id)"
             >
               <div class="flex items-center justify-between gap-2">
@@ -243,9 +240,28 @@
                 {{ project.description || 'No description available.' }}
               </p>
 
-              <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                <span class="truncate pr-2">{{ formatTechStack(project.tech_stack) }}</span>
-                <span class="font-semibold text-indigo-600 dark:text-indigo-400">Open</span>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                <span
+                  v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 3)"
+                  :key="`${project.id}-${tech}`"
+                  class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  :class="dashboardTechChipClass(index)"
+                >
+                  {{ tech }}
+                </span>
+                <span
+                  v-if="(project.tech_stack ?? []).length > 3"
+                  class="inline-flex items-center rounded-full bg-[#ddd7f6] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
+                >
+                  +{{ (project.tech_stack ?? []).length - 3 }}
+                </span>
+              </div>
+
+              <div class="mt-auto flex items-center justify-between gap-2 pt-3 text-[11px] text-slate-500 dark:text-slate-400">
+                <span class="truncate pr-2 font-medium text-slate-600 dark:text-slate-300">
+                  {{ project.company?.name || 'Unknown company' }}
+                </span>
+                <span class="shrink-0 font-semibold text-indigo-600 dark:text-indigo-400">Open</span>
               </div>
             </article>
           </div>
@@ -669,6 +685,15 @@ export default defineComponent({
 
       if (!items.length) return 'General skill fit'
       return items.slice(0, 3).join(' • ')
+    },
+    dashboardTechChipClass(index: number): string {
+      const classes = [
+        'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
+        'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300',
+        'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+      ]
+
+      return classes[index % classes.length] || 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
     },
     scrollRecentProjects(direction: 'left' | 'right'): void {
       const rail = this.$refs.recentProjectsRail
