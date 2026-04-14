@@ -1,35 +1,10 @@
 <template>
   <div class="space-y-6">
-    <header class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-[#1f1a38] dark:text-slate-100 sm:text-3xl">Application Journey</h1>
-        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#6c6786] dark:text-slate-300">
-          Sleduj svoj progress napriec prihlaskami a maj prehlad o kazdej prilezitosti na jednom mieste.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3 rounded-xl border border-[#ddd7ea] bg-[#f4f1fb] px-3 py-2.5 dark:border-slate-700/70 dark:bg-slate-900/90">
-        <div class="relative flex h-11 w-11 items-center justify-center">
-          <svg class="h-full w-full -rotate-90" viewBox="0 0 44 44" fill="none">
-            <circle cx="22" cy="22" r="18" class="stroke-[#d9d2ec] dark:stroke-slate-700" stroke-width="4" />
-            <circle
-              cx="22"
-              cy="22"
-              r="18"
-              class="stroke-[#4d33c5] dark:stroke-indigo-400"
-              stroke-width="4"
-              stroke-linecap="round"
-              :stroke-dasharray="`${profileStrengthCircumference} ${profileStrengthCircumference}`"
-              :stroke-dashoffset="profileStrengthOffset"
-            />
-          </svg>
-          <span class="absolute text-[9px] font-extrabold text-[#2f2952] dark:text-slate-200">{{ profileStrength }}%</span>
-        </div>
-        <div>
-          <p class="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#7c7699] dark:text-slate-400">Profile strength</p>
-          <p class="mt-0.5 text-xs font-bold text-[#2f2952] dark:text-slate-200">{{ profileStrengthLabel }}</p>
-        </div>
-      </div>
+    <header>
+      <h1 class="text-2xl font-extrabold tracking-tight text-[#1f1a38] dark:text-slate-100 sm:text-3xl">Application Journey</h1>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#6c6786] dark:text-slate-300">
+        Track your progress across applications and keep every opportunity in one clear view.
+      </p>
     </header>
 
     <div class="flex flex-wrap items-center gap-2">
@@ -73,23 +48,36 @@
           :key="application.id"
           class="grid grid-cols-1 gap-3 rounded-2xl bg-white px-4 py-3.5 md:grid-cols-[minmax(0,1.45fr)_130px_170px_170px] md:items-center dark:bg-slate-900"
         >
-          <div class="min-w-0">
-            <p class="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-[#7c7699] dark:text-slate-400">
-              <RouterLink
-                v-if="companyProfilePath(application)"
-                :to="companyProfilePath(application) as string"
-                class="transition hover:text-[#4f33d7] dark:hover:text-indigo-300"
+          <div class="flex min-w-0 items-start gap-3">
+            <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#e8e3f2] text-[11px] font-bold text-[#4d466b] dark:bg-slate-800 dark:text-slate-200">
+              <img
+                v-if="companyLogoUrl(application)"
+                :src="companyLogoUrl(application)"
+                :alt="`${companyName(application)} logo`"
+                class="h-full w-full object-cover"
+                loading="lazy"
               >
-                {{ companyName(application) }}
-              </RouterLink>
-              <span v-else>{{ companyName(application) }}</span>
-            </p>
-            <h3 class="mt-1 truncate text-sm font-bold text-[#1f1a38] dark:text-slate-100">
-              {{ projectTitle(application) }}
-            </h3>
-            <p v-if="coverLetterPreview(application)" class="mt-1 line-clamp-1 text-xs text-[#66607d] dark:text-slate-300">
-              {{ coverLetterPreview(application) }}
-            </p>
+              <span v-else>{{ companyInitials(application) }}</span>
+            </div>
+
+            <div class="min-w-0">
+              <p class="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-[#7c7699] dark:text-slate-400">
+                <RouterLink
+                  v-if="companyProfilePath(application)"
+                  :to="companyProfilePath(application) as string"
+                  class="transition hover:text-[#4f33d7] dark:hover:text-indigo-300"
+                >
+                  {{ companyName(application) }}
+                </RouterLink>
+                <span v-else>{{ companyName(application) }}</span>
+              </p>
+              <h3 class="mt-1 truncate text-sm font-bold text-[#1f1a38] dark:text-slate-100">
+                {{ projectTitle(application) }}
+              </h3>
+              <p v-if="coverLetterPreview(application)" class="mt-1 line-clamp-1 text-xs text-[#66607d] dark:text-slate-300">
+                {{ coverLetterPreview(application) }}
+              </p>
+            </div>
           </div>
 
           <div>
@@ -137,18 +125,17 @@
 import { defineComponent, type PropType } from 'vue'
 import {
   STUDENT_APPLICATION_TABS,
-  calculateProfileStrength,
   companyName,
   companyProfilePath,
   coverLetterPreview,
   filterStudentApplicationsByTab,
-  profileStrengthLabel,
   projectTitle,
   statusHint,
   statusLabel,
   type StudentApplicationListItem,
   type StudentTab,
 } from '@/services/applications/StudentApplicationsService'
+import { resolveAssetUrl } from '@/services/core/url'
 
 export default defineComponent({
   name: 'StudentApplicationsList',
@@ -173,25 +160,37 @@ export default defineComponent({
     visibleApplications(): StudentApplicationListItem[] {
       return filterStudentApplicationsByTab(this.applications, this.activeTab)
     },
-    profileStrength(): number {
-      return calculateProfileStrength(this.applications)
-    },
-    profileStrengthLabel(): string {
-      return profileStrengthLabel(this.profileStrength)
-    },
-    profileStrengthCircumference(): number {
-      return 2 * Math.PI * 18
-    },
-    profileStrengthOffset(): number {
-      const progress = this.profileStrength / 100
-      return this.profileStrengthCircumference * (1 - progress)
-    },
   },
   methods: {
     projectTitle,
     companyName,
     companyProfilePath,
     coverLetterPreview,
+    companyInitials(application: StudentApplicationListItem): string {
+      const name = this.companyName(application)
+      return name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase() || 'CO'
+    },
+    companyLogoUrl(application: StudentApplicationListItem): string {
+      const company = (application.project?.company ?? {}) as Record<string, unknown>
+      const profile = (company.profile ?? {}) as Record<string, unknown>
+
+      const possibleUrl = [
+        company.logo_url,
+        company.avatar_url,
+        company.logo,
+        company.avatar,
+        profile.logo_url,
+        profile.avatar_url,
+      ].find((value) => typeof value === 'string' && value.trim().length > 0)
+
+      return resolveAssetUrl(typeof possibleUrl === 'string' ? possibleUrl : '')
+    },
     statusLabel,
     statusHint,
     statusPillClass(status?: string): string {
