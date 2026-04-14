@@ -70,40 +70,47 @@
           <div class="space-y-6">
             <section class="space-y-4">
               <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Recommended for You</h2>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Recommended for You</h2>
                 <RouterLink to="/projects" class="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
                   See all matches
                 </RouterLink>
               </div>
 
-              <div v-if="projectStore.loading" class="grid gap-4 md:grid-cols-2">
+              <div v-if="projectStore.loading" class="grid gap-3 sm:grid-cols-2">
                 <div
                   v-for="n in 4"
                   :key="n"
-                  class="h-56 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800"
+                  class="h-32 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800"
                 />
               </div>
 
-              <div v-else-if="recentProjects.length" class="grid gap-4 md:grid-cols-2">
+              <div v-else-if="recommendedProjects.length" class="grid gap-3 sm:grid-cols-2">
                 <article
-                  v-for="project in recentProjects"
+                  v-for="project in recommendedProjects"
                   :key="project.id"
-                  class="group rounded-3xl bg-white p-5 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800"
+                  class="group flex min-h-36 flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800"
                 >
                   <div class="flex items-center justify-between gap-3">
-                    <span class="inline-flex rounded-full bg-indigo-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                    <span class="inline-flex rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
                       {{ normalizeLocationStrategy(project.location_strategy) }}
                     </span>
-                    <span class="text-xs text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
                   </div>
-                  <h3 class="mt-3 text-lg font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
+
+                  <h3 class="mt-2 line-clamp-1 text-sm font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
                     {{ project.title }}
                   </h3>
-                  <p class="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">
-                    {{ project.description }}
+
+                  <p class="mt-1 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">
+                    {{ project.description || 'No description available.' }}
                   </p>
-                  <div class="mt-4 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                    <span>{{ formatTechStack(project.tech_stack) }}</span>
+
+                  <p class="mt-2 truncate text-[11px] text-slate-500 dark:text-slate-400">
+                    {{ formatTechStack(project.tech_stack) }}
+                  </p>
+
+                  <div class="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-slate-500 dark:text-slate-400">
+                    <span class="truncate pr-2 text-[11px] font-medium text-slate-600 dark:text-slate-300">{{ companyName(project) }}</span>
                     <RouterLink :to="`/projects/${project.id}`" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
                       Open
                     </RouterLink>
@@ -528,6 +535,9 @@ export default defineComponent({
     },
     recentProjects(): DashboardProject[] {
       return (this.projectStore.projects as DashboardProject[]).slice(0, 6)
+    },
+    recommendedProjects(): DashboardProject[] {
+      return this.recentProjects.slice(0, 4)
     },
     unreadMessages(): number {
       return Number(this.messageStore.totalUnread ?? 0)
