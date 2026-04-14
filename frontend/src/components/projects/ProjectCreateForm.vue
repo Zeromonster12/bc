@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="$emit('submit')" novalidate class="space-y-6">
-    <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90 sm:p-8">
+    <section class="rounded-3xl bg-white p-6 dark:bg-slate-900/90 sm:p-8">
       <div class="space-y-6">
         <div class="flex items-center gap-3">
           <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8e1ff] text-[#4b35cb] dark:bg-indigo-500/20 dark:text-indigo-200">
@@ -254,7 +254,7 @@
       </div>
     </section>
 
-    <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90 sm:p-8">
+    <section class="rounded-3xl bg-white p-6 dark:bg-slate-900/90 sm:p-8">
       <div class="space-y-6">
         <div class="flex items-center gap-3">
           <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8e1ff] text-[#4b35cb] dark:bg-violet-500/20 dark:text-violet-200">

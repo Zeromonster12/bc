@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <div class="mx-auto w-full max-w-7xl space-y-6 pb-8">
-      <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90 sm:p-8">
+      <section class="rounded-3xl bg-white p-6 dark:bg-slate-900/90 sm:p-8">
         <div>
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#6f6989] dark:text-slate-400">Projects / New project</p>
@@ -42,7 +42,7 @@
         </div>
 
         <aside class="space-y-6 xl:col-span-4">
-          <section class="rounded-3xl border border-[#ded8f0] bg-[#f5f2fd] p-6 dark:border-slate-700 dark:bg-slate-900/80">
+          <section class="rounded-3xl bg-[#f5f2fd] p-6 dark:bg-slate-900/80">
             <div class="space-y-3">
               <p class="inline-flex rounded-full bg-[#e5ddff] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#4b35cb] dark:bg-indigo-500/20 dark:text-indigo-200">Curator tip</p>
               <h2 class="text-xl font-bold text-[#1f1a38] dark:text-slate-100">Detailed scope gets better applicants</h2>
@@ -52,9 +52,9 @@
             </div>
           </section>
 
-          <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90">
+          <section class="rounded-3xl bg-white p-6 dark:bg-slate-900/90">
             <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-[#6f6989] dark:text-slate-400">Live preview</h3>
-            <div class="mt-4 rounded-2xl border border-[#e3dcf4] bg-[#f7f4fc] p-4 dark:border-slate-700 dark:bg-slate-800/60">
+            <div class="mt-4 rounded-2xl bg-[#f7f4fc] p-4 dark:bg-slate-800/60">
               <p class="text-base font-bold text-[#1f1a38] dark:text-slate-100">{{ previewTitle }}</p>
               <p class="mt-1 text-sm text-[#625d7c] dark:text-slate-300">{{ previewLocation }}</p>
               <p class="mt-1 text-xs uppercase tracking-widest text-[#7b7595] dark:text-slate-400">
@@ -79,7 +79,7 @@
             </div>
           </section>
 
-          <section class="rounded-3xl border border-[#ddd7ef] bg-white p-6 dark:border-slate-700 dark:bg-slate-900/90">
+          <section class="rounded-3xl bg-white p-6 dark:bg-slate-900/90">
             <div class="flex items-center justify-between gap-3">
               <h3 class="text-sm font-bold text-[#1f1a38] dark:text-slate-100">Saved drafts</h3>
               <FileClock class="h-4 w-4 text-[#7c7699] dark:text-slate-400" />
@@ -97,7 +97,7 @@
               <li v-for="draft in draftProjects" :key="draft.id">
                 <RouterLink
                   :to="'/projects/' + draft.id + '/edit'"
-                  class="group flex items-center justify-between rounded-xl border border-[#dfd8ef] bg-[#faf8ff] px-3 py-2 transition hover:border-[#cfc3ef] hover:bg-[#f4eeff] dark:border-slate-700 dark:bg-slate-800/70 dark:hover:border-indigo-400/40 dark:hover:bg-indigo-500/10"
+                  class="group flex items-center justify-between rounded-xl bg-[#faf8ff] px-3 py-2 transition hover:bg-[#f4eeff] dark:bg-slate-800/70 dark:hover:bg-indigo-500/10"
                 >
                   <div class="min-w-0">
                     <p class="truncate text-sm font-semibold text-[#2f2a47] dark:text-slate-100">{{ draft.title || 'Untitled draft' }}</p>
