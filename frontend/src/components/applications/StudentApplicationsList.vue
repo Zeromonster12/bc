@@ -59,15 +59,22 @@
       </RouterLink>
     </div>
 
-    <div v-else class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <article
-        v-for="application in visibleApplications"
-        :key="application.id"
-        class="rounded-3xl border border-[#dfd9ec] bg-white p-5 shadow-[0_8px_22px_rgba(31,26,56,0.06)] transition hover:shadow-[0_12px_30px_rgba(31,26,56,0.1)] dark:border-slate-700/70 dark:bg-slate-900/90 dark:shadow-[0_10px_26px_rgba(2,6,23,0.45)]"
-      >
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#7c7699] dark:text-slate-400">
+    <div v-else class="rounded-3xl bg-[#f1edf8] p-2.5 dark:bg-slate-900/80">
+      <div class="hidden grid-cols-[minmax(0,1.45fr)_130px_170px_170px] items-center gap-3 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#5b5676] md:grid dark:text-slate-400">
+        <div>Application</div>
+        <div>Applied</div>
+        <div>Status</div>
+        <div class="text-right">Actions</div>
+      </div>
+
+      <div class="space-y-2.5">
+        <article
+          v-for="application in visibleApplications"
+          :key="application.id"
+          class="grid grid-cols-1 gap-3 rounded-2xl bg-white px-4 py-3.5 md:grid-cols-[minmax(0,1.45fr)_130px_170px_170px] md:items-center dark:bg-slate-900"
+        >
+          <div class="min-w-0">
+            <p class="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-[#7c7699] dark:text-slate-400">
               <RouterLink
                 v-if="companyProfilePath(application)"
                 :to="companyProfilePath(application) as string"
@@ -77,49 +84,51 @@
               </RouterLink>
               <span v-else>{{ companyName(application) }}</span>
             </p>
-            <h3 class="mt-1.5 text-lg font-extrabold tracking-tight text-[#1f1a38] dark:text-slate-100">
+            <h3 class="mt-1 truncate text-sm font-bold text-[#1f1a38] dark:text-slate-100">
               {{ projectTitle(application) }}
             </h3>
+            <p v-if="coverLetterPreview(application)" class="mt-1 line-clamp-1 text-xs text-[#66607d] dark:text-slate-300">
+              {{ coverLetterPreview(application) }}
+            </p>
           </div>
-          <span :class="statusBadgeClass(application.status)">
-            {{ statusLabel(application.status) }}
-          </span>
-        </div>
 
-        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8b86a3] dark:text-slate-400">Applied date</p>
-            <p class="mt-1 text-sm font-bold text-[#2f2952] dark:text-slate-200">{{ formatDate(application.created_at) }}</p>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8b86a3] md:hidden dark:text-slate-500">Applied</p>
+            <p class="text-xs font-semibold text-[#3a3558] dark:text-slate-200">{{ formatDate(application.created_at) }}</p>
           </div>
+
           <div>
-            <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8b86a3] dark:text-slate-400">Status</p>
-            <p class="mt-1 text-sm font-bold text-[#2f2952] dark:text-slate-200">{{ statusHint(application.status) }}</p>
+            <p class="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8b86a3] md:hidden dark:text-slate-500">Status</p>
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em]"
+              :class="statusPillClass(application.status)"
+            >
+              <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(application.status)" />
+              {{ statusLabel(application.status) }}
+            </span>
+            <p class="mt-1 text-[11px] text-[#6f6989] dark:text-slate-400">{{ statusHint(application.status) }}</p>
           </div>
-        </div>
 
-        <p v-if="coverLetterPreview(application)" class="mt-4 line-clamp-2 text-sm leading-relaxed text-[#66607d] dark:text-slate-300">
-          {{ coverLetterPreview(application) }}
-        </p>
-
-        <div class="mt-5 flex flex-wrap items-center gap-2">
-          <RouterLink
-            v-if="application.project_id"
-            :to="`/projects/${application.project_id}`"
-            class="inline-flex rounded-full bg-linear-to-r from-[#4120cd] to-[#5a42e5] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 dark:from-indigo-600 dark:to-indigo-500"
-          >
-            View details
-          </RouterLink>
-          <button
-            v-if="application.status === 'pending'"
-            type="button"
-            class="inline-flex rounded-full border border-[#d8d2e7] px-4 py-2 text-sm font-semibold text-[#6a647f] transition hover:border-[#cf4a4a] hover:text-[#b42323] dark:border-slate-700 dark:text-slate-300 dark:hover:border-rose-400 dark:hover:text-rose-300"
-            :disabled="withdrawingId === application.id"
-            @click="$emit('withdraw', application.id)"
-          >
-            {{ withdrawingId === application.id ? 'Withdrawing...' : 'Withdraw' }}
-          </button>
-        </div>
-      </article>
+          <div class="flex flex-wrap items-center gap-2 md:justify-end">
+            <RouterLink
+              v-if="application.project_id"
+              :to="`/projects/${application.project_id}`"
+              class="inline-flex rounded-full bg-[#3f34a6] px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
+            >
+              View details
+            </RouterLink>
+            <button
+              v-if="application.status === 'pending'"
+              type="button"
+              class="inline-flex rounded-full bg-[#e8e3f2] px-3.5 py-1.5 text-xs font-semibold text-[#5c5579] transition hover:bg-[#ddd7f6] hover:text-[#b42323] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-rose-300"
+              :disabled="withdrawingId === application.id"
+              @click="$emit('withdraw', application.id)"
+            >
+              {{ withdrawingId === application.id ? 'Withdrawing...' : 'Withdraw' }}
+            </button>
+          </div>
+        </article>
+      </div>
     </div>
   </div>
 </template>
@@ -135,7 +144,6 @@ import {
   filterStudentApplicationsByTab,
   profileStrengthLabel,
   projectTitle,
-  statusBadgeClass,
   statusHint,
   statusLabel,
   type StudentApplicationListItem,
@@ -186,7 +194,32 @@ export default defineComponent({
     coverLetterPreview,
     statusLabel,
     statusHint,
-    statusBadgeClass,
+    statusPillClass(status?: string): string {
+      if (status === 'accepted') {
+        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+      }
+      if (status === 'rejected') {
+        return 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
+      }
+      if (status === 'withdrawn') {
+        return 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+      }
+
+      return 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+    },
+    statusDotClass(status?: string): string {
+      if (status === 'accepted') {
+        return 'bg-emerald-500 dark:bg-emerald-300'
+      }
+      if (status === 'rejected') {
+        return 'bg-rose-500 dark:bg-rose-300'
+      }
+      if (status === 'withdrawn') {
+        return 'bg-slate-500 dark:bg-slate-300'
+      }
+
+      return 'bg-amber-500 dark:bg-amber-300'
+    },
     formatDate(value?: string): string {
       if (!value) return 'Unknown'
       return new Date(value).toLocaleDateString('en-US', {
