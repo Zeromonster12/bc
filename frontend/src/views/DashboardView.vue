@@ -150,10 +150,20 @@
                   <div
                     v-for="activity in recentActivities"
                     :key="activity.id"
-                    class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800"
+                    class="rounded-2xl p-3.5"
+                    :class="activityCardClass(activity.status)"
                   >
-                    <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
-                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
+                    <div class="flex items-center justify-between gap-2">
+                      <span
+                        class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]"
+                        :class="activityStatusBadgeClass(activity.status)"
+                      >
+                        <span class="h-1.5 w-1.5 rounded-full" :class="activityStatusDotClass(activity.status)" />
+                        {{ activityStatusLabel(activity.status) }}
+                      </span>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
+                    </div>
+                    <p class="mt-2 text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
                   </div>
                 </div>
               </section>
@@ -514,6 +524,7 @@ interface StudentActivity {
   id: string
   title: string
   meta: string
+  status?: 'accepted' | 'pending' | 'rejected' | 'neutral'
 }
 
 export default defineComponent({
@@ -559,6 +570,7 @@ export default defineComponent({
             id: 'no-activity',
             title: 'No recent application activity',
             meta: 'Start by applying to open projects.',
+            status: 'neutral',
           },
         ]
       }
@@ -569,11 +581,13 @@ export default defineComponent({
         const title = String(project.title ?? 'Project application')
         const status = String(appAsRecord.status ?? 'pending')
         const createdAt = String(appAsRecord.created_at ?? '')
+        const normalizedStatus = this.normalizeActivityStatus(status)
 
         return {
           id: `app-${String(appAsRecord.id ?? Math.random())}`,
-          title: `${this.capitalizeStatus(status)} application • ${title}`,
+          title,
           meta: this.formatRelativeDate(createdAt),
+          status: normalizedStatus,
         }
       })
     },
@@ -736,6 +750,38 @@ export default defineComponent({
     capitalizeStatus(status: string): string {
       if (!status) return 'Pending'
       return status.charAt(0).toUpperCase() + status.slice(1)
+    },
+    normalizeActivityStatus(status: string): 'accepted' | 'pending' | 'rejected' | 'neutral' {
+      const normalized = status.trim().toLowerCase()
+      if (normalized === 'accepted' || normalized === 'pending' || normalized === 'rejected') {
+        return normalized
+      }
+
+      return 'neutral'
+    },
+    activityStatusLabel(status: StudentActivity['status']): string {
+      if (status === 'accepted') return 'Accepted'
+      if (status === 'pending') return 'Pending'
+      if (status === 'rejected') return 'Rejected'
+      return 'Update'
+    },
+    activityStatusBadgeClass(status: StudentActivity['status']): string {
+      if (status === 'accepted') return 'bg-emerald-200 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-200'
+      if (status === 'pending') return 'bg-amber-200 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200'
+      if (status === 'rejected') return 'bg-rose-200 text-rose-800 dark:bg-rose-500/20 dark:text-rose-200'
+      return 'bg-[#ddd7f6] text-[#4d466b] dark:bg-slate-700 dark:text-slate-200'
+    },
+    activityStatusDotClass(status: StudentActivity['status']): string {
+      if (status === 'accepted') return 'bg-emerald-600 dark:bg-emerald-300'
+      if (status === 'pending') return 'bg-amber-500 dark:bg-amber-300'
+      if (status === 'rejected') return 'bg-rose-600 dark:bg-rose-300'
+      return 'bg-[#4d466b] dark:bg-slate-300'
+    },
+    activityCardClass(status: StudentActivity['status']): string {
+      if (status === 'accepted') return 'bg-emerald-50 dark:bg-emerald-500/10'
+      if (status === 'pending') return 'bg-amber-50 dark:bg-amber-500/10'
+      if (status === 'rejected') return 'bg-rose-50 dark:bg-rose-500/10'
+      return 'bg-[#f1edf8] dark:bg-slate-800'
     },
     formatTechStack(stack: unknown): string {
       const items = Array.isArray(stack)
