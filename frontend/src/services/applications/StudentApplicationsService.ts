@@ -1,4 +1,4 @@
-export type StudentTab = 'active' | 'archive' | 'drafts'
+export type StudentTab = 'active' | 'archive'
 
 export interface StudentApplicationListItem {
   id: number
@@ -18,7 +18,6 @@ export interface StudentApplicationListItem {
 export const STUDENT_APPLICATION_TABS: Array<{ value: StudentTab; label: string }> = [
   { value: 'active', label: 'Active applications' },
   { value: 'archive', label: 'Past archives' },
-  { value: 'drafts', label: 'Saved drafts' },
 ]
 
 const normalizeStatus = (status?: string): string => String(status ?? 'pending')
@@ -32,10 +31,6 @@ export const filterStudentApplicationsByTab = (
   applications: StudentApplicationListItem[],
   tab: StudentTab,
 ): StudentApplicationListItem[] => {
-  if (tab === 'drafts') {
-    return []
-  }
-
   return applications.filter((application) => {
     const archived = isArchiveStatus(application.status)
     return tab === 'archive' ? archived : !archived
