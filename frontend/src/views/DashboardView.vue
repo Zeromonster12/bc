@@ -66,7 +66,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.65fr)_360px]">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
           <div class="space-y-6">
             <section class="space-y-4">
               <div class="flex items-center justify-between">
@@ -76,7 +76,7 @@
                 </RouterLink>
               </div>
 
-              <div v-if="projectStore.loading" class="grid gap-3 sm:grid-cols-2">
+              <div v-if="projectStore.loading" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <div
                   v-for="n in 4"
                   :key="n"
@@ -84,7 +84,7 @@
                 />
               </div>
 
-              <div v-else-if="recommendedProjects.length" class="grid gap-3 sm:grid-cols-2">
+              <div v-else-if="recommendedProjects.length" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <article
                   v-for="project in recommendedProjects"
                   :key="project.id"
@@ -537,7 +537,7 @@ export default defineComponent({
       return (this.projectStore.projects as DashboardProject[]).slice(0, 6)
     },
     recommendedProjects(): DashboardProject[] {
-      return this.recentProjects.slice(0, 4)
+      return this.recentProjects.slice(0, 3)
     },
     unreadMessages(): number {
       return Number(this.messageStore.totalUnread ?? 0)
