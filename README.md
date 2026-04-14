@@ -1,4 +1,4 @@
-# BC Platform - Postup lokalneho overenia funkcnosti
+# Postup lokalneho overenia funkcnosti
 
 ## 1. Rozsah riesenia
 
