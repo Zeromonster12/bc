@@ -161,6 +161,7 @@
 
     <BasePagination
       v-if="pagination && pagination.last_page > 1"
+      variant="company-applications"
       :current-page="pagination.current_page"
       :last-page="pagination.last_page"
       :total="pagination.total"
