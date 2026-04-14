@@ -37,17 +37,18 @@
             </div>
           </div>
         </div>
-
-        <input
-          v-model.trim="searchQuery"
-          type="text"
-          placeholder="Search by name, skill, university..."
-          class="mt-3 w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
-        />
       </div>
 
       <div class="flex flex-col gap-3 md:flex-row md:items-center">
-        <div class="flex w-full gap-2 overflow-x-auto pb-1 md:ml-auto md:w-auto md:pb-0">
+        <div class="w-full flex-1">
+          <input
+            v-model.trim="searchQuery"
+            type="text"
+            placeholder="Search by name, skill, university..."
+            class="w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
+          />
+        </div>
+        <div class="flex w-full gap-2 overflow-x-auto pb-1 md:w-auto md:pb-0">
           <button
             v-for="option in quickStatusOptions"
             :key="option.value"
