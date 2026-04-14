@@ -180,27 +180,78 @@
         </div>
 
         <section>
-          <div class="flex items-center justify-between mb-4">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent open projects</h2>
-            <RouterLink to="/projects" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">
-              View all →
-            </RouterLink>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#e8e3f2] text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                aria-label="Scroll projects left"
+                @click="scrollRecentProjects('left')"
+              >
+                <svg viewBox="0 0 20 20" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12.5 15.5 7 10l5.5-5.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#e8e3f2] text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                aria-label="Scroll projects right"
+                @click="scrollRecentProjects('right')"
+              >
+                <svg viewBox="0 0 20 20" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="m7.5 15.5 5.5-5.5-5.5-5.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <RouterLink to="/projects" class="ml-1 text-sm text-indigo-600 hover:underline dark:text-indigo-400">
+                View all →
+              </RouterLink>
+            </div>
           </div>
-          <div v-if="projectStore.loading" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+          <div v-if="projectStore.loading" class="flex gap-3 overflow-hidden">
             <div
-              v-for="n in 3"
+              v-for="n in 4"
               :key="n"
-              class="h-40 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800"
+              class="h-36 w-55 shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-60"
             />
           </div>
-          <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <ProjectCard
+
+          <div
+            v-else-if="recentProjects.length"
+            ref="recentProjectsRail"
+            class="flex gap-3 overflow-x-auto scroll-smooth pb-1"
+          >
+            <article
               v-for="project in recentProjects"
               :key="project.id"
-              :project="project"
+              class="group w-55 shrink-0 cursor-pointer rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-60"
               @click="$router.push('/projects/' + project.id)"
-              class="cursor-pointer"
-            />
+            >
+              <div class="flex items-center justify-between gap-2">
+                <span class="inline-flex rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                  {{ normalizeLocationStrategy(project.location_strategy) }}
+                </span>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
+              </div>
+
+              <h3 class="mt-2 line-clamp-2 text-sm font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
+                {{ project.title }}
+              </h3>
+
+              <p class="mt-1 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">
+                {{ project.description || 'No description available.' }}
+              </p>
+
+              <div class="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                <span class="truncate pr-2">{{ formatTechStack(project.tech_stack) }}</span>
+                <span class="font-semibold text-indigo-600 dark:text-indigo-400">Open</span>
+              </div>
+            </article>
+          </div>
+
+          <div v-else class="rounded-2xl bg-white p-6 text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+            No open projects right now.
           </div>
         </section>
       </template>
@@ -618,6 +669,18 @@ export default defineComponent({
 
       if (!items.length) return 'General skill fit'
       return items.slice(0, 3).join(' • ')
+    },
+    scrollRecentProjects(direction: 'left' | 'right'): void {
+      const rail = this.$refs.recentProjectsRail
+      if (!(rail instanceof HTMLElement)) {
+        return
+      }
+
+      const step = Math.max(220, Math.floor(rail.clientWidth * 0.8))
+      rail.scrollBy({
+        left: direction === 'left' ? -step : step,
+        behavior: 'smooth',
+      })
     },
   },
 })
