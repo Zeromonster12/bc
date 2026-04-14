@@ -27,43 +27,43 @@
           />
 
           <div v-if="loading" class="space-y-3">
-            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800" />
+            <div v-for="n in 3" :key="n" class="h-36 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800/80" />
           </div>
 
           <div
             v-else-if="!selectedProjectId"
-            class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300"
+            class="rounded-3xl bg-[#f1edf8] p-10 text-center text-sm text-[#5b5676] dark:bg-slate-800 dark:text-slate-300"
           >
             Select a project from left sidebar.
           </div>
 
           <div
             v-else
-            class="min-h-0 flex-1 overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-[0_10px_26px_rgba(2,6,23,0.5)]"
+            class="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white dark:bg-slate-900"
           >
-            <div class="h-full overflow-y-auto overflow-x-hidden rounded-3xl bg-white p-3 sm:p-4 lg:p-5 dark:bg-slate-900">
+            <div class="h-full overflow-y-auto overflow-x-hidden rounded-3xl bg-white px-6 pb-6 pt-4 dark:bg-slate-900">
             <section
               v-for="(status, index) in boardStatuses"
               :key="status"
               :class="[
                 'overflow-visible transition',
-                index < boardStatuses.length - 1 ? 'border-b border-slate-200/60 dark:border-slate-700/60' : '',
+                index < boardStatuses.length - 1 ? '' : '',
                 isDropZoneActive(status, null, null, 'status') ? 'bg-[#4e3aba]/5 dark:bg-[#4e3aba]/15' : '',
               ]"
               @dragover.prevent="setActiveDropZone(status, null, null, 'status')"
               @dragleave="clearActiveDropZone"
               @drop.prevent="onStatusDrop(status)"
             >
-              <div class="flex items-center gap-2 px-3 pb-2 pt-2.5">
+              <div class="flex items-center gap-2 px-4 pb-2 pt-2.5">
                 <component :is="statusIcon(status)" :class="statusIconClass(status)" />
                 <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ statusLabel(status) }}</h2>
-                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                <span class="rounded-full bg-[#e8e3f2] px-2.5 py-1 text-xs font-semibold text-[#4d466b] dark:bg-slate-800 dark:text-slate-300">
                   {{ statusCount(status) }}
                 </span>
               </div>
 
               <div
-                class="grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3 bg-slate-50/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:bg-slate-800/70 dark:text-slate-400"
+                class="mb-2 grid grid-cols-[minmax(0,1fr)_160px_130px_130px_86px] items-center gap-3 rounded-2xl bg-[#f1edf8] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#5b5676] dark:bg-slate-800 dark:text-slate-400"
               >
                 <span>Name</span>
                 <span>Assignee</span>
@@ -79,7 +79,7 @@
                 <div v-if="canManageTasks" class="mt-3 relative inline-block">
                   <button
                     type="button"
-                    class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#e8e3f2] text-[#5b5676] transition hover:bg-[#ddd7f6] hover:text-[#3f34a6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                     @click.stop="toggleActionMenu(`status-empty-add:${status}`)"
                   >
                     <Plus class="h-3.5 w-3.5" />
@@ -87,12 +87,12 @@
 
                   <div
                     v-if="isActionMenuOpen(`status-empty-add:${status}`)"
-                    class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                    class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
                     @click.stop
                   >
                     <button
                       type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                      class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                       @click.stop="
                         startInlineFolderCreate(status, null);
                         closeActionMenu()
@@ -103,7 +103,7 @@
                     </button>
                     <button
                       type="button"
-                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                      class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                       @click.stop="openStatusQuickCreateTask(status)"
                     >
                       <Plus class="h-3.5 w-3.5" />
@@ -114,7 +114,7 @@
 
                 <div
                   v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === null"
-                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                  class="mt-3 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                 >
                   <div class="flex items-center gap-2">
                     <input
@@ -145,7 +145,7 @@
 
                 <div
                   v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === null"
-                  class="mt-3 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                  class="mt-3 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                 >
                   <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                     <input
@@ -197,11 +197,11 @@
                 </div>
               </div>
 
-              <div v-else class="px-2 py-1.5">
+              <div v-else class="px-2 py-2">
                 <div
                   v-for="entry in flattenedFoldersForStatus(status)"
                   :key="`folder-${status}-${entry.folder.id}`"
-                  class="rounded-lg border border-transparent transition hover:border-slate-200/80"
+                  class="rounded-lg transition"
                   @dragover.prevent="setActiveDropZone(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')"
                   @dragleave="clearActiveDropZone"
                   @drop.prevent.stop="onFolderDrop(status, entry.folder.id)"
@@ -209,12 +209,14 @@
                   <div
                     v-if="!entry.folder.is_virtual"
                     :class="[
-                      'group flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition hover:bg-slate-100/80 dark:hover:bg-slate-700/60',
+                      'group flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition hover:bg-[#f1edf8] dark:hover:bg-slate-700/70',
+                      entry.depth > 0 ? 'mt-1' : '',
+                      !isFolderOpen(status, entry.folder.id) ? 'mb-1.5' : '',
                       entry.depth === 0
-                        ? 'bg-white dark:bg-slate-800/70'
+                        ? 'bg-[#f7f4fc] dark:bg-slate-800/70'
                         : entry.depth === 1
-                          ? 'bg-slate-50/70 dark:bg-slate-800/60'
-                          : 'bg-slate-100/70 dark:bg-slate-800/50',
+                          ? 'bg-[#f1edf8] dark:bg-slate-800/60'
+                          : 'bg-[#ece7f8] dark:bg-slate-800/55',
                       isDropZoneActive(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')
                         ? 'bg-[#4e3aba]/10 ring-2 ring-[#4e3aba]/25'
                         : '',
@@ -299,11 +301,11 @@
 
                   <div
                     v-if="entry.folder.is_virtual || isFolderOpen(status, entry.folder.id)"
-                    :class="entry.folder.is_virtual ? '' : 'border-l border-slate-300/80 pl-2.5 dark:border-slate-700'"
+                    :class="entry.folder.is_virtual ? '' : 'mt-1 border-l border-[#d9d2eb] pl-3 dark:border-slate-700/80'"
                     :style="entry.folder.is_virtual ? undefined : { marginLeft: `${entry.depth * 18 + 30}px` }"
                   >
                     <div
-                      class="mb-1.5 space-y-1 rounded-lg transition"
+                      class="mb-2 mt-1 space-y-1.5 rounded-lg transition"
                       @dragover.prevent="setActiveDropZone(status, entry.folder.is_virtual ? null : entry.folder.id, null, 'folder')"
                       @dragleave="clearActiveDropZone"
                       @drop.prevent.stop="onTaskDrop(status, entry.folder.id, null)"
@@ -312,13 +314,13 @@
                         v-for="task in filteredTasks(entry.folder.uncategorized_tasks)"
                         :key="`task-folder-${task.id}`"
                         :class="[
-                          'group cursor-grab rounded-md border px-2.5 py-1.5 transition active:cursor-grabbing',
+                          'group cursor-grab rounded-xl px-3 py-2 transition active:cursor-grabbing',
                           entry.depth === 0
-                            ? 'border-slate-200 bg-slate-50/40 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/55 dark:hover:border-slate-600 dark:hover:bg-slate-800'
+                            ? 'bg-[#f7f4fc] hover:bg-[#f1edf8] dark:bg-slate-800/70 dark:hover:bg-slate-800'
                             : entry.depth === 1
-                              ? 'border-slate-200/90 bg-slate-100/55 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/65 dark:hover:border-slate-600 dark:hover:bg-slate-800/80'
-                              : 'border-slate-300/80 bg-slate-100/80 hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/75 dark:hover:border-slate-600 dark:hover:bg-slate-800/90',
-                          isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
+                              ? 'bg-[#f1edf8] hover:bg-[#ece7f8] dark:bg-slate-800/75 dark:hover:bg-slate-800/90'
+                              : 'bg-[#ece7f8] hover:bg-[#e8e3f2] dark:bg-slate-800/80 dark:hover:bg-slate-800/95',
+                          isDraggingTask(task.id) ? 'scale-[0.98] opacity-80' : '',
                         ]"
                         :draggable="true"
                         @dragstart="onTaskDragStart(task, status, entry.folder.id, null, $event)"
@@ -404,7 +406,7 @@
                     <div
                       v-for="category in entry.folder.categories"
                       :key="`cat-${status}-${category.id}`"
-                      class="py-1 rounded-lg transition"
+                      class="py-1.5 rounded-lg transition"
                       @dragover.prevent="
                         setActiveDropZone(status, entry.folder.id, category.id, 'category')
                       "
@@ -413,8 +415,8 @@
                     >
                       <div
                         :class="[
-                          'group flex w-full items-center justify-between rounded-lg px-2 py-1 text-left transition hover:bg-slate-100/80 dark:hover:bg-slate-700/60',
-                          entry.depth > 0 ? 'bg-slate-50/80 dark:bg-slate-800/65' : 'bg-slate-50/40 dark:bg-slate-800/50',
+                          'group flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition hover:bg-[#f1edf8] dark:hover:bg-slate-700/70',
+                          entry.depth > 0 ? 'bg-[#f1edf8] dark:bg-slate-800/65' : 'bg-[#f7f4fc] dark:bg-slate-800/55',
                           isDropZoneActive(status, entry.folder.id, category.id, 'category')
                             ? 'bg-[#4e3aba]/10 ring-2 ring-[#4e3aba]/25'
                             : '',
@@ -492,7 +494,7 @@
 
                       <div
                         v-if="isCategoryOpen(status, category.id)"
-                        class="ml-5 mt-1 space-y-1 border-l border-slate-300/80 pl-2.5 dark:border-slate-700"
+                        class="ml-5 mt-1.5 space-y-1.5 border-l border-[#d9d2eb] pl-3 dark:border-slate-700/80"
                         @dragover.prevent
                         @drop.prevent.stop="onCategoryDrop(status, entry.folder.id, category.id)"
                       >
@@ -500,13 +502,13 @@
                           v-for="task in filteredTasks(category.tasks)"
                           :key="`task-${task.id}`"
                           :class="[
-                              'group cursor-grab rounded-md border px-2.5 py-1.5 transition active:cursor-grabbing',
+                              'group cursor-grab rounded-xl px-3 py-2 transition active:cursor-grabbing',
                               entry.depth === 0
-                                ? 'border-slate-200 bg-slate-50/35 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/55 dark:hover:border-slate-600 dark:hover:bg-slate-800'
+                                ? 'bg-[#f7f4fc] hover:bg-[#f1edf8] dark:bg-slate-800/70 dark:hover:bg-slate-800'
                                 : entry.depth === 1
-                                  ? 'border-slate-200/90 bg-slate-100/60 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/65 dark:hover:border-slate-600 dark:hover:bg-slate-800/80'
-                                  : 'border-slate-300/80 bg-slate-100/85 hover:border-slate-400 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800/75 dark:hover:border-slate-600 dark:hover:bg-slate-800/90',
-                            isDraggingTask(task.id) ? 'scale-[0.98] opacity-80 shadow-lg' : '',
+                                  ? 'bg-[#f1edf8] hover:bg-[#ece7f8] dark:bg-slate-800/75 dark:hover:bg-slate-800/90'
+                                  : 'bg-[#ece7f8] hover:bg-[#e8e3f2] dark:bg-slate-800/80 dark:hover:bg-slate-800/95',
+                            isDraggingTask(task.id) ? 'scale-[0.98] opacity-80' : '',
                           ]"
                           :draggable="true"
                           @dragstart="
@@ -599,7 +601,7 @@
                           <div class="relative inline-block">
                             <button
                               type="button"
-                              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
+                              class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#e8e3f2] text-[#5b5676] transition hover:bg-[#ddd7f6] hover:text-[#3f34a6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                               @click.stop="toggleActionMenu(`category-add:${status}:${entry.folder.id}:${category.id}`)"
                             >
                               <Plus class="h-3.5 w-3.5" />
@@ -607,12 +609,12 @@
 
                             <div
                               v-if="isActionMenuOpen(`category-add:${status}:${entry.folder.id}:${category.id}`)"
-                              class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                              class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
                               @click.stop
                             >
                               <button
                                 type="button"
-                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                                 @click.stop="
                                   startInlineFolderCreate(status, entry.folder.id);
                                   closeActionMenu()
@@ -623,7 +625,7 @@
                               </button>
                               <button
                                 type="button"
-                                class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                                class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                                 @click.stop="
                                   startInlineTaskCreate(status, entry.folder.id, category.id);
                                   closeActionMenu()
@@ -637,7 +639,7 @@
 
                           <div
                             v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === entry.folder.id && inlineTaskDraft.categoryId === category.id"
-                            class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                            class="mt-2 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                           >
                             <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                               <input
@@ -695,7 +697,7 @@
                       <div class="relative inline-block">
                         <button
                           type="button"
-                          class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
+                          class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#e8e3f2] text-[#5b5676] transition hover:bg-[#ddd7f6] hover:text-[#3f34a6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                           @click.stop="toggleActionMenu(`folder-add:${status}:${entry.folder.id}`)"
                         >
                           <Plus class="h-3.5 w-3.5" />
@@ -703,12 +705,12 @@
 
                         <div
                           v-if="isActionMenuOpen(`folder-add:${status}:${entry.folder.id}`)"
-                          class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                          class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
                           @click.stop
                         >
                           <button
                             type="button"
-                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                            class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                             @click.stop="
                               startInlineFolderCreate(status, entry.folder.id);
                               closeActionMenu()
@@ -719,7 +721,7 @@
                           </button>
                           <button
                             type="button"
-                            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                            class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                             @click.stop="
                               startInlineTaskCreate(status, entry.folder.id, null);
                               closeActionMenu()
@@ -733,7 +735,7 @@
 
                       <div
                         v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === entry.folder.id"
-                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                        class="mt-2 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                       >
                         <div class="flex items-center gap-2">
                           <input
@@ -764,7 +766,7 @@
 
                       <div
                         v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === entry.folder.id && inlineTaskDraft.categoryId === null"
-                        class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                        class="mt-2 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                       >
                         <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                           <input
@@ -822,7 +824,7 @@
                   <div class="relative inline-block">
                     <button
                       type="button"
-                      class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-slate-500 transition hover:border-[#4e3aba]/40 hover:text-[#4e3aba] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-indigo-400/60 dark:hover:text-indigo-300"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#e8e3f2] text-[#5b5676] transition hover:bg-[#ddd7f6] hover:text-[#3f34a6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                       @click.stop="toggleActionMenu(`section-end-add:${status}`)"
                     >
                       <Plus class="h-3.5 w-3.5" />
@@ -830,12 +832,12 @@
 
                     <div
                       v-if="isActionMenuOpen(`section-end-add:${status}`)"
-                      class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                      class="absolute left-0 top-[calc(100%+6px)] z-30 min-w-44 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
                       @click.stop
                     >
                       <button
                         type="button"
-                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                        class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                         @click.stop="
                           startInlineFolderCreate(status, null);
                           closeActionMenu()
@@ -846,7 +848,7 @@
                       </button>
                       <button
                         type="button"
-                        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                        class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800"
                         @click.stop="openStatusQuickCreateTask(status)"
                       >
                         <Plus class="h-3.5 w-3.5" />
@@ -857,7 +859,7 @@
 
                   <div
                     v-if="inlineFolderDraft && inlineFolderDraft.status === status && inlineFolderDraft.parentFolderId === null"
-                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                    class="mt-2 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                   >
                     <div class="flex items-center gap-2">
                       <input
@@ -888,7 +890,7 @@
 
                   <div
                     v-if="inlineTaskDraft && inlineTaskDraft.status === status && inlineTaskDraft.folderId === null"
-                    class="mt-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800/70"
+                    class="mt-2 rounded-2xl bg-[#f1edf8] p-2.5 dark:bg-slate-800"
                   >
                     <div class="grid grid-cols-[minmax(0,1fr)_160px_130px_86px] items-center gap-2">
                       <input

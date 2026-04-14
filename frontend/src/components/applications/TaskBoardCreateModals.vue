@@ -3,11 +3,11 @@
     v-if="canManageTasks && openCreateFolder"
     class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
   >
-    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+    <div class="w-full max-w-md rounded-3xl bg-white p-6 dark:bg-slate-900">
       <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create folder</h3>
       <select
         :value="createFolderStatus"
-        class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         @change="onCreateFolderStatusChange"
       >
         <option value="todo">TO DO</option>
@@ -18,17 +18,17 @@
         :value="newFolderName"
         type="text"
         maxlength="120"
-        class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         placeholder="Folder name"
         @input="onNewFolderNameInput"
       />
       <div class="mt-4 flex justify-end gap-2">
-        <BaseButton variant="secondary" class="rounded-xl!" @click="$emit('update:openCreateFolder', false)">
+        <BaseButton variant="secondary" class="rounded-full! border-0! bg-[#e8e3f2]! px-4! py-2.5! text-[#2f2952]! hover:bg-[#ddd7f6]! dark:bg-slate-800! dark:text-slate-200! dark:hover:bg-slate-700!" @click="$emit('update:openCreateFolder', false)">
           Cancel
         </BaseButton>
         <BaseButton
           variant="primary"
-          class="rounded-xl!"
+          class="rounded-full! border-0! bg-[#3f34a6]! px-4! py-2.5! text-white! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
           :loading="submitting"
           @click="$emit('create-folder')"
         >
@@ -42,12 +42,12 @@
     v-if="canManageTasks && openCreateCategory"
     class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
   >
-    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+    <div class="w-full max-w-md rounded-3xl bg-white p-6 dark:bg-slate-900">
       <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create subfolder</h3>
 
       <select
         :value="createCategoryStatus"
-        class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         @change="onCreateCategoryStatusChange"
       >
         <option value="todo">TO DO</option>
@@ -58,7 +58,7 @@
       <select
         v-if="!createCategoryFolderLocked"
         :value="selectedFolderId ?? ''"
-        class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         @change="onSelectedFolderChange"
       >
         <option value="">Select folder</option>
@@ -73,7 +73,7 @@
 
       <div
         v-else
-        class="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        class="mt-3 rounded-2xl bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] dark:bg-slate-800 dark:text-slate-200"
       >
         {{ selectedFolderName }}
       </div>
@@ -82,18 +82,18 @@
         :value="newCategoryName"
         type="text"
         maxlength="120"
-        class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         placeholder="Category name"
         @input="onNewCategoryNameInput"
       />
 
       <div class="mt-4 flex justify-end gap-2">
-        <BaseButton variant="secondary" class="rounded-xl!" @click="$emit('close-create-category')">
+        <BaseButton variant="secondary" class="rounded-full! border-0! bg-[#e8e3f2]! px-4! py-2.5! text-[#2f2952]! hover:bg-[#ddd7f6]! dark:bg-slate-800! dark:text-slate-200! dark:hover:bg-slate-700!" @click="$emit('close-create-category')">
           Cancel
         </BaseButton>
         <BaseButton
           variant="primary"
-          class="rounded-xl!"
+          class="rounded-full! border-0! bg-[#3f34a6]! px-4! py-2.5! text-white! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
           :loading="submitting"
           @click="$emit('create-category')"
         >
@@ -107,12 +107,12 @@
     v-if="canManageTasks && openCreateTask"
     class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4 dark:bg-slate-950/55"
   >
-    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+    <div class="w-full max-w-md rounded-3xl bg-white p-6 dark:bg-slate-900">
       <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Create task</h3>
 
       <select
         :value="createTaskStatus"
-        class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         @change="onCreateTaskStatusChange"
       >
         <option value="todo">TO DO</option>
@@ -122,7 +122,7 @@
 
       <select
         :value="selectedTaskApplicationId ?? ''"
-        class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         @change="onSelectedTaskApplicationChange"
       >
         <option v-if="acceptedApplications.length === 0" value="" disabled>
@@ -137,14 +137,14 @@
         :value="newTaskTitle"
         type="text"
         maxlength="160"
-        class="mt-3 block w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         placeholder="Task title"
         @input="onNewTaskTitleInput"
       />
 
       <select
         :value="newTaskPriority"
-        class="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-slate-500 dark:focus:ring-slate-700"
+        class="mt-3 block w-full rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-[#2f2952] outline-none transition focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-400/30"
         @change="onNewTaskPriorityChange"
       >
         <option value="low">Low</option>
@@ -154,12 +154,12 @@
       </select>
 
       <div class="mt-4 flex justify-end gap-2">
-        <BaseButton variant="secondary" class="rounded-xl!" @click="$emit('update:openCreateTask', false)">
+        <BaseButton variant="secondary" class="rounded-full! border-0! bg-[#e8e3f2]! px-4! py-2.5! text-[#2f2952]! hover:bg-[#ddd7f6]! dark:bg-slate-800! dark:text-slate-200! dark:hover:bg-slate-700!" @click="$emit('update:openCreateTask', false)">
           Cancel
         </BaseButton>
         <BaseButton
           variant="primary"
-          class="rounded-xl!"
+          class="rounded-full! border-0! bg-[#3f34a6]! px-4! py-2.5! text-white! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
           :loading="submitting"
           @click="$emit('create-task')"
         >

@@ -1,5 +1,5 @@
 <template>
-  <section class="surface-card p-6 sm:p-7 space-y-5">
+  <section class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
     <div class="flex items-center justify-between gap-4">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Projects and Experience</h2>
       <BaseButton type="button" variant="secondary" size="sm" @click="$emit('add')"
@@ -12,7 +12,7 @@
     <div
       v-for="(project, index) in projects"
       :key="`project-${index}`"
-      class="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700"
+      class="space-y-3 rounded-2xl bg-[#f1edf8] p-4 dark:bg-slate-800"
     >
       <div class="grid gap-3 sm:grid-cols-2">
         <BaseInput
@@ -39,7 +39,7 @@
         <textarea
           :value="project.description"
           rows="3"
-          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+          class="w-full rounded-2xl bg-white/80 px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
           placeholder="What was your role, what was delivered, what impact did it have"
           @input="
             $emit('update-field', {

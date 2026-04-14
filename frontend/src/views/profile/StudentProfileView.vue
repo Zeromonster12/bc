@@ -25,10 +25,10 @@
       />
 
       <div v-if="!loading" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section class="surface-card p-6 sm:p-7">
+        <section class="rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Recent Activity</h2>
-            <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+            <span class="rounded-full bg-[#e8e3f2] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">
               Profile
             </span>
           </div>
@@ -37,7 +37,7 @@
             <div
               v-for="activity in recentProfileActivities"
               :key="activity.id"
-              class="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
+              class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800"
             >
               <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
               <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
@@ -45,10 +45,10 @@
           </div>
         </section>
 
-        <section class="surface-card p-6 sm:p-7">
+        <section class="rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Next Steps</h2>
-            <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+            <span class="rounded-full bg-[#e8e3f2] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">
               {{ pendingProfileStepsCount }} pending
             </span>
           </div>
@@ -57,14 +57,14 @@
             <li
               v-for="item in profileNextSteps"
               :key="item.key"
-              class="flex items-start gap-3 rounded-xl border px-3 py-2.5"
+              class="flex items-start gap-3 rounded-2xl px-3.5 py-3"
               :class="item.done
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
-                : 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200'"
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+                : 'bg-[#f1edf8] text-slate-700 dark:bg-slate-800 dark:text-slate-200'"
             >
               <span
                 class="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[11px] font-black"
-                :class="item.done ? 'bg-emerald-600 text-white dark:bg-emerald-500' : 'bg-slate-300 text-slate-700 dark:bg-slate-600 dark:text-slate-100'"
+                :class="item.done ? 'bg-emerald-600 text-white dark:bg-emerald-500' : 'bg-[#ddd7f6] text-[#4d466b] dark:bg-slate-700 dark:text-slate-100'"
               >
                 {{ item.done ? '✓' : '•' }}
               </span>
@@ -78,11 +78,11 @@
       </div>
 
       <div v-if="loading" class="space-y-4">
-        <div v-for="n in 8" :key="n" class="h-16 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+        <div v-for="n in 8" :key="n" class="h-16 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800" />
       </div>
 
       <form v-else @submit.prevent="handleSubmit" novalidate class="space-y-6">
-        <div class="p-3 sm:p-4">
+        <div class="rounded-3xl bg-white p-3 sm:p-4 dark:bg-slate-900">
           <div class="flex flex-wrap gap-2">
             <button
               v-for="tab in profileTabs"
@@ -91,8 +91,8 @@
               class="rounded-full px-5 py-2 text-sm font-medium transition"
               :class="
                 activeTab === tab.id
-                  ? 'bg-[#4e3aba] text-white shadow-sm'
-                  : 'bg-[#4e3aba]/10 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                  ? 'bg-[#3f34a6] text-white dark:bg-indigo-600'
+                  : 'bg-[#e8e3f2] text-[#4d466b] hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
               "
               @click="activeTab = tab.id"
             >
@@ -102,7 +102,7 @@
         </div>
 
         <fieldset class="space-y-6">
-          <section v-show="activeTab === 'personal'" class="surface-card p-6 sm:p-7 space-y-5">
+          <section v-show="activeTab === 'personal'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Identity and Contact</h2>
 
             <div>
@@ -110,7 +110,7 @@
               <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <label
                   for="avatar-upload"
-                  class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#4e3aba] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#3f2ea1]"
+                  class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#3f34a6] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
                 >
                   Choose photo
                 </label>
@@ -154,7 +154,7 @@
                 <input
                   v-model="form.date_of_birth"
                   type="date"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  class="block w-full rounded-2xl bg-[#f1edf8] px-3 py-2.5 text-sm text-slate-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
                 />
               </div>
 
@@ -162,7 +162,7 @@
                 <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Gender</label>
                 <select
                   v-model="form.gender"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  class="block w-full rounded-2xl bg-[#f1edf8] px-3 py-2.5 text-sm text-slate-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
                 >
                   <option value="">Select</option>
                   <option value="female">Female</option>
@@ -174,7 +174,7 @@
             </div>
           </section>
 
-          <section v-show="activeTab === 'personal'" class="surface-card p-6 sm:p-7 space-y-5">
+          <section v-show="activeTab === 'personal'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Location</h2>
             <div class="grid gap-4 sm:grid-cols-2">
               <BaseInput v-model="form.country" label="Country" :error="errors.country" />
@@ -192,7 +192,7 @@
             </div>
           </section>
 
-          <section v-show="activeTab === 'education'" class="surface-card p-6 sm:p-7 space-y-5">
+          <section v-show="activeTab === 'education'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Education</h2>
             <div class="grid gap-4 sm:grid-cols-2">
               <BaseInput v-model="form.university" label="University" :error="errors.university" />
@@ -220,7 +220,7 @@
                   type="number"
                   min="1"
                   max="8"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  class="block w-full rounded-2xl bg-[#f1edf8] px-3 py-2.5 text-sm text-slate-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
                 />
                 <p v-if="errors.year_of_study" class="mt-1 text-xs text-red-600">
                   {{ errors.year_of_study }}
@@ -236,7 +236,7 @@
                   type="number"
                   min="2000"
                   max="2100"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  class="block w-full rounded-2xl bg-[#f1edf8] px-3 py-2.5 text-sm text-slate-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
                 />
               </div>
 
@@ -245,14 +245,14 @@
                 <input
                   v-model="form.gpa"
                   type="text"
-                  class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  class="block w-full rounded-2xl bg-[#f1edf8] px-3 py-2.5 text-sm text-slate-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
                   placeholder="e.g. 1.7"
                 />
               </div>
             </div>
           </section>
 
-          <section v-show="activeTab === 'personal'" class="surface-card p-6 sm:p-7 space-y-5">
+          <section v-show="activeTab === 'personal'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">About You</h2>
 
             <div>
@@ -260,7 +260,7 @@
               <textarea
                 v-model="form.bio"
                 rows="3"
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
                 placeholder="Summarize your profile in 2-3 sentences"
               />
             </div>
@@ -272,13 +272,13 @@
               <textarea
                 v-model="form.about_me"
                 rows="5"
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
                 placeholder="Describe your motivation, strengths, and what kind of work you enjoy"
               />
             </div>
           </section>
 
-          <section v-show="activeTab === 'skills'" class="surface-card p-6 sm:p-7 space-y-5">
+          <section v-show="activeTab === 'skills'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Skills, Interests, and Links</h2>
 
             <ProfileTagInput
@@ -312,7 +312,7 @@
               />
             </div>
 
-            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-800/60">
+            <div class="rounded-2xl bg-[#f1edf8] p-4 dark:bg-slate-800">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">GitHub account connection</p>
@@ -369,14 +369,14 @@
 
               <div
                 v-if="githubConnected && githubConnection"
-                class="mt-4 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900"
+                class="mt-4 rounded-2xl bg-white/80 p-3.5 dark:bg-slate-900"
               >
                 <div class="flex items-center gap-3">
                   <img
                     v-if="githubConnection.avatar_url"
                     :src="githubConnection.avatar_url"
                     alt="GitHub avatar"
-                    class="h-10 w-10 rounded-full border border-slate-200 object-cover dark:border-slate-600"
+                    class="h-10 w-10 rounded-full object-cover"
                   />
                   <div>
                     <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -423,7 +423,7 @@
                       <li
                         v-for="repo in githubRepositories"
                         :key="repo.url"
-                        class="rounded-md border border-slate-200 px-2 py-1.5 dark:border-slate-700"
+                        class="rounded-xl bg-[#f8f5ff] px-2.5 py-2 dark:bg-slate-800"
                       >
                         <a
                           :href="repo.url"
@@ -452,7 +452,7 @@
                       <li
                         v-for="commit in githubRecentCommits"
                         :key="`${commit.sha}-${commit.pushed_at}`"
-                        class="rounded-md border border-slate-200 px-2 py-1.5 dark:border-slate-700"
+                        class="rounded-xl bg-[#f8f5ff] px-2.5 py-2 dark:bg-slate-800"
                       >
                         <p class="text-xs font-medium text-slate-700 dark:text-slate-200">{{ commit.message }}</p>
                         <p class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
@@ -474,7 +474,7 @@
                   <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
                     Public contributions over the last year.
                   </p>
-                  <div class="mt-2 overflow-x-auto rounded-md border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+                  <div class="mt-2 overflow-x-auto rounded-xl bg-[#f8f5ff] p-2 dark:bg-slate-900">
                     <img
                       v-if="githubConnection.username"
                       :src="githubHeatmapUrl(githubConnection.username)"
@@ -516,7 +516,7 @@
             @update-field="updateProjectField"
           />
 
-          <section v-show="activeTab === 'documents'" class="surface-card p-6 sm:p-7 space-y-5">
+          <section v-show="activeTab === 'documents'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
             <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">CV Upload (Secure Storage)</h2>
             <p class="text-sm text-slate-600 dark:text-slate-300">
               Upload your CV as PDF, DOC, or DOCX. Files are stored in private storage and are not
@@ -526,7 +526,7 @@
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
               <label
                 for="cv-upload"
-                class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#4e3aba] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#3f2ea1]"
+                class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#3f34a6] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
               >
                 Choose CV file
               </label>
@@ -555,7 +555,7 @@
               <p class="text-xs font-medium text-slate-700 dark:text-slate-200">
                 {{ cvUploadStatusText() }} {{ cvUploadProgress }}%
               </p>
-              <div class="h-2 w-full overflow-hidden rounded bg-slate-200 dark:bg-slate-700">
+              <div class="h-2 w-full overflow-hidden rounded bg-[#e8e3f2] dark:bg-slate-700">
                 <div
                   class="h-full bg-teal-600 transition-all duration-300"
                   :style="{ width: `${cvUploadProgress}%` }"
@@ -567,7 +567,7 @@
               <div
                 v-for="n in 2"
                 :key="n"
-                class="h-10 rounded-lg bg-gray-100 animate-pulse dark:bg-slate-800"
+                class="h-10 animate-pulse rounded-xl bg-[#f1edf8] dark:bg-slate-800"
               ></div>
             </div>
 
@@ -579,7 +579,7 @@
               <li
                 v-for="cv in cvFiles"
                 :key="cv.id"
-                class="flex flex-col gap-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between"
+                class="flex flex-col gap-2 rounded-2xl bg-[#f8f5ff] p-3.5 dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <p class="text-sm font-medium text-slate-800 dark:text-slate-100">{{ cv.original_filename }}</p>
@@ -620,14 +620,14 @@
             </ul>
           </section>
 
-          <div class="surface-card p-4 sm:p-5">
+          <div class="rounded-3xl bg-white p-4 sm:p-5 dark:bg-slate-900">
             <div class="flex justify-end">
               <BaseButton
                 type="submit"
                 variant="primary"
                 size="lg"
                 :loading="saving"
-                class="rounded-full! px-6"
+                class="rounded-full! bg-[#3f34a6]! px-6! text-white! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
               >
                 {{ saveButtonLabel }}
               </BaseButton>

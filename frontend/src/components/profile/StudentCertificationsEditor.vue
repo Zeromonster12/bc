@@ -1,5 +1,5 @@
 <template>
-  <section class="surface-card p-6 sm:p-7 space-y-5">
+  <section class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
     <div class="flex items-center justify-between gap-4">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Certifications</h2>
       <BaseButton type="button" variant="secondary" size="sm" @click="$emit('add')"
@@ -14,7 +14,7 @@
     <div
       v-for="(certification, index) in certifications"
       :key="`cert-${index}`"
-      class="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700"
+      class="space-y-3 rounded-2xl bg-[#f1edf8] p-4 dark:bg-slate-800"
     >
       <div class="grid gap-3 sm:grid-cols-2">
         <BaseInput

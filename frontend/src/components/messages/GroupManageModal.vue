@@ -24,7 +24,7 @@
           type="text"
           maxlength="160"
           placeholder="Group name"
-          class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] placeholder:text-[#a3a7bb] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+          class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] placeholder:text-[#a3a7bb] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:bg-slate-900"
           @input="$emit('update:editName', ($event.target as HTMLInputElement).value)"
         />
         <div class="flex justify-end gap-2">
@@ -111,7 +111,7 @@
 
         <select
           :value="addUserId ?? ''"
-          class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+          class="w-full rounded-2xl border border-[#ebeaf2] bg-[#f8f7fc] px-3 py-2.5 text-sm font-medium text-[#474a61] focus:border-[#4b35cb] focus:bg-white focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400 dark:focus:bg-slate-900"
           @change="onAddUserChange"
         >
           <option value="">Select user</option>

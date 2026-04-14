@@ -1,6 +1,6 @@
 <template>
-  <div class="flex h-full min-h-0 flex-col bg-[#e8e3f2] dark:bg-slate-900">
-    <div ref="threadRef" class="message-scrollbar min-h-0 flex-1 overflow-y-auto bg-white px-4 py-4 dark:bg-slate-950">
+  <div class="flex h-full min-h-0 flex-col bg-white dark:bg-slate-900">
+    <div ref="threadRef" class="message-scrollbar min-h-0 flex-1 overflow-y-auto bg-white px-4 py-4 dark:bg-slate-900">
       <div
         v-for="message in messages"
         :key="String(message.id)"
@@ -47,7 +47,7 @@
               'rounded-2xl px-4 py-2.5 text-sm',
               Number(message.sender?.id) === currentUserId
                 ? 'rounded-br-sm bg-linear-to-r from-[#4526c9] to-[#5b45f0] text-white'
-                : 'rounded-bl-sm bg-[#f1edf8] text-[#2f2952] dark:bg-slate-900 dark:text-slate-100',
+                : 'rounded-bl-sm bg-[#f1edf8] text-[#2f2952] dark:bg-slate-800 dark:text-slate-100',
             ]"
           >
             <p>{{ message.body }}</p>
@@ -94,7 +94,7 @@
         <button
           :disabled="sending || !body.trim()"
           @click="send"
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3f34a6] text-white transition hover:brightness-105 disabled:opacity-40"
+          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3f34a6] text-white transition hover:brightness-105 disabled:opacity-40 dark:bg-indigo-600 dark:hover:bg-indigo-500"
         >
           <svg v-if="!sending" class="h-5 w-5 rotate-90" fill="currentColor" viewBox="0 0 20 20">
             <path

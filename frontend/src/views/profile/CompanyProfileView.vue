@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="max-w-5xl mx-auto space-y-6">
+    <div class="mx-auto max-w-5xl space-y-5">
 
       <BaseAlert
         v-if="showApprovalAlert"
@@ -25,8 +25,12 @@
         @dismiss="errorMessage = ''"
       />
 
-      <div v-if="loading" class="space-y-4">
-        <div v-for="n in 4" :key="n" class="h-12 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+      <div v-if="loading" class="space-y-3">
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="h-12 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800"
+        />
       </div>
 
       <CompanyProfileForm

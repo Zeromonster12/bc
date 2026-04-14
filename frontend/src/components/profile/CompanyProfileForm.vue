@@ -2,9 +2,9 @@
   <form
     @submit.prevent="$emit('submit')"
     novalidate
-    class="space-y-6"
+    class="space-y-5"
   >
-    <div class="p-3 sm:p-4">
+    <div class="rounded-3xl bg-white p-3 sm:p-4 dark:bg-slate-900">
       <div class="flex flex-wrap gap-2">
         <button
           v-for="tab in tabs"
@@ -13,8 +13,8 @@
           class="rounded-full px-5 py-2 text-sm font-medium transition"
           :class="
             activeTab === tab.id
-              ? 'bg-[#4e3aba] text-white shadow-sm'
-              : 'bg-[#4e3aba]/10 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+              ? 'bg-[#3f34a6] text-white dark:bg-indigo-600'
+              : 'bg-[#e8e3f2] text-[#4d466b] hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
           "
           @click="activeTab = tab.id"
         >
@@ -23,12 +23,12 @@
       </div>
     </div>
 
-    <section v-show="activeTab === 'identity'" class="surface-card rounded-3xl! space-y-5 p-6 sm:p-7">
+    <section v-show="activeTab === 'identity'" class="rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Identity</h2>
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div
-          class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100 dark:bg-slate-800"
+          class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#f1edf8] dark:bg-slate-800"
         >
           <img v-if="logoPreview" :src="logoPreview" alt="Logo" class="h-full w-full object-cover" />
           <span v-else class="text-2xl">🏢</span>
@@ -36,7 +36,7 @@
         <div class="space-y-2">
           <label
             for="company-logo-upload"
-            class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#4e3aba] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#3f2ea1]"
+            class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#3f34a6] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
           >
             Choose company logo
           </label>
@@ -141,15 +141,15 @@
       </div>
     </section>
 
-    <section v-show="activeTab === 'overview'" class="surface-card space-y-5 p-6 sm:p-7">
+    <section v-show="activeTab === 'overview'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Overview and Culture</h2>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
+        <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
         <textarea
           :value="form.description"
           rows="4"
-          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+          class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
           placeholder="Describe what your company does and who your products are for"
           @input="emitField('description', ($event.target as HTMLTextAreaElement).value)"
         />
@@ -158,21 +158,21 @@
 
       <div class="grid gap-4 lg:grid-cols-2">
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Mission</label>
+          <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Mission</label>
           <textarea
             :value="form.mission"
             rows="4"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+            class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
             placeholder="What drives your team"
             @input="emitField('mission', ($event.target as HTMLTextAreaElement).value)"
           />
         </div>
         <div>
-          <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Values</label>
+          <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Values</label>
           <textarea
             :value="form.values"
             rows="4"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+            class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
             placeholder="Team values and ways of working"
             @input="emitField('values', ($event.target as HTMLTextAreaElement).value)"
           />
@@ -180,18 +180,18 @@
       </div>
 
       <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Benefits</label>
+        <label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Benefits</label>
         <textarea
           :value="form.benefits"
           rows="3"
-          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+          class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
           placeholder="What students can expect: mentoring, flexibility, growth, etc."
           @input="emitField('benefits', ($event.target as HTMLTextAreaElement).value)"
         />
       </div>
     </section>
 
-    <section v-show="activeTab === 'hiring'" class="surface-card space-y-5 p-6 sm:p-7">
+    <section v-show="activeTab === 'hiring'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Hiring and Team</h2>
 
       <div class="grid gap-4 sm:grid-cols-2">
@@ -232,7 +232,7 @@
       </div>
     </section>
 
-    <section v-show="activeTab === 'presence'" class="surface-card space-y-5 p-6 sm:p-7">
+    <section v-show="activeTab === 'presence'" class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Online Presence</h2>
 
       <div class="grid gap-4 sm:grid-cols-2">
@@ -272,9 +272,14 @@
       </div>
     </section>
 
-    <div class="surface-card rounded-3xl! p-4 sm:p-5">
+    <div class="rounded-3xl bg-white p-4 sm:p-5 dark:bg-slate-900">
       <div class="flex justify-end">
-        <BaseButton type="submit" variant="primary" :loading="saving" class="rounded-full px-6">
+        <BaseButton
+          type="submit"
+          variant="primary"
+          :loading="saving"
+          class="rounded-full! bg-[#3f34a6]! px-6! text-white! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
+        >
           {{ saveButtonLabel }}
         </BaseButton>
       </div>

@@ -4,15 +4,15 @@
       <BaseAlert v-if="errorMessage" type="error" :message="errorMessage" class="mt-2" />
 
       <div v-if="loading" class="space-y-4">
-        <div class="h-20 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800" />
-        <div v-for="n in 5" :key="n" class="h-32 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800" />
+        <div class="h-20 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800" />
+        <div v-for="n in 5" :key="n" class="h-32 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800" />
       </div>
 
       <template v-else>
-        <section class="overflow-hidden rounded-3xl border border-slate-200/80 bg-linear-to-br from-white via-[#f8f5ff] to-[#ece5ff] p-6 shadow-[0_14px_34px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/30">
+        <section class="overflow-hidden rounded-3xl bg-white p-6 dark:bg-slate-900">
           <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div class="flex min-w-0 items-center gap-4">
-              <div class="h-18 w-18 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+              <div class="h-18 w-18 shrink-0 overflow-hidden rounded-2xl bg-[#f1edf8] dark:bg-slate-800">
                 <img v-if="avatarUrl" :src="avatarUrl" alt="Student avatar" class="h-full w-full object-cover" />
                 <div v-else class="flex h-full w-full items-center justify-center text-lg font-bold text-slate-500 dark:text-slate-300">
                   {{ initials }}
@@ -30,13 +30,13 @@
                 :href="github.profile_url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center rounded-full bg-[#4f33d7] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+                class="inline-flex items-center rounded-full bg-[#3f34a6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
               >
                 GitHub {{ github.username ? `@${github.username}` : '' }}
               </a>
               <RouterLink
                 to="/applications"
-                class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                class="inline-flex items-center rounded-full bg-[#e8e3f2] px-4 py-2 text-sm font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
                 Back to applications
               </RouterLink>
@@ -45,7 +45,7 @@
         </section>
 
         <section class="grid gap-5 lg:grid-cols-2">
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Personal details</h2>
             <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -67,7 +67,7 @@
             </dl>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Location</h2>
             <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -89,7 +89,7 @@
             </dl>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Education</h2>
             <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -123,7 +123,7 @@
             </dl>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Work preferences</h2>
             <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -145,14 +145,14 @@
               <div class="sm:col-span-2">
                 <dt class="text-slate-500 dark:text-slate-400">Preferred locations</dt>
                 <dd class="mt-1 flex flex-wrap gap-2">
-                  <span v-for="item in form.preferred_locations" :key="item" class="rounded-full bg-[#ede8ff] px-3 py-1 text-xs font-semibold text-[#4420cf] dark:bg-indigo-500/20 dark:text-indigo-300">{{ item }}</span>
+                  <span v-for="item in form.preferred_locations" :key="item" class="rounded-full bg-[#e8e3f2] px-3 py-1 text-xs font-semibold text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">{{ item }}</span>
                   <span v-if="form.preferred_locations.length === 0" class="text-sm font-medium text-slate-800 dark:text-slate-200">Not provided</span>
                 </dd>
               </div>
             </dl>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 lg:col-span-2">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900 lg:col-span-2">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">About</h2>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
               <div>
@@ -166,27 +166,27 @@
             </div>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 lg:col-span-2">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900 lg:col-span-2">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Skills and interests</h2>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Skills</p>
                 <div class="mt-2 flex flex-wrap gap-2">
-                  <span v-for="item in form.skills" :key="item" class="rounded-full bg-[#e5f3ff] px-3 py-1 text-xs font-semibold text-[#18598f] dark:bg-cyan-500/20 dark:text-cyan-300">{{ item }}</span>
+                  <span v-for="item in form.skills" :key="item" class="rounded-full bg-[#e8e3f2] px-3 py-1 text-xs font-semibold text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">{{ item }}</span>
                   <span v-if="form.skills.length === 0" class="text-sm font-medium text-slate-800 dark:text-slate-200">Not provided</span>
                 </div>
               </div>
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Interests</p>
                 <div class="mt-2 flex flex-wrap gap-2">
-                  <span v-for="item in form.interests" :key="item" class="rounded-full bg-[#fff0d9] px-3 py-1 text-xs font-semibold text-[#9b5b00] dark:bg-amber-500/20 dark:text-amber-300">{{ item }}</span>
+                  <span v-for="item in form.interests" :key="item" class="rounded-full bg-[#e8e3f2] px-3 py-1 text-xs font-semibold text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">{{ item }}</span>
                   <span v-if="form.interests.length === 0" class="text-sm font-medium text-slate-800 dark:text-slate-200">Not provided</span>
                 </div>
               </div>
             </div>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 lg:col-span-2">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900 lg:col-span-2">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Links and projects</h2>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
               <div class="space-y-2 text-sm">
@@ -198,7 +198,7 @@
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Projects</p>
                 <ul v-if="form.projects.length" class="mt-2 space-y-2">
-                  <li v-for="(item, index) in form.projects" :key="`${item.title}-${index}`" class="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+                  <li v-for="(item, index) in form.projects" :key="`${item.title}-${index}`" class="rounded-2xl bg-[#f1edf8] p-3 dark:bg-slate-800">
                     <p class="font-semibold text-slate-900 dark:text-slate-100">{{ fieldOrFallback(item.title) }}</p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">{{ fieldOrFallback(item.tech) }}</p>
                     <p class="mt-1 text-sm text-slate-700 dark:text-slate-200">{{ fieldOrFallback(item.description) }}</p>
@@ -209,21 +209,21 @@
             </div>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Languages</h2>
             <ul v-if="form.languages.length" class="mt-4 space-y-2 text-sm">
-              <li v-for="item in form.languages" :key="`${item.name}-${item.level}`" class="flex items-center justify-between rounded-xl border border-slate-200 px-3 py-2 dark:border-slate-700">
+              <li v-for="item in form.languages" :key="`${item.name}-${item.level}`" class="flex items-center justify-between rounded-2xl bg-[#f1edf8] px-3 py-2 dark:bg-slate-800">
                 <span class="font-medium text-slate-800 dark:text-slate-200">{{ item.name }}</span>
-                <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ item.level || 'n/a' }}</span>
+                <span class="rounded-full bg-[#e8e3f2] px-2.5 py-0.5 text-xs font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200">{{ item.level || 'n/a' }}</span>
               </li>
             </ul>
             <p v-else class="mt-3 text-sm font-medium text-slate-800 dark:text-slate-200">No languages listed</p>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Certifications</h2>
             <ul v-if="form.certifications.length" class="mt-4 space-y-2 text-sm">
-              <li v-for="(item, index) in form.certifications" :key="`${item.name}-${index}`" class="rounded-xl border border-slate-200 px-3 py-2 dark:border-slate-700">
+              <li v-for="(item, index) in form.certifications" :key="`${item.name}-${index}`" class="rounded-2xl bg-[#f1edf8] px-3 py-2 dark:bg-slate-800">
                 <p class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(item.name) }}</p>
                 <p class="text-xs text-slate-500 dark:text-slate-400">{{ fieldOrFallback(item.issuer) }}{{ item.year ? ` - ${item.year}` : '' }}</p>
               </li>
@@ -231,7 +231,7 @@
             <p v-else class="mt-3 text-sm font-medium text-slate-800 dark:text-slate-200">No certifications listed</p>
           </article>
 
-          <article class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 lg:col-span-2">
+          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900 lg:col-span-2">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Emergency contact</h2>
             <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
               <div>

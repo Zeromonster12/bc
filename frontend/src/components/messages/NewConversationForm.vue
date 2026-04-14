@@ -3,7 +3,7 @@
     v-if="visible"
     class="space-y-4 bg-white px-8 pb-8 pt-2 dark:bg-slate-900"
   >
-    <div class="grid grid-cols-2 rounded-full bg-[#e8e3f2] p-1 dark:bg-slate-900">
+    <div class="grid grid-cols-2 rounded-full bg-[#e8e3f2] p-1 dark:bg-slate-800">
       <button
         type="button"
         class="rounded-full px-3 py-1.5 text-xs font-semibold transition"

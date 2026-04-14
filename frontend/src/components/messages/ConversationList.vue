@@ -13,8 +13,8 @@
         :class="[
           'cursor-pointer rounded-2xl px-5 py-3.5 transition',
           activeId === convo.id
-            ? 'bg-[#e8e3f2] dark:bg-indigo-500/15'
-            : 'bg-[#f1edf8] dark:bg-slate-800/70 dark:hover:bg-slate-800',
+            ? 'bg-[#e8e3f2] dark:bg-indigo-500/25'
+            : 'bg-[#f1edf8] dark:bg-slate-800 dark:hover:bg-slate-700/90',
         ]"
         @click="$emit('select', convo.id)"
       >
@@ -35,12 +35,12 @@
               <p class="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {{ conversationTitle(convo) }}
               </p>
-              <span class="ml-auto shrink-0 text-[11px] text-slate-500 dark:text-slate-500">
+              <span class="ml-auto shrink-0 text-[11px] text-slate-500 dark:text-slate-400">
                 {{ formatConversationTime(convo.last_message?.created_at || convo.created_at) }}
               </span>
             </div>
             <div class="mt-0.5 flex items-center gap-2">
-              <p class="truncate text-xs text-[#5b5676] dark:text-slate-400">
+              <p class="truncate text-xs text-[#5b5676] dark:text-slate-300">
                 {{ lastMessagePreview(convo) }}
               </p>
               <span

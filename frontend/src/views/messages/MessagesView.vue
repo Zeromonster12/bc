@@ -13,7 +13,7 @@
                 <h2 class="font-semibold text-slate-900 dark:text-slate-100">Messages</h2>
                 <button
                   @click="toggleNewConversationForm"
-                  class="rounded-full bg-[#3f34a6] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-105 dark:bg-indigo-600"
+                  class="rounded-full bg-[#3f34a6] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-105 dark:bg-indigo-600 dark:hover:bg-indigo-500"
                 >
                   New chat
                 </button>
@@ -23,7 +23,7 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search chats"
-                class="mt-3 w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+                class="mt-3 w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
               />
             </div>
 
@@ -68,7 +68,7 @@
 
         <div
           :class="[
-            'min-h-0 overflow-hidden rounded-3xl bg-white dark:bg-slate-950 flex flex-col',
+            'min-h-0 overflow-hidden rounded-3xl bg-white dark:bg-slate-900 flex flex-col',
             !currentConversation ? 'hidden md:flex' : 'flex',
           ]"
         >
@@ -78,7 +78,7 @@
             >
               <div class="px-6 text-center">
                 <p class="text-2xl font-semibold text-[#332d52] dark:text-slate-200">Your chats</p>
-                <p class="mt-2 text-sm">Select a conversation from the left and start messaging.</p>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Select a conversation from the left and start messaging.</p>
               </div>
             </div>
 

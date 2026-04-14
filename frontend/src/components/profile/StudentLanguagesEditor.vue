@@ -1,5 +1,5 @@
 <template>
-  <section class="surface-card p-6 sm:p-7 space-y-5">
+  <section class="space-y-5 rounded-3xl bg-white p-6 sm:p-7 dark:bg-slate-900">
     <div class="flex items-center justify-between gap-4">
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Languages</h2>
       <BaseButton type="button" variant="secondary" size="sm" @click="$emit('add')"
@@ -12,7 +12,7 @@
     <div
       v-for="(language, index) in languages"
       :key="`lang-${index}`"
-      class="grid gap-3 sm:grid-cols-[1fr_220px_auto] items-end"
+      class="grid items-end gap-3 rounded-2xl bg-[#f1edf8] p-4 sm:grid-cols-[1fr_220px_auto] dark:bg-slate-800"
     >
       <BaseInput
         :model-value="language.name"
@@ -24,7 +24,7 @@
         <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-slate-300">Level</label>
         <select
           :value="language.level"
-          class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+          class="block w-full rounded-2xl bg-white/80 px-3 py-2 text-sm text-slate-900 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-indigo-400/30"
           @change="
             $emit('update-level', { index, value: ($event.target as HTMLSelectElement).value })
           "
