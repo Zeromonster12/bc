@@ -1,22 +1,22 @@
 <template>
   <div
-    class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-3xl bg-white p-4 transition duration-200 hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:p-7"
+    class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-3xl bg-white p-5 transition duration-200 hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:p-6"
     @click="$emit('click', project)"
   >
-    <div class="mb-3 flex items-start justify-between gap-2 sm:gap-3">
+    <div class="mb-4 flex items-start justify-between gap-2 sm:gap-3">
       <h3 class="line-clamp-2 flex-1 text-base font-semibold leading-tight text-slate-900 dark:text-slate-100 sm:text-[1.05rem]">
         {{ project.title }}
       </h3>
       <ProjectStatusBadge :status="project.status ?? 'draft'" />
     </div>
 
-    <p class="mb-3 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:mb-4">
+    <p class="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 sm:mb-5">
       {{ project.description }}
     </p>
 
     <p
       v-if="project.location"
-      class="mb-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#e8e3f2] px-2.5 py-1 text-xs font-medium text-[#4d466b] dark:bg-slate-800 dark:text-slate-300 sm:mb-4"
+      class="mb-4 inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#e8e3f2] px-2.5 py-1 text-xs font-medium text-[#4d466b] dark:bg-slate-800 dark:text-slate-300 sm:mb-5"
     >
       <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
@@ -25,7 +25,7 @@
       <span class="truncate">{{ project.location }}</span>
     </p>
 
-    <div class="mb-4 flex flex-wrap gap-1.5 sm:mb-5 sm:gap-2">
+    <div class="mb-5 flex flex-wrap gap-2 sm:mb-6">
       <span
         v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 4)"
         :key="tech"
@@ -42,7 +42,7 @@
       </span>
     </div>
 
-    <div class="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-3 text-xs sm:flex-nowrap sm:pt-4">
+    <div class="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4 text-xs sm:flex-nowrap sm:pt-5">
       <div class="flex min-w-0 items-center gap-2 text-slate-600 dark:text-slate-300">
         <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e3f2] text-[10px] font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200">
           {{ companyInitials(project.company?.name) }}
@@ -118,12 +118,12 @@ export default defineComponent({
     },
     techChipClass(index: number): string {
       const classes = [
-        'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200',
-        'bg-[#ddd7f6] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200',
-        'bg-[#f1edf8] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200',
-        'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200',
+        'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
+        'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300',
+        'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+        'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
       ]
-      return classes[index % classes.length] || 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
+      return classes[index % classes.length] || 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
     },
     formatPostedDate(date?: string | null): string {
       if (!date) return 'Posted recently'

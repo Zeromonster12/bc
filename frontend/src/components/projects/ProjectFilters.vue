@@ -8,8 +8,8 @@
     "
   >
     <div
-      class="mb-3 flex flex-wrap items-center justify-between gap-2"
-      :class="isSidebar ? 'pb-1' : 'border-b border-slate-200/70 pb-2 dark:border-slate-700/70'"
+      class="mb-4 flex flex-wrap items-center justify-between gap-2"
+      :class="isSidebar ? 'pb-2' : 'border-b border-slate-200/70 pb-2 dark:border-slate-700/70'"
     >
       <div>
         <p
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap items-end gap-3" :class="isSidebar ? 'space-y-1' : ''">
+    <div class="flex flex-wrap items-end gap-4" :class="isSidebar ? 'space-y-2' : ''">
       <div :class="isSidebar ? 'w-full' : 'w-full sm:w-75'">
         <label
           class="mb-1 block text-[11px] font-semibold"
@@ -40,7 +40,7 @@
             v-model="localFilters.search"
             type="text"
             placeholder="Search by title or description"
-            class="w-full px-3 py-2 pl-9 text-xs text-slate-900 transition focus:outline-none"
+            class="w-full px-3.5 py-2.5 pl-10 text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
                 ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30'
@@ -64,7 +64,7 @@
         <div ref="techDropdown" class="relative">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
+            class="inline-flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
                 ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30'
@@ -82,14 +82,14 @@
 
           <div
             v-if="techMenuOpen"
-            class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-1.5 dark:bg-slate-900"
+            class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-2 dark:bg-slate-900"
             role="listbox"
             aria-multiselectable="true"
           >
             <button
               v-if="localFilters.tech_stack.length"
               type="button"
-              class="mb-1 flex w-full items-center justify-center rounded-full bg-[#f1edf8] px-3 py-1.5 text-[11px] font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              class="mb-1.5 flex w-full items-center justify-center rounded-full bg-[#f1edf8] px-3.5 py-2 text-[11px] font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               @click="clearTechSelection"
             >
               Clear selection
@@ -99,7 +99,7 @@
                 v-for="option in normalizedTechOptions"
                 :key="option"
                 type="button"
-                class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs transition"
+                class="flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-xs transition"
                 :class="
                   localFilters.tech_stack.includes(option)
                     ? 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
@@ -139,7 +139,7 @@
             v-model="localFilters.location"
             type="text"
             placeholder="City / region"
-            class="w-full px-3 py-2 text-xs text-slate-900 transition focus:outline-none"
+            class="w-full px-3.5 py-2.5 text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
                 ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30'
@@ -160,7 +160,7 @@
         <div ref="statusDropdown" class="relative w-full">
             <button
               type="button"
-              class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
+              class="inline-flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs text-slate-900 transition focus:outline-none"
               :class="
                 isSidebar
                     ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30'
@@ -178,14 +178,14 @@
 
             <div
               v-if="statusMenuOpen"
-              class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-1.5 dark:bg-slate-900"
+              class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-2 dark:bg-slate-900"
               role="listbox"
             >
               <button
                 v-for="option in statusOptions"
                 :key="option.value"
                 type="button"
-                class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs transition"
+                class="flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-xs transition"
                 :class="
                   localFilters.status === option.value
                     ? 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
@@ -221,7 +221,7 @@
         <div ref="sortDropdown" class="relative w-full">
           <button
             type="button"
-            class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
+            class="inline-flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
                 ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30'
@@ -239,14 +239,14 @@
 
           <div
             v-if="sortMenuOpen"
-            class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-1.5 dark:bg-slate-900"
+            class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-2 dark:bg-slate-900"
             role="listbox"
           >
             <button
               v-for="option in sortOptions"
               :key="option.value"
               type="button"
-              class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs transition"
+              class="flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-xs transition"
               :class="
                 localFilters.sort_date === option.value
                   ? 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
@@ -272,7 +272,7 @@
         </div>
       </div>
 
-      <div class="w-full" :class="isSidebar ? 'mt-1 space-y-2' : 'sm:w-auto'">
+      <div class="w-full" :class="isSidebar ? 'mt-2 space-y-2' : 'sm:w-auto'">
         <button
           class="inline-flex w-full items-center justify-center px-3 py-2 text-xs font-semibold transition"
           :class="

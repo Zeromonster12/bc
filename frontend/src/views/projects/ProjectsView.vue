@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="space-y-5 pt-12 lg:space-y-6 lg:pt-0">
+    <div class="space-y-6 pt-12 lg:space-y-7 lg:pt-0">
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ pageTitle }}</h1>
       </div>
@@ -15,8 +15,8 @@
           />
         </aside>
 
-        <section class="space-y-4">
-          <div class="flex w-full flex-wrap items-center justify-end gap-2 rounded-3xl bg-white p-2.5 dark:bg-slate-900">
+        <section class="space-y-5">
+          <div class="flex w-full flex-wrap items-center justify-end gap-3 rounded-3xl bg-white px-5 py-3.5 dark:bg-slate-900 sm:px-6">
             <div
               v-if="auth.isCompany"
               class="grid grid-cols-2 rounded-full bg-[#e8e3f2] p-1 dark:bg-slate-800"
@@ -87,8 +87,8 @@
             v-if="projectStore.loading"
             :class="
               viewMode === 'grid'
-                ? 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'
-                : 'grid gap-4 grid-cols-1'
+                ? 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3'
+                : 'grid gap-5 grid-cols-1'
             "
           >
             <div
@@ -99,7 +99,7 @@
           </div>
 
           <template v-else>
-            <div v-if="projectStore.projects.length === 0" class="rounded-3xl bg-white px-4 py-16 text-center text-gray-500 dark:bg-slate-900 dark:text-slate-400">
+            <div v-if="projectStore.projects.length === 0" class="rounded-3xl bg-white px-8 py-20 text-center text-gray-500 dark:bg-slate-900 dark:text-slate-400 sm:px-10">
               <p class="text-4xl mb-3">📂</p>
               <p class="font-medium">No projects found</p>
               <p class="text-sm mt-1">Try adjusting your filters.</p>
@@ -108,8 +108,8 @@
               v-else
               :class="
                 viewMode === 'grid'
-                  ? 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'
-                  : 'grid gap-4 grid-cols-1'
+                  ? 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3'
+                  : 'grid gap-5 grid-cols-1'
               "
             >
               <ProjectCard
