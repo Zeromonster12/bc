@@ -52,12 +52,18 @@
           <div class="rounded-3xl bg-white p-5 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Applications Sent</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.myApplications }}</p>
-            <p class="mt-1 text-xs text-indigo-600 dark:text-indigo-400">{{ pendingApplicationsCount }} pending review</p>
+            <p class="mt-1 inline-flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400">
+              <span class="h-2 w-2 rounded-full bg-amber-400 dark:bg-amber-300" />
+              {{ pendingApplicationsCount }} pending review
+            </p>
           </div>
           <div class="rounded-3xl bg-white p-5 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Accepted</p>
             <p class="mt-2 text-3xl font-black text-slate-900 dark:text-slate-100">{{ stats.acceptedApplications }}</p>
-            <p class="mt-1 text-xs text-violet-600 dark:text-violet-400">Projects where you are in</p>
+            <p class="mt-1 inline-flex items-center gap-1.5 text-xs text-violet-600 dark:text-violet-400">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+              Projects where you are in
+            </p>
           </div>
           <div class="rounded-3xl bg-white p-5 dark:bg-slate-900">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Unread Messages</p>
@@ -66,8 +72,8 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
-          <div class="space-y-6">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-4 xl:gap-4">
+          <div class="space-y-6 xl:col-span-3">
             <section class="space-y-4">
               <div class="flex items-center justify-between">
                 <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Recommended for You</h2>
@@ -124,7 +130,7 @@
             </section>
           </div>
 
-          <aside class="xl:sticky xl:top-24 xl:h-fit">
+          <aside class="w-full xl:col-span-1 xl:sticky xl:top-24 xl:h-fit">
             <div class="rounded-3xl bg-white p-5 dark:bg-slate-900 sm:p-6">
               <div class="flex items-center justify-between">
                 <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Activity Panel</h2>
