@@ -16,7 +16,7 @@
         </div>
       </section>
 
-      <AdminTabNav :tabs="tabs" :active-tab="activeTab" @change="activeTab = $event" />
+      <AdminTabNav :tabs="tabs" :active-tab="activeTab" @change="handleTabChange" />
 
       <AdminUsersPanel
         v-if="activeTab === 'users'"
@@ -93,26 +93,37 @@ export default defineComponent({
       userCompanyStatusFilter: '',
       userPagination: null as AdminPagination | null,
       usersLoading: false,
+      usersLoaded: false,
       // Projects
       adminProjects: [] as AdminProject[],
       projectPagination: null as AdminPagination | null,
       projectsLoading: false,
+      projectsLoaded: false,
       searchTimeout: undefined as ReturnType<typeof setTimeout> | undefined,
     }
-  },
-  watch: {
-    activeTab(tab: string) {
-      if (tab === 'users') this.fetchUsers(1)
-      if (tab === 'projects') this.fetchAdminProjects(1)
-    },
   },
   mounted() {
     this.fetchUsers(1)
   },
   methods: {
+    handleTabChange(tab: string) {
+      if (this.activeTab === tab) return
+
+      this.activeTab = tab
+
+      if (tab === 'users' && !this.usersLoaded) {
+        this.usersLoading = true
+        void this.fetchUsers(1)
+      }
+
+      if (tab === 'projects' && !this.projectsLoaded) {
+        this.projectsLoading = true
+        void this.fetchAdminProjects(1)
+      }
+    },
     handleUserSearch(value: string) {
       this.userSearch = value
-      this.fetchUsers(1)
+      this.fetchUsers(1, { debounce: true })
     },
     handleUserRoleFilter(value: string) {
       this.userRoleFilter = value
@@ -125,9 +136,11 @@ export default defineComponent({
     changeRoleFromEvent(payload: { id: number; role: string }) {
       return this.changeRole(payload.id, payload.role)
     },
-    async fetchUsers(page = 1) {
+    async fetchUsers(page = 1, options?: { debounce?: boolean }) {
+      const useDebounce = Boolean(options?.debounce)
       clearTimeout(this.searchTimeout)
-      this.searchTimeout = setTimeout(async () => {
+
+      const run = async () => {
         this.usersLoading = true
         try {
           const params = buildAdminUsersParams(
@@ -139,10 +152,20 @@ export default defineComponent({
           const result = await AdminService.getUsers(params)
           this.users = result.data
           this.userPagination = result.meta
+          this.usersLoaded = true
         } finally {
           this.usersLoading = false
         }
-      }, 300)
+      }
+
+      if (useDebounce) {
+        this.searchTimeout = setTimeout(() => {
+          void run()
+        }, 300)
+        return
+      }
+
+      await run()
     },
     async fetchAdminProjects(page = 1) {
       this.projectsLoading = true
@@ -150,6 +173,7 @@ export default defineComponent({
         const result = await AdminService.getProjects({ page })
         this.adminProjects = result.data
         this.projectPagination = result.meta
+        this.projectsLoaded = true
       } finally {
         this.projectsLoading = false
       }

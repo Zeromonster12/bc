@@ -37,11 +37,11 @@
         <table class="min-w-170 w-full text-sm">
         <thead class="bg-[#f1edf8] text-xs font-semibold uppercase tracking-wide text-[#6b6682] dark:bg-slate-800/80 dark:text-slate-400">
           <tr>
-            <th class="px-4 py-3 text-left">Title</th>
-            <th class="px-4 py-3 text-left">Company</th>
-            <th class="px-4 py-3 text-left">Status</th>
-            <th class="px-4 py-3 text-left">Created</th>
-            <th class="px-4 py-3 text-left">Actions</th>
+            <th class="px-5 py-4 text-left">Title</th>
+            <th class="px-5 py-4 text-left">Company</th>
+            <th class="px-5 py-4 text-left">Status</th>
+            <th class="px-5 py-4 text-left">Created</th>
+            <th class="px-5 py-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[#ece8f4] dark:divide-slate-700/60">
