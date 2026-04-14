@@ -8,12 +8,12 @@
     </div>
 
     <template v-else>
-      <div class="rounded-3xl border border-[#dfd8ef] bg-linear-to-br from-white via-[#f7f3ff] to-[#ece5ff] p-6 dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/30">
+      <div class="rounded-3xl bg-white px-6 py-6 dark:bg-slate-900/90 sm:px-8">
         <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div class="space-y-2">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-[#5a42e5]">Applicant management</p>
-            <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ selectedProject.title }}</h2>
-            <p class="max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+          <div class="space-y-1">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#66628b] dark:text-slate-400">Applicant management</p>
+            <h2 class="text-sm font-semibold text-[#2f2a4b] dark:text-slate-100">{{ selectedProject.title }}</h2>
+            <p class="max-w-2xl text-xs text-slate-500 dark:text-slate-400">
               Reviewing {{ applications.length }} candidates for this project.
             </p>
           </div>
@@ -37,21 +37,17 @@
             </div>
           </div>
         </div>
+
+        <input
+          v-model.trim="searchQuery"
+          type="text"
+          placeholder="Search by name, skill, university..."
+          class="mt-3 w-full rounded-full bg-[#e8e3f2] px-3 py-2 text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
+        />
       </div>
 
       <div class="flex flex-col gap-3 md:flex-row md:items-center">
-        <div class="relative w-full flex-1">
-          <svg viewBox="0 0 24 24" class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" />
-          </svg>
-          <input
-            v-model.trim="searchQuery"
-            type="text"
-            placeholder="Search by name, skill, university..."
-            class="h-12 w-full rounded-2xl border border-[#d8d0ea] bg-white pl-11 pr-4 text-sm text-slate-800 outline-none transition focus:border-[#5a42e5] focus:ring-2 focus:ring-[#5a42e5]/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-          />
-        </div>
-        <div class="flex w-full gap-2 overflow-x-auto pb-1 md:w-auto md:pb-0">
+        <div class="flex w-full gap-2 overflow-x-auto pb-1 md:ml-auto md:w-auto md:pb-0">
           <button
             v-for="option in quickStatusOptions"
             :key="option.value"
