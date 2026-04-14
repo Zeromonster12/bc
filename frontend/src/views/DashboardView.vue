@@ -264,9 +264,25 @@
               </div>
 
               <div class="mt-auto flex items-center justify-between gap-2 pt-3 text-[11px] text-slate-500 dark:text-slate-400">
-                <span class="truncate pr-2 font-medium text-slate-600 dark:text-slate-300">
-                  {{ project.company?.name || 'Unknown company' }}
-                </span>
+                <div class="flex min-w-0 items-center gap-2">
+                  <img
+                    v-if="companyAvatarUrl(project)"
+                    :src="companyAvatarUrl(project)"
+                    :alt="`${companyName(project)} logo`"
+                    class="h-6 w-6 shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                    loading="lazy"
+                  >
+                  <span
+                    v-else
+                    class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e3f2] text-[10px] font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200"
+                  >
+                    {{ companyInitials(project) }}
+                  </span>
+
+                  <span class="truncate pr-2 font-medium text-slate-600 dark:text-slate-300">
+                    {{ companyName(project) }}
+                  </span>
+                </div>
                 <span class="shrink-0 font-semibold text-indigo-600 dark:text-indigo-400">Open</span>
               </div>
             </article>
@@ -434,9 +450,23 @@ import {
   countAcceptedApplications,
   createDefaultDashboardStats,
 } from '@/services/dashboard/DashboardService'
+import { resolveAssetUrl } from '@/services/core/url'
 import AdminService from '@/services/admin/AdminService'
 import AppLayout from '@/layouts/AppLayout.vue'
 import ProjectCard from '@/components/projects/ProjectCard.vue'
+
+interface DashboardCompany {
+  name?: string | null
+  logo_url?: string | null
+  avatar_url?: string | null
+  logo?: string | null
+  avatar?: string | null
+  profile?: {
+    logo_url?: string | null
+    avatar_url?: string | null
+  } | null
+  [key: string]: unknown
+}
 
 interface DashboardProject {
   id: number
@@ -447,6 +477,7 @@ interface DashboardProject {
   location_strategy?: string | null
   posted_at?: string | null
   tech_stack?: string[]
+  company?: DashboardCompany | null
   [key: string]: unknown
 }
 
@@ -700,6 +731,41 @@ export default defineComponent({
       ]
 
       return classes[index % classes.length] || 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+    },
+    companyName(project: DashboardProject): string {
+      const name = String(project.company?.name ?? '').trim()
+      return name || 'Unknown company'
+    },
+    companyInitials(project: DashboardProject): string {
+      const name = this.companyName(project)
+      if (name === 'Unknown company') {
+        return 'CO'
+      }
+
+      return name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase()
+    },
+    companyAvatarUrl(project: DashboardProject): string {
+      const company = project.company
+      if (!company) {
+        return ''
+      }
+
+      const possibleUrl = [
+        company.logo_url,
+        company.avatar_url,
+        company.logo,
+        company.avatar,
+        company.profile?.logo_url,
+        company.profile?.avatar_url,
+      ].find((value) => typeof value === 'string' && value.trim().length > 0)
+
+      return resolveAssetUrl(typeof possibleUrl === 'string' ? possibleUrl : '')
     },
     scrollRecentProjects(direction: 'left' | 'right'): void {
       const rail = this.$refs.recentProjectsRail
