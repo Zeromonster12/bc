@@ -66,87 +66,93 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.65fr_1fr]">
-          <section class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Recommended for You</h2>
-              <RouterLink to="/projects" class="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-                See all matches
-              </RouterLink>
-            </div>
-
-            <div v-if="projectStore.loading" class="grid gap-4 md:grid-cols-2">
-              <div
-                v-for="n in 4"
-                :key="n"
-                class="h-56 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800"
-              />
-            </div>
-
-            <div v-else-if="recentProjects.length" class="grid gap-4 md:grid-cols-2">
-              <article
-                v-for="project in recentProjects"
-                :key="project.id"
-                class="group rounded-3xl bg-white p-5 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800"
-              >
-                <div class="flex items-center justify-between gap-3">
-                  <span class="inline-flex rounded-full bg-indigo-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
-                    {{ normalizeLocationStrategy(project.location_strategy) }}
-                  </span>
-                  <span class="text-xs text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
-                </div>
-                <h3 class="mt-3 text-lg font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
-                  {{ project.title }}
-                </h3>
-                <p class="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">
-                  {{ project.description }}
-                </p>
-                <div class="mt-4 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <span>{{ formatTechStack(project.tech_stack) }}</span>
-                  <RouterLink :to="`/projects/${project.id}`" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-                    Open
-                  </RouterLink>
-                </div>
-              </article>
-            </div>
-
-            <div v-else class="rounded-3xl bg-white p-8 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-              No open projects right now. Check back later.
-            </div>
-          </section>
-
-          <aside class="space-y-6">
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.65fr)_360px]">
+          <div class="space-y-6">
             <section class="space-y-4">
               <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Recent Activity</h2>
-                <RouterLink to="/applications" class="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-                  View
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Recommended for You</h2>
+                <RouterLink to="/projects" class="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                  See all matches
                 </RouterLink>
               </div>
 
-              <div class="rounded-3xl bg-white p-5 dark:bg-slate-900">
-                <div class="space-y-3">
+              <div v-if="projectStore.loading" class="grid gap-4 md:grid-cols-2">
                 <div
-                  v-for="activity in recentActivities"
-                  :key="activity.id"
-                  class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800"
+                  v-for="n in 4"
+                  :key="n"
+                  class="h-56 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800"
+                />
+              </div>
+
+              <div v-else-if="recentProjects.length" class="grid gap-4 md:grid-cols-2">
+                <article
+                  v-for="project in recentProjects"
+                  :key="project.id"
+                  class="group rounded-3xl bg-white p-5 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800"
                 >
-                  <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
-                  <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
-                </div>
-                </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="inline-flex rounded-full bg-indigo-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                      {{ normalizeLocationStrategy(project.location_strategy) }}
+                    </span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
+                  </div>
+                  <h3 class="mt-3 text-lg font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
+                    {{ project.title }}
+                  </h3>
+                  <p class="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">
+                    {{ project.description }}
+                  </p>
+                  <div class="mt-4 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span>{{ formatTechStack(project.tech_stack) }}</span>
+                    <RouterLink :to="`/projects/${project.id}`" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                      Open
+                    </RouterLink>
+                  </div>
+                </article>
+              </div>
+
+              <div v-else class="rounded-3xl bg-white p-8 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                No open projects right now. Check back later.
               </div>
             </section>
+          </div>
 
-            <section class="space-y-4">
+          <aside class="xl:sticky xl:top-24 xl:h-fit">
+            <div class="rounded-3xl bg-white p-5 dark:bg-slate-900 sm:p-6">
               <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Next Steps</h2>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Activity Panel</h2>
                 <span class="rounded-full bg-[#e8e3f2] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">
-                  {{ pendingChecklistCount }} pending
+                  Student
                 </span>
               </div>
 
-              <div class="rounded-3xl bg-white p-5 dark:bg-slate-900">
+              <section class="mt-5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Recent Activity</h3>
+                  <RouterLink to="/applications" class="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                    View
+                  </RouterLink>
+                </div>
+                <div class="space-y-2.5">
+                  <div
+                    v-for="activity in recentActivities"
+                    :key="activity.id"
+                    class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800"
+                  >
+                    <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ activity.title }}</p>
+                    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ activity.meta }}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="mt-6 border-t border-[#e8e3f2] pt-5 dark:border-slate-800">
+                <div class="mb-3 flex items-center justify-between">
+                  <h3 class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-500 dark:text-slate-400">Next Steps</h3>
+                  <span class="rounded-full bg-[#e8e3f2] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">
+                    {{ pendingChecklistCount }} pending
+                  </span>
+                </div>
+
                 <ul class="space-y-2.5">
                   <li
                     v-for="item in checklistItems"
@@ -174,8 +180,8 @@
                 >
                   Manage Profile
                 </RouterLink>
-              </div>
-            </section>
+              </section>
+            </div>
           </aside>
         </div>
 
