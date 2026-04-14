@@ -1,24 +1,21 @@
 <template>
   <AppLayout>
     <div v-if="loading" class="space-y-4 pt-12 lg:pt-0">
-      <div class="h-12 w-full rounded-2xl bg-gray-100 animate-pulse dark:bg-slate-800" />
-      <div class="h-80 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
-      <div class="h-56 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+      <div class="h-12 w-full animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800" />
+      <div class="h-80 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800" />
+      <div class="h-56 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800" />
     </div>
 
     <BaseAlert v-else-if="fetchError" type="error" :message="fetchError" class="mt-4" />
 
     <template v-else-if="project">
       <div class="space-y-8 pt-12 lg:space-y-10 lg:pt-0">
-        <section class="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-linear-to-br from-slate-50 via-white to-indigo-50/50 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/30 sm:p-7 lg:p-10">
-          <div class="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-indigo-400/10 blur-3xl"></div>
-          <div class="pointer-events-none absolute -bottom-28 -left-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl"></div>
-
-          <div class="relative z-10 flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+        <section class="overflow-hidden rounded-3xl bg-white p-5 dark:bg-slate-900 sm:p-7 lg:p-10">
+          <div class="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
             <div class="max-w-3xl space-y-5">
               <button
                 type="button"
-                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-3 py-1.5 text-xs font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 @click="goBack"
               >
                 <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2">
@@ -32,7 +29,7 @@
                 <RouterLink
                   v-if="project.company?.user_id"
                   :to="`/companies/${project.company.user_id}/profile`"
-                  class="text-sm font-medium text-slate-500 transition hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300"
+                  class="text-sm font-medium text-slate-500 transition hover:text-[#4f33d7] dark:text-slate-400 dark:hover:text-indigo-300"
                 >
                   {{ project.company?.name ?? 'Unknown company' }}
                 </RouterLink>
@@ -48,15 +45,15 @@
               </p>
 
               <div class="grid gap-3 sm:grid-cols-3">
-                <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
+                <div class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800">
                   <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Posted</p>
                   <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ formatDate(project.posted_at ?? project.created_at ?? '') }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
+                <div class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800">
                   <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Location</p>
                   <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ project.location || 'Not specified' }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-200/70 bg-white/85 p-3 dark:border-slate-700/70 dark:bg-slate-800/80">
+                <div class="rounded-2xl bg-[#f1edf8] p-3.5 dark:bg-slate-800">
                   <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Work mode</p>
                   <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">{{ locationStrategyLabel(project.location_strategy) }}</p>
                 </div>
@@ -76,7 +73,7 @@
               <template v-if="canStudentApply">
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                  class="inline-flex items-center justify-center rounded-full bg-[#3f34a6] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#352b91] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-600 dark:hover:bg-indigo-500"
                   @click="openApplyModal"
                   :disabled="hasActiveApplication || isProjectFull"
                 >
@@ -89,21 +86,15 @@
 
         <section class="grid gap-8 lg:grid-cols-12">
           <div class="space-y-8 lg:col-span-8">
-            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-8">
-              <h2 class="mb-5 flex items-center gap-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
-                About the Project
-                <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
-              </h2>
+            <div class="rounded-3xl bg-white p-6 dark:bg-slate-900 sm:p-8">
+              <h2 class="mb-5 text-2xl font-bold text-slate-900 dark:text-slate-100">About the Project</h2>
               <p class="whitespace-pre-line text-[15px] leading-relaxed text-slate-600 dark:text-slate-300">
                 {{ project.description }}
               </p>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-8">
-              <h2 class="mb-5 flex items-center gap-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
-                Requirements & Skills
-                <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
-              </h2>
+            <div class="rounded-3xl bg-white p-6 dark:bg-slate-900 sm:p-8">
+              <h2 class="mb-5 text-2xl font-bold text-slate-900 dark:text-slate-100">Requirements & Skills</h2>
 
               <p
                 v-if="project.requirements"
@@ -115,24 +106,25 @@
 
               <div v-if="project.tech_stack?.length" class="mt-6 flex flex-wrap gap-2">
                 <span
-                  v-for="tech in project.tech_stack"
+                  v-for="(tech, index) in project.tech_stack"
                   :key="tech"
-                  class="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/20 dark:text-indigo-300"
+                  class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+                  :class="detailTechChipClass(index)"
                 >
                   {{ tech }}
                 </span>
               </div>
             </div>
 
-            <div v-if="isOwnerCompany" class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90 sm:p-8">
+            <div v-if="isOwnerCompany" class="rounded-3xl bg-white p-6 dark:bg-slate-900 sm:p-8">
               <h2 class="mb-3 text-lg font-semibold text-gray-900 dark:text-slate-100">
                 Applications
-                <span class="ml-2 rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                <span class="ml-2 rounded-full bg-[#e8e3f2] px-2 py-0.5 text-xs text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">
                   {{ applicationStore.applications.length }}
                 </span>
               </h2>
               <div v-if="applicationStore.loading" class="space-y-3">
-                <div v-for="n in 3" :key="n" class="h-20 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+                <div v-for="n in 3" :key="n" class="h-20 animate-pulse rounded-xl bg-[#f1edf8] dark:bg-slate-800" />
               </div>
               <div
                 v-else-if="applicationStore.applications.length === 0"
@@ -151,7 +143,7 @@
           </div>
 
           <aside class="space-y-6 lg:col-span-4">
-            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+            <div class="rounded-3xl bg-white p-6 dark:bg-slate-900">
               <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Project Overview</h3>
               <div class="space-y-3 text-sm">
                 <div class="flex items-center justify-between gap-4">
@@ -159,7 +151,7 @@
                   <RouterLink
                     v-if="project.company?.user_id"
                     :to="`/companies/${project.company.user_id}/profile`"
-                    class="text-right font-semibold text-slate-900 transition hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-300"
+                    class="text-right font-semibold text-slate-900 transition hover:text-[#4f33d7] dark:text-slate-100 dark:hover:text-indigo-300"
                   >
                     {{ project.company?.name ?? 'Unknown' }}
                   </RouterLink>
@@ -196,11 +188,11 @@
               </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+            <div class="rounded-3xl bg-white p-6 dark:bg-slate-900">
               <h3 class="mb-5 text-lg font-semibold text-slate-900 dark:text-slate-100">Timeline</h3>
               <div class="space-y-4">
                 <div class="flex items-start gap-3">
-                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">
                     <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 0a6 6 0 0 1 6 6m-6-6a6 6 0 0 0-6 6m6 9c3.314 0 6-2.686 6-6m-6 6c-3.314 0-6-2.686-6-6m6 0-2.5 2.5M12 15l2.5-2.5" />
                     </svg>
@@ -211,7 +203,7 @@
                   </div>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f1edf8] text-[#4d466b] dark:bg-slate-800 dark:text-slate-300">
                     <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm8 0a3 3 0 1 1 0-6 3 3 0 0 1 0 6ZM3 19a5 5 0 0 1 10 0m8 0a5 5 0 0 0-8-4.33" />
                     </svg>
@@ -222,7 +214,7 @@
                   </div>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f1edf8] text-[#4d466b] dark:bg-slate-800 dark:text-slate-300">
                     <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14v12H5z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 20h6M12 16v4" />
@@ -236,9 +228,9 @@
               </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 dark:border-slate-700/70 dark:bg-slate-900/90">
+            <div class="rounded-3xl bg-white p-6 dark:bg-slate-900">
               <h3 class="mb-2 text-base font-semibold text-slate-900 dark:text-slate-100">Location</h3>
-              <div class="mb-4 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 dark:border-slate-700/70 dark:bg-slate-800/70">
+              <div class="mb-4 overflow-hidden rounded-2xl bg-[#f1edf8] dark:bg-slate-800/70">
                 <iframe
                   v-if="mapQuery"
                   :src="mapEmbedUrl"
@@ -267,13 +259,13 @@
               <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Internship place provided by company.</p>
             </div>
 
-            <div class="rounded-3xl border border-indigo-200/70 bg-indigo-50/70 p-6 dark:border-indigo-500/30 dark:bg-indigo-500/10">
-              <h3 class="mb-2 text-base font-semibold text-indigo-700 dark:text-indigo-300">Need more info?</h3>
+            <div class="rounded-3xl bg-white p-6 dark:bg-slate-900">
+              <h3 class="mb-2 text-base font-semibold text-slate-900 dark:text-slate-100">Need more info?</h3>
               <p class="text-sm text-slate-600 dark:text-slate-300">Reach out to the company via application and cover letter.</p>
               <button
                 v-if="canStudentApply"
                 type="button"
-                class="mt-4 inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                class="mt-4 inline-flex items-center justify-center rounded-full bg-[#3f34a6] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#352b91] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-600 dark:hover:bg-indigo-500"
                 @click="openApplyModal"
                 :disabled="hasActiveApplication || isProjectFull"
               >
@@ -452,6 +444,16 @@ export default defineComponent({
     }
   },
   methods: {
+    detailTechChipClass(index: number): string {
+      const classes = [
+        'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
+        'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300',
+        'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+        'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
+      ]
+
+      return classes[index % classes.length] || 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+    },
     handlePanelUpdateStatus(payload: { id: number; status: 'accepted' | 'rejected' }) {
       return this.updateStatus(payload.id, payload.status)
     },

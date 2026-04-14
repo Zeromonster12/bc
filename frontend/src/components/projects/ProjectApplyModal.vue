@@ -7,7 +7,7 @@
         <textarea
           :value="coverLetter"
           rows="6"
-          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+          class="w-full rounded-2xl bg-[#f1edf8] px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
           placeholder="Tell the company why you're a great fit for this project... (min. 50 characters)"
           @input="$emit('update:coverLetter', ($event.target as HTMLTextAreaElement).value)"
         />
@@ -15,8 +15,21 @@
       </div>
     </div>
     <template #footer>
-      <BaseButton variant="secondary" @click="$emit('update:show', false)">Cancel</BaseButton>
-      <BaseButton variant="primary" :loading="submitting" @click="$emit('submit')">{{ submitLabel }}</BaseButton>
+      <BaseButton
+        variant="secondary"
+        class="rounded-full! bg-[#e8e3f2]! text-[#4d466b]! border-0! hover:bg-[#ddd7f6]! dark:bg-slate-800! dark:text-slate-200! dark:hover:bg-slate-700!"
+        @click="$emit('update:show', false)"
+      >
+        Cancel
+      </BaseButton>
+      <BaseButton
+        variant="primary"
+        class="rounded-full! bg-[#3f34a6]! text-white! hover:bg-[#352b91]! dark:bg-indigo-600! dark:hover:bg-indigo-500!"
+        :loading="submitting"
+        @click="$emit('submit')"
+      >
+        {{ submitLabel }}
+      </BaseButton>
     </template>
   </BaseModal>
 </template>
