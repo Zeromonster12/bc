@@ -8,14 +8,14 @@
         class="rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
         @input="$emit('update:search', ($event.target as HTMLInputElement).value)"
       />
-      <div class="relative">
+      <div class="relative admin-users-dropdown">
         <button
           type="button"
           class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm font-medium text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
-          @click="roleFilterDropdownOpen = !roleFilterDropdownOpen"
+          @click="toggleRoleFilterDropdown"
         >
           {{ roleFilterLabel }}
-          <span class="text-xs">v</span>
+          <ChevronDown class="h-4 w-4 transition" :class="roleFilterDropdownOpen ? 'rotate-180' : ''" />
         </button>
         <div
           v-if="roleFilterDropdownOpen"
@@ -28,14 +28,14 @@
         </div>
       </div>
 
-      <div class="relative">
+      <div class="relative admin-users-dropdown">
         <button
           type="button"
           class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm font-medium text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
-          @click="companyStatusDropdownOpen = !companyStatusDropdownOpen"
+          @click="toggleCompanyStatusDropdown"
         >
           {{ companyStatusFilterLabel }}
-          <span class="text-xs">v</span>
+          <ChevronDown class="h-4 w-4 transition" :class="companyStatusDropdownOpen ? 'rotate-180' : ''" />
         </button>
         <div
           v-if="companyStatusDropdownOpen"
@@ -114,14 +114,14 @@
               </span>
             </td>
             <td class="px-4 py-3">
-              <div class="relative flex gap-2">
+              <div class="relative flex gap-2 admin-users-dropdown">
                 <button
                   type="button"
                   class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-3 py-1.5 text-xs font-semibold text-[#4d466b] dark:bg-slate-800 dark:text-slate-200"
-                  @click="roleDropdownUserId = roleDropdownUserId === user.id ? null : user.id"
+                  @click="toggleRoleDropdown(user.id)"
                 >
                   {{ user.role }}
-                  <span class="text-[10px]">v</span>
+                  <ChevronDown class="h-3.5 w-3.5 transition" :class="roleDropdownUserId === user.id ? 'rotate-180' : ''" />
                 </button>
                 <div
                   v-if="roleDropdownUserId === user.id"
@@ -172,6 +172,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue'
+import { ChevronDown } from 'lucide-vue-next'
 import BasePagination from '@/components/ui/BasePagination.vue'
 
 interface Pagination {
@@ -191,7 +192,7 @@ interface AdminUserRow {
 
 export default defineComponent({
   name: 'AdminUsersPanel',
-  components: { BasePagination },
+  components: { BasePagination, ChevronDown },
   props: {
     users: {
       type: Array as PropType<AdminUserRow[]>,
@@ -229,16 +230,41 @@ export default defineComponent({
     'page-change',
   ],
   methods: {
-    setRoleFilter(value: string) {
+    closeAllDropdowns() {
       this.roleFilterDropdownOpen = false
+      this.companyStatusDropdownOpen = false
+      this.roleDropdownUserId = null
+    },
+    toggleRoleFilterDropdown() {
+      const next = !this.roleFilterDropdownOpen
+      this.closeAllDropdowns()
+      this.roleFilterDropdownOpen = next
+    },
+    toggleCompanyStatusDropdown() {
+      const next = !this.companyStatusDropdownOpen
+      this.closeAllDropdowns()
+      this.companyStatusDropdownOpen = next
+    },
+    toggleRoleDropdown(userId: number) {
+      const next = this.roleDropdownUserId !== userId
+      this.closeAllDropdowns()
+      this.roleDropdownUserId = next ? userId : null
+    },
+    onDocumentClick(event: Event) {
+      const target = event.target as HTMLElement | null
+      if (target?.closest('.admin-users-dropdown')) return
+      this.closeAllDropdowns()
+    },
+    setRoleFilter(value: string) {
+      this.closeAllDropdowns()
       this.$emit('update:roleFilter', value)
     },
     setCompanyStatusFilter(value: string) {
-      this.companyStatusDropdownOpen = false
+      this.closeAllDropdowns()
       this.$emit('update:companyStatusFilter', value)
     },
     changeRole(userId: number, role: string) {
-      this.roleDropdownUserId = null
+      this.closeAllDropdowns()
       this.$emit('change-role', { id: userId, role })
     },
     companyStatusClass(user: AdminUserRow): string {
@@ -263,6 +289,12 @@ export default defineComponent({
       companyStatusDropdownOpen: false,
       roleDropdownUserId: null as number | null,
     }
+  },
+  mounted() {
+    document.addEventListener('click', this.onDocumentClick)
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.onDocumentClick)
   },
   computed: {
     roleFilterLabel(): string {
