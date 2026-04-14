@@ -24,6 +24,15 @@
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
+              <a
+                v-if="githubUrl"
+                :href="githubUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center rounded-full bg-[#3f34a6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
+              >
+                Linked GitHub
+              </a>
               <RouterLink
                 to="/applications"
                 class="inline-flex items-center rounded-full bg-[#e8e3f2] px-4 py-2 text-sm font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
@@ -113,35 +122,6 @@
             </dl>
           </article>
 
-          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
-            <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Work preferences</h2>
-            <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-              <div>
-                <dt class="text-slate-500 dark:text-slate-400">Availability</dt>
-                <dd class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(form.availability) }}</dd>
-              </div>
-              <div>
-                <dt class="text-slate-500 dark:text-slate-400">Preferred work type</dt>
-                <dd class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(form.preferred_work_type) }}</dd>
-              </div>
-              <div>
-                <dt class="text-slate-500 dark:text-slate-400">Expected salary min</dt>
-                <dd class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(form.expected_salary_min) }}</dd>
-              </div>
-              <div>
-                <dt class="text-slate-500 dark:text-slate-400">Expected salary max</dt>
-                <dd class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(form.expected_salary_max) }}</dd>
-              </div>
-              <div class="sm:col-span-2">
-                <dt class="text-slate-500 dark:text-slate-400">Preferred locations</dt>
-                <dd class="mt-1 flex flex-wrap gap-2">
-                  <span v-for="item in form.preferred_locations" :key="item" class="rounded-full bg-[#e8e3f2] px-3 py-1 text-xs font-semibold text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200">{{ item }}</span>
-                  <span v-if="form.preferred_locations.length === 0" class="text-sm font-medium text-slate-800 dark:text-slate-200">Not provided</span>
-                </dd>
-              </div>
-            </dl>
-          </article>
-
           <article class="rounded-3xl bg-white p-6 dark:bg-slate-900 lg:col-span-2">
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">About</h2>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
@@ -181,9 +161,7 @@
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
               <div class="space-y-2 text-sm">
                 <p><span class="font-semibold text-slate-700 dark:text-slate-200">Portfolio:</span> {{ fieldOrFallback(form.portfolio_url) }}</p>
-                <p><span class="font-semibold text-slate-700 dark:text-slate-200">CV URL:</span> {{ fieldOrFallback(form.cv_url) }}</p>
-                <p><span class="font-semibold text-slate-700 dark:text-slate-200">LinkedIn:</span> {{ fieldOrFallback(form.linkedin_url) }}</p>
-                <p><span class="font-semibold text-slate-700 dark:text-slate-200">Website:</span> {{ fieldOrFallback(form.website_url) }}</p>
+                <p><span class="font-semibold text-slate-700 dark:text-slate-200">GitHub:</span> {{ fieldOrFallback(form.github_url) }}</p>
               </div>
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Projects</p>
@@ -256,20 +234,6 @@
             </ul>
             <p v-else class="mt-3 text-sm font-medium text-slate-800 dark:text-slate-200">No certifications listed</p>
           </article>
-
-          <article class="rounded-3xl bg-white p-6 dark:bg-slate-900 lg:col-span-2">
-            <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Emergency contact</h2>
-            <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-              <div>
-                <dt class="text-slate-500 dark:text-slate-400">Name</dt>
-                <dd class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(form.emergency_contact_name) }}</dd>
-              </div>
-              <div>
-                <dt class="text-slate-500 dark:text-slate-400">Phone</dt>
-                <dd class="font-medium text-slate-800 dark:text-slate-200">{{ fieldOrFallback(form.emergency_contact_phone) }}</dd>
-              </div>
-            </dl>
-          </article>
         </section>
       </template>
     </div>
@@ -312,6 +276,11 @@ export default defineComponent({
   computed: {
     avatarUrl(): string {
       return resolveAssetUrl(this.profileUser.avatar_url)
+    },
+    githubUrl(): string {
+      const value = String(this.form.github_url ?? '').trim()
+      if (!value) return ''
+      return /^https?:\/\//i.test(value) ? value : ''
     },
     initials(): string {
       const value = (this.profileUser.name ?? 'U').trim()

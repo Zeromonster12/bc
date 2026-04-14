@@ -38,24 +38,13 @@ class StudentProfileController extends Controller
         'gpa',
         'bio',
         'about_me',
-        'availability',
-        'preferred_work_type',
-        'preferred_locations',
-        'expected_salary_min',
-        'expected_salary_max',
         'skills',
         'interests',
         'portfolio_url',
-        'cv_url',
         'github_url',
-        'linkedin_url',
-        'website_url',
         'languages',
         'certifications',
         'projects',
-        'emergency_contact_name',
-        'emergency_contact_phone',
-        'consent_public_profile',
     ];
 
     public function show(Request $request): JsonResponse
@@ -276,10 +265,6 @@ class StudentProfileController extends Controller
             }
 
             $normalized[$field] = $data[$field];
-        }
-
-        if (array_key_exists('consent_public_profile', $normalized)) {
-            $normalized['consent_public_profile'] = filter_var($normalized['consent_public_profile'], FILTER_VALIDATE_BOOL);
         }
 
         return $normalized;
