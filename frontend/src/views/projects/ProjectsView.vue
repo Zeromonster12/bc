@@ -16,18 +16,18 @@
         </aside>
 
         <section class="space-y-4">
-          <div class="flex w-full flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200/80 bg-white/80 p-2.5 dark:border-slate-700/70 dark:bg-slate-900/70">
+          <div class="flex w-full flex-wrap items-center justify-end gap-2 rounded-3xl bg-white p-2.5 dark:bg-slate-900">
             <div
               v-if="auth.isCompany"
-              class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-600 dark:bg-slate-800"
+              class="grid grid-cols-2 rounded-full bg-[#e8e3f2] p-1 dark:bg-slate-800"
             >
               <button
                 type="button"
                 class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
                 :class="
                   companyScope === 'all'
-                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
-                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                    ? 'bg-[#3f34a6] text-white dark:bg-indigo-600'
+                    : 'text-[#5f6078] hover:bg-[#ddd7f6] dark:text-slate-300 dark:hover:bg-slate-700/70'
                 "
                 @click="setCompanyScope('all')"
               >
@@ -38,8 +38,8 @@
                 class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
                 :class="
                   companyScope === 'mine'
-                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
-                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                    ? 'bg-[#3f34a6] text-white dark:bg-indigo-600'
+                    : 'text-[#5f6078] hover:bg-[#ddd7f6] dark:text-slate-300 dark:hover:bg-slate-700/70'
                 "
                 @click="setCompanyScope('mine')"
               >
@@ -47,14 +47,14 @@
               </button>
             </div>
 
-            <div class="grid grid-cols-2 rounded-full border border-[#ded8ee] bg-[#e8e3f2] p-1 dark:border-slate-600 dark:bg-slate-800">
+            <div class="grid grid-cols-2 rounded-full bg-[#e8e3f2] p-1 dark:bg-slate-800">
               <button
                 type="button"
                 class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
                 :class="
                   viewMode === 'grid'
-                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
-                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                    ? 'bg-[#3f34a6] text-white dark:bg-indigo-600'
+                    : 'text-[#5f6078] hover:bg-[#ddd7f6] dark:text-slate-300 dark:hover:bg-slate-700/70'
                 "
                 @click="viewMode = 'grid'"
               >
@@ -65,8 +65,8 @@
                 class="rounded-full px-3 py-1.5 text-xs font-semibold transition sm:px-4 sm:text-sm"
                 :class="
                   viewMode === 'list'
-                    ? 'bg-white text-[#201f35] shadow-sm dark:bg-slate-700 dark:text-slate-100'
-                    : 'text-[#5f6078] hover:bg-white/70 dark:text-slate-300 dark:hover:bg-slate-700/70'
+                    ? 'bg-[#3f34a6] text-white dark:bg-indigo-600'
+                    : 'text-[#5f6078] hover:bg-[#ddd7f6] dark:text-slate-300 dark:hover:bg-slate-700/70'
                 "
                 @click="viewMode = 'list'"
               >
@@ -76,7 +76,7 @@
 
             <RouterLink v-if="auth.isCompany" to="/projects/create">
               <span
-                class="inline-flex items-center justify-center rounded-full bg-linear-to-r from-[#4526c9] to-[#5b45f0] px-3 py-2 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(77,55,197,0.35)] transition hover:brightness-105 sm:px-5 sm:py-2.5 sm:text-sm"
+                class="inline-flex items-center justify-center rounded-full bg-[#3f34a6] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500 sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 + New project
               </span>
@@ -94,12 +94,12 @@
             <div
               v-for="n in viewMode === 'grid' ? 6 : 4"
               :key="n"
-              class="h-48 rounded-xl bg-gray-100 animate-pulse dark:bg-slate-800"
+              class="h-48 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800"
             />
           </div>
 
           <template v-else>
-            <div v-if="projectStore.projects.length === 0" class="py-16 text-center text-gray-500 dark:text-slate-400">
+            <div v-if="projectStore.projects.length === 0" class="rounded-3xl bg-white px-4 py-16 text-center text-gray-500 dark:bg-slate-900 dark:text-slate-400">
               <p class="text-4xl mb-3">📂</p>
               <p class="font-medium">No projects found</p>
               <p class="text-sm mt-1">Try adjusting your filters.</p>

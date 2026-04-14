@@ -3,7 +3,7 @@
     class="relative z-30"
     :class="
       isSidebar
-        ? 'rounded-3xl border border-[#e3ddef] bg-white p-6 shadow-[0_14px_30px_rgba(77,55,197,0.10)] dark:border-slate-700 dark:bg-slate-900/95'
+        ? 'rounded-3xl bg-white p-6 dark:bg-slate-900'
         : 'rounded-2xl border border-slate-200/80 bg-white/95 p-3 shadow-[0_6px_18px_rgba(15,23,42,0.05)] backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/90 dark:shadow-[0_8px_20px_rgba(2,6,23,0.3)] sm:p-4'
     "
   >
@@ -43,7 +43,7 @@
             class="w-full px-3 py-2 pl-9 text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
-                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
+                ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30'
                 : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
             "
             @input="debouncedEmit"
@@ -67,7 +67,7 @@
             class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
-                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+                ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30'
                 : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
             "
             :aria-expanded="techMenuOpen"
@@ -82,14 +82,14 @@
 
           <div
             v-if="techMenuOpen"
-            class="absolute z-80 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.16)] dark:border-slate-700 dark:bg-slate-900"
+            class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-1.5 dark:bg-slate-900"
             role="listbox"
             aria-multiselectable="true"
           >
             <button
               v-if="localFilters.tech_stack.length"
               type="button"
-              class="mb-1 flex w-full items-center justify-center rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              class="mb-1 flex w-full items-center justify-center rounded-full bg-[#f1edf8] px-3 py-1.5 text-[11px] font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               @click="clearTechSelection"
             >
               Clear selection
@@ -102,7 +102,7 @@
                 class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs transition"
                 :class="
                   localFilters.tech_stack.includes(option)
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+                    ? 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
                     : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
                 "
                 role="option"
@@ -142,7 +142,7 @@
             class="w-full px-3 py-2 text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
-                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
+                ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30'
                 : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-400'
             "
             @input="debouncedEmit"
@@ -163,7 +163,7 @@
               class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
               :class="
                 isSidebar
-                    ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+                    ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30'
                   : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
               "
               :aria-expanded="statusMenuOpen"
@@ -178,7 +178,7 @@
 
             <div
               v-if="statusMenuOpen"
-              class="absolute z-80 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.16)] dark:border-slate-700 dark:bg-slate-900"
+              class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-1.5 dark:bg-slate-900"
               role="listbox"
             >
               <button
@@ -188,7 +188,7 @@
                 class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs transition"
                 :class="
                   localFilters.status === option.value
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+                    ? 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
                     : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
                 "
                 role="option"
@@ -224,7 +224,7 @@
             class="inline-flex w-full items-center justify-between px-3 py-2 text-left text-xs text-slate-900 transition focus:outline-none"
             :class="
               isSidebar
-                ? 'rounded-full border border-transparent bg-[#e8e3f2] focus:border-[#b5afe7] focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
+                ? 'rounded-full bg-[#e8e3f2] focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30'
                 : 'rounded-lg border border-slate-300 bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-400'
             "
             :aria-expanded="sortMenuOpen"
@@ -239,7 +239,7 @@
 
           <div
             v-if="sortMenuOpen"
-            class="absolute z-80 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-[0_10px_30px_rgba(15,23,42,0.16)] dark:border-slate-700 dark:bg-slate-900"
+            class="absolute z-80 mt-2 w-full overflow-hidden rounded-2xl bg-white p-1.5 dark:bg-slate-900"
             role="listbox"
           >
             <button
@@ -249,7 +249,7 @@
               class="flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-xs transition"
               :class="
                 localFilters.sort_date === option.value
-                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+                  ? 'bg-[#e8e3f2] text-[#4d466b] dark:bg-indigo-500/20 dark:text-indigo-200'
                   : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
               "
               role="option"
@@ -277,7 +277,7 @@
           class="inline-flex w-full items-center justify-center px-3 py-2 text-xs font-semibold transition"
           :class="
             isSidebar
-              ? 'rounded-full bg-[#3f34a6] text-white shadow-[0_8px_20px_rgba(63,52,166,0.35)] hover:brightness-105 dark:bg-indigo-600 dark:text-white'
+              ? 'rounded-full bg-[#3f34a6] text-white hover:bg-[#352b91] dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-500'
               : 'rounded-lg border border-[#ebeaf2] bg-white text-[#474a61] hover:bg-[#f8f7fc] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:w-auto'
           "
           @click="resetFilters"
@@ -436,7 +436,7 @@ export default defineComponent({
 <style scoped>
 .project-filter-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.65) rgba(148, 163, 184, 0.22);
+  scrollbar-color: rgba(99, 102, 241, 0.55) rgba(148, 163, 184, 0.22);
 }
 
 .project-filter-scrollbar::-webkit-scrollbar {
@@ -449,12 +449,12 @@ export default defineComponent({
 }
 
 .project-filter-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.85), rgba(79, 70, 229, 0.9));
+  background: rgba(99, 102, 241, 0.78);
   border-radius: 9999px;
 }
 
 .project-filter-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(79, 70, 229, 0.95), rgba(67, 56, 202, 0.95));
+  background: rgba(79, 70, 229, 0.9);
 }
 
 :global(.dark) .project-filter-scrollbar {
@@ -466,6 +466,6 @@ export default defineComponent({
 }
 
 :global(.dark) .project-filter-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(129, 140, 248, 0.85), rgba(99, 102, 241, 0.9));
+  background: rgba(129, 140, 248, 0.82);
 }
 </style>

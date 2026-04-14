@@ -16,8 +16,8 @@ import { defineComponent } from 'vue'
 const CONFIG: Record<string, { label: string; classes: string; dotClasses: string }> = {
   draft: {
     label: 'Draft',
-    classes: 'bg-gray-100 text-gray-600 ring-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600',
-    dotClasses: 'bg-gray-500 dark:bg-slate-300',
+    classes: 'bg-[#e8e3f2] text-[#4d466b] ring-[#ddd7f6] dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-600',
+    dotClasses: 'bg-[#5f6078] dark:bg-slate-300',
   },
   open: {
     label: 'Open',
@@ -26,15 +26,15 @@ const CONFIG: Record<string, { label: string; classes: string; dotClasses: strin
   },
   closed: {
     label: 'Closed',
-    classes: 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-700/70 dark:text-slate-200 dark:ring-slate-600',
+    classes: 'bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-600',
     dotClasses: 'bg-slate-500 dark:bg-slate-300',
   },
 }
 
 const FALLBACK_CONFIG = {
   label: 'Draft',
-  classes: 'bg-gray-100 text-gray-600 ring-gray-200 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600',
-  dotClasses: 'bg-gray-500 dark:bg-slate-300',
+  classes: 'bg-[#e8e3f2] text-[#4d466b] ring-[#ddd7f6] dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-600',
+  dotClasses: 'bg-[#5f6078] dark:bg-slate-300',
 }
 
 export default defineComponent({
