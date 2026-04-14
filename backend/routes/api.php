@@ -78,6 +78,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
         ->middleware('throttle:60,1')
         ->name('users.avatar.show');
 
+    Route::get('/students/{user}/cv', [StudentCvController::class, 'indexForStudent'])
+        ->middleware('throttle:30,1');
+
     Route::get('/students/{user}/profile', [StudentProfileController::class, 'showForCompany'])
         ->middleware('throttle:30,1');
 

@@ -20,20 +20,10 @@
               </div>
               <div class="min-w-0">
                 <p class="truncate text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ profileUser.name || 'Student profile' }}</p>
-                <p class="truncate text-sm text-slate-600 dark:text-slate-300">{{ profileUser.email || 'Email not available' }}</p>
                 <p class="mt-1 truncate text-sm text-[#4f33d7] dark:text-indigo-300">{{ fieldOrFallback(form.headline) }}</p>
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-              <a
-                v-if="github.profile_url"
-                :href="github.profile_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center rounded-full bg-[#3f34a6] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#352b91] dark:bg-indigo-600 dark:hover:bg-indigo-500"
-              >
-                GitHub {{ github.username ? `@${github.username}` : '' }}
-              </a>
               <RouterLink
                 to="/applications"
                 class="inline-flex items-center rounded-full bg-[#e8e3f2] px-4 py-2 text-sm font-semibold text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
@@ -207,6 +197,42 @@
                 <p v-else class="mt-2 text-sm font-medium text-slate-800 dark:text-slate-200">No projects listed</p>
               </div>
             </div>
+
+            <div class="mt-5 rounded-2xl bg-[#f1edf8] p-4 dark:bg-slate-800/70">
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Uploaded CV documents</p>
+
+              <div v-if="cvLoading" class="mt-3 space-y-2">
+                <div v-for="n in 2" :key="n" class="h-10 animate-pulse rounded-xl bg-white/80 dark:bg-slate-700"></div>
+              </div>
+
+              <p v-else-if="cvFiles.length === 0" class="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+                No downloadable CV file available.
+              </p>
+
+              <ul v-else class="mt-3 space-y-2">
+                <li
+                  v-for="cv in cvFiles"
+                  :key="cv.id"
+                  class="flex flex-col gap-2 rounded-xl bg-white/90 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between dark:bg-slate-900"
+                >
+                  <div>
+                    <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ cv.original_filename }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                      {{ humanFileSize(cv.size_bytes) }} - Uploaded {{ formatDate(cv.uploaded_at) }}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center rounded-full bg-[#3f34a6] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#352b91] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-indigo-600 dark:hover:bg-indigo-500"
+                    :disabled="!canDownloadCv(cv.scan_status) || downloadingCvId === cv.id"
+                    @click="handleCvDownload(cv)"
+                  >
+                    {{ downloadingCvId === cv.id ? 'Downloading...' : 'Download CV' }}
+                  </button>
+                </li>
+              </ul>
+            </div>
           </article>
 
           <article class="rounded-3xl bg-white p-6 dark:bg-slate-900">
@@ -254,7 +280,7 @@
 import { defineComponent } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 import BaseAlert from '@/components/ui/BaseAlert.vue'
-import ProfileService from '@/services/profile/ProfileService'
+import ProfileService, { type StudentCvFileItem } from '@/services/profile/ProfileService'
 import {
   createDefaultStudentProfileForm,
   hydrateStudentProfileForm,
@@ -265,15 +291,7 @@ import { resolveAssetUrl } from '@/services/core/url'
 interface PublicProfileUser {
   id?: number
   name?: string
-  email?: string
   avatar_url?: string | null
-}
-
-interface PublicGitHubInfo {
-  connected?: boolean
-  username?: string
-  profile_url?: string
-  avatar_url?: string
 }
 
 export default defineComponent({
@@ -285,7 +303,10 @@ export default defineComponent({
       errorMessage: '',
       form: createDefaultStudentProfileForm() as StudentProfileForm,
       profileUser: {} as PublicProfileUser,
-      github: {} as PublicGitHubInfo,
+      cvLoading: false,
+      cvFiles: [] as StudentCvFileItem[],
+      downloadingCvId: null as number | null,
+      projectId: null as number | null,
     }
   },
   computed: {
@@ -304,6 +325,8 @@ export default defineComponent({
   },
   async mounted() {
     const userId = Number(this.$route.params.id)
+    const projectIdRaw = Number(this.$route.query.project_id)
+    this.projectId = Number.isFinite(projectIdRaw) && projectIdRaw > 0 ? projectIdRaw : null
 
     if (!Number.isFinite(userId) || userId <= 0) {
       this.errorMessage = 'Invalid student profile link.'
@@ -315,13 +338,12 @@ export default defineComponent({
       const response = await ProfileService.getStudentProfileById(userId)
       const payload = (response?.data ?? {}) as {
         user?: PublicProfileUser
-        github?: PublicGitHubInfo
         profile?: Record<string, unknown>
       }
 
       this.profileUser = payload.user ?? {}
-      this.github = payload.github ?? {}
       this.form = hydrateStudentProfileForm(payload.profile ?? {})
+      await this.loadCvFiles(userId)
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } }
       this.errorMessage = err?.response?.data?.message ?? 'Failed to load student profile.'
@@ -330,6 +352,44 @@ export default defineComponent({
     }
   },
   methods: {
+    async loadCvFiles(userId: number) {
+      this.cvLoading = true
+      try {
+        const response = await ProfileService.getStudentCvFilesByStudentId(userId, {
+          projectId: this.projectId ?? undefined,
+        })
+        this.cvFiles = response.data
+      } catch {
+        this.cvFiles = []
+      } finally {
+        this.cvLoading = false
+      }
+    },
+    async handleCvDownload(cv: StudentCvFileItem) {
+      if (!this.canDownloadCv(cv.scan_status)) return
+
+      this.downloadingCvId = cv.id
+      this.errorMessage = ''
+
+      try {
+        const blob = await ProfileService.downloadStudentCv(cv.id, {
+          projectId: this.projectId ?? undefined,
+        })
+        const objectUrl = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = objectUrl
+        link.download = cv.original_filename || 'cv-file'
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(objectUrl)
+      } catch (error: unknown) {
+        const typedError = error as { response?: { data?: { message?: string } } }
+        this.errorMessage = typedError?.response?.data?.message ?? 'Failed to download CV.'
+      } finally {
+        this.downloadingCvId = null
+      }
+    },
     fieldOrFallback(value: unknown): string {
       const normalized = String(value ?? '').trim()
       return normalized.length ? normalized : 'Not provided'
@@ -337,6 +397,34 @@ export default defineComponent({
     formatNumeric(value: number | '' | undefined): string {
       if (value === '' || value === undefined || value === null) return ''
       return String(value)
+    },
+    formatDate(value: string | null): string {
+      if (!value) return 'Unknown'
+      const parsed = new Date(value)
+      if (Number.isNaN(parsed.getTime())) return 'Unknown'
+
+      return parsed.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    },
+    canDownloadCv(scanStatus: string): boolean {
+      return scanStatus === 'clean' || scanStatus === 'skipped'
+    },
+    humanFileSize(sizeBytes: number): string {
+      if (!Number.isFinite(sizeBytes) || sizeBytes <= 0) return '0 B'
+      const units = ['B', 'KB', 'MB', 'GB']
+      let value = sizeBytes
+      let unitIndex = 0
+
+      while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024
+        unitIndex += 1
+      }
+
+      const precision = unitIndex === 0 ? 0 : 1
+      return `${value.toFixed(precision)} ${units[unitIndex]}`
     },
   },
 })

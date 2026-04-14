@@ -144,6 +144,17 @@ const ProfileService = {
     return data
   },
 
+  async getStudentCvFilesByStudentId(
+    userId: number,
+    options: { projectId?: number } = {},
+  ): Promise<StudentCvFilesResponse> {
+    const projectId = Number(options.projectId)
+    const params = Number.isFinite(projectId) && projectId > 0 ? { project_id: projectId } : undefined
+
+    const { data } = await http.get(`/students/${userId}/cv`, { params })
+    return data
+  },
+
   async uploadStudentCv(
     file: File,
     onProgress?: (progressPercent: number) => void,
@@ -174,8 +185,12 @@ const ProfileService = {
     return data
   },
 
-  async downloadStudentCv(id: number): Promise<Blob> {
+  async downloadStudentCv(id: number, options: { projectId?: number } = {}): Promise<Blob> {
+    const projectId = Number(options.projectId)
+    const params = Number.isFinite(projectId) && projectId > 0 ? { project_id: projectId } : undefined
+
     const { data } = await http.get(`/profile/student/cv/${id}/download`, {
+      params,
       responseType: 'blob',
     })
 

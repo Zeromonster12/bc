@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Models\Application;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -14,6 +15,48 @@ use Illuminate\Support\Facades\URL;
 class StudentProfileController extends Controller
 {
     private const AVATAR_DISK = 'userpfp';
+
+    /**
+     * @var array<int, string>
+     */
+    private const PROFILE_ALLOWED_FIELDS = [
+        'headline',
+        'date_of_birth',
+        'gender',
+        'phone',
+        'alternate_email',
+        'country',
+        'city',
+        'address_line',
+        'postal_code',
+        'university',
+        'faculty',
+        'degree',
+        'field_of_study',
+        'year_of_study',
+        'graduation_year',
+        'gpa',
+        'bio',
+        'about_me',
+        'availability',
+        'preferred_work_type',
+        'preferred_locations',
+        'expected_salary_min',
+        'expected_salary_max',
+        'skills',
+        'interests',
+        'portfolio_url',
+        'cv_url',
+        'github_url',
+        'linkedin_url',
+        'website_url',
+        'languages',
+        'certifications',
+        'projects',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'consent_public_profile',
+    ];
 
     public function show(Request $request): JsonResponse
     {
@@ -102,6 +145,12 @@ class StudentProfileController extends Controller
             ], 401);
         }
 
+        if ($actor->role === 'company' && ! $this->companyCanAccessStudentProfile($actor->id, $user->id)) {
+            return response()->json([
+                'message' => 'You are not allowed to view this student profile.',
+            ], 403);
+        }
+
         if (! in_array($actor->role, ['company', 'admin'], true) && $actor->id !== $user->id) {
             return response()->json([
                 'message' => 'You are not allowed to view this student profile.',
@@ -116,29 +165,20 @@ class StudentProfileController extends Controller
 
         $user->load([
             'studentProfile:id,user_id,profile_data,avatar_path',
-            'githubAccount:id,user_id,provider,profile_data',
         ]);
 
-        $profileData = is_array($user->studentProfile?->profile_data)
-            ? $user->studentProfile->profile_data
-            : [];
-        $githubProfileData = is_array($user->githubAccount?->profile_data)
-            ? $user->githubAccount->profile_data
-            : [];
+        $profileData = $this->normalizeProfileData(
+            is_array($user->studentProfile?->profile_data)
+                ? $user->studentProfile->profile_data
+                : []
+        );
 
         return response()->json([
             'data' => [
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'email' => $user->email,
                     'avatar_url' => $user->avatar_url,
-                ],
-                'github' => [
-                    'connected' => (bool) $user->githubAccount,
-                    'username' => (string) ($githubProfileData['nickname'] ?? ''),
-                    'profile_url' => (string) ($githubProfileData['html_url'] ?? ''),
-                    'avatar_url' => (string) ($githubProfileData['avatar_url'] ?? ''),
                 ],
                 'profile' => $profileData,
             ],
@@ -228,16 +268,38 @@ class StudentProfileController extends Controller
      */
     private function normalizeProfileData(array $data): array
     {
-        if (array_key_exists('consent_public_profile', $data)) {
-            $data['consent_public_profile'] = filter_var($data['consent_public_profile'], FILTER_VALIDATE_BOOL);
+        $normalized = [];
+
+        foreach (self::PROFILE_ALLOWED_FIELDS as $field) {
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+
+            $normalized[$field] = $data[$field];
         }
 
-        return $data;
+        if (array_key_exists('consent_public_profile', $normalized)) {
+            $normalized['consent_public_profile'] = filter_var($normalized['consent_public_profile'], FILTER_VALIDATE_BOOL);
+        }
+
+        return $normalized;
+    }
+
+    private function companyCanAccessStudentProfile(int $companyUserId, int $studentUserId): bool
+    {
+        return Application::query()
+            ->where('student_user_id', $studentUserId)
+            ->whereHas('project', fn($query) => $query->where('company_user_id', $companyUserId))
+            ->exists();
     }
 
     private function transformProfile(?StudentProfile $profile, int $userId): array
     {
-        $data = is_array($profile?->profile_data) ? $profile->profile_data : [];
+        $data = $this->normalizeProfileData(
+            is_array($profile?->profile_data)
+                ? $profile->profile_data
+                : []
+        );
 
         if ($profile?->avatar_path) {
             $ttlMinutes = max(1, (int) config('filesystems.avatar_temporary_url_minutes', 60));

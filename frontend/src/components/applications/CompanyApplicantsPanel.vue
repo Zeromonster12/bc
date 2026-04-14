@@ -94,7 +94,11 @@
               <div class="min-w-0">
                 <RouterLink
                   v-if="application.student?.id"
-                  :to="{ name: 'students.profile', params: { id: application.student.id } }"
+                  :to="{
+                    name: 'students.profile',
+                    params: { id: application.student.id },
+                    query: selectedProject?.id ? { project_id: String(selectedProject.id) } : undefined,
+                  }"
                   class="truncate text-base font-bold text-slate-900 transition hover:text-[#4f33d7] dark:text-slate-100 dark:hover:text-indigo-300"
                 >
                   {{ application.student?.name || 'Unknown applicant' }}
@@ -126,7 +130,11 @@
             <div class="col-span-2 flex items-center justify-start gap-2 md:justify-end">
               <RouterLink
                 v-if="application.student?.id"
-                :to="{ name: 'students.profile', params: { id: application.student.id } }"
+                :to="{
+                  name: 'students.profile',
+                  params: { id: application.student.id },
+                  query: selectedProject?.id ? { project_id: String(selectedProject.id) } : undefined,
+                }"
                 class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#ebe7f7] text-slate-600 transition hover:bg-[#5a42e5] hover:text-white dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-indigo-500"
                 title="View full profile"
               >

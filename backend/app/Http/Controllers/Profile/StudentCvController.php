@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Models\Application;
 use App\Models\StudentCvFile;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -39,6 +41,46 @@ class StudentCvController extends Controller
 
         $files = StudentCvFile::query()
             ->where('student_user_id', $user->id)
+            ->latest('uploaded_at')
+            ->get();
+
+        return response()->json([
+            'data' => $files->map(fn(StudentCvFile $file) => $this->transformFile($file))->values(),
+        ]);
+    }
+
+    public function indexForStudent(Request $request, User $user): JsonResponse
+    {
+        $actor = $request->user();
+
+        if (! $actor) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        if ($user->role !== 'student') {
+            return response()->json([
+                'message' => 'Student profile not found.',
+            ], 404);
+        }
+
+        $projectId = $request->integer('project_id');
+        $projectScope = $projectId > 0 ? $projectId : null;
+        $isOwner = $actor->id === $user->id;
+        $isAdmin = $actor->role === 'admin';
+        $isLinkedCompany = $actor->role === 'company'
+            && $this->companyCanAccessStudentCv($actor->id, $user->id, $projectScope);
+
+        if (! $isOwner && ! $isAdmin && ! $isLinkedCompany) {
+            return response()->json([
+                'message' => 'You are not allowed to access CV files for this student.',
+            ], 403);
+        }
+
+        $files = StudentCvFile::query()
+            ->where('student_user_id', $user->id)
+            ->whereIn('scan_status', self::DOWNLOADABLE_SCAN_STATUSES)
             ->latest('uploaded_at')
             ->get();
 
@@ -148,10 +190,14 @@ class StudentCvController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
+        $projectId = $request->integer('project_id');
+        $projectScope = $projectId > 0 ? $projectId : null;
         $isOwner = $cvFile->student_user_id === $user->id;
         $isAdmin = $user->role === 'admin';
+        $isLinkedCompany = $user->role === 'company'
+            && $this->companyCanAccessStudentCv($user->id, (int) $cvFile->student_user_id, $projectScope);
 
-        if (! $isOwner && ! $isAdmin) {
+        if (! $isOwner && ! $isAdmin && ! $isLinkedCompany) {
             return response()->json([
                 'message' => 'You are not allowed to access this CV file.',
             ], 403);
@@ -213,6 +259,21 @@ class StudentCvController extends Controller
         return response()->json([
             'message' => 'CV deleted successfully.',
         ]);
+    }
+
+    private function companyCanAccessStudentCv(int $companyUserId, int $studentUserId, ?int $projectId = null): bool
+    {
+        return Application::query()
+            ->where('student_user_id', $studentUserId)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->whereHas('project', function ($query) use ($companyUserId, $projectId): void {
+                $query->where('company_user_id', $companyUserId);
+
+                if ($projectId !== null) {
+                    $query->where('id', $projectId);
+                }
+            })
+            ->exists();
     }
 
     private function transformFile(StudentCvFile $file): array
