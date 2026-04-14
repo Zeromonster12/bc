@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-5">
-    <div class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90">
+    <div class="overflow-hidden rounded-3xl bg-white dark:bg-slate-900/90">
       <div v-if="loading" class="space-y-2 p-4">
-        <div v-for="n in 5" :key="n" class="h-12 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+        <div v-for="n in 5" :key="n" class="h-12 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800" />
       </div>
       <div v-else class="overflow-x-auto">
         <table class="min-w-170 w-full text-sm">
-        <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-400">
+        <thead class="bg-[#f1edf8] text-xs font-semibold uppercase tracking-wide text-[#6b6682] dark:bg-slate-800/80 dark:text-slate-400">
           <tr>
             <th class="px-4 py-3 text-left">Title</th>
             <th class="px-4 py-3 text-left">Company</th>
@@ -15,11 +15,11 @@
             <th class="px-4 py-3 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100 dark:divide-slate-700/60">
+        <tbody class="divide-y divide-[#ece8f4] dark:divide-slate-700/60">
           <tr v-if="projects.length === 0">
             <td colspan="5" class="px-4 py-10 text-center text-slate-400 dark:text-slate-500">No projects found.</td>
           </tr>
-          <tr v-for="project in projects" :key="project.id" class="hover:bg-slate-50/80 dark:hover:bg-slate-800/70">
+          <tr v-for="project in projects" :key="project.id" class="hover:bg-[#f7f4fc] dark:hover:bg-slate-800/70">
             <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{{ project.title }}</td>
             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
               <RouterLink

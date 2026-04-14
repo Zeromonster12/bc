@@ -5,13 +5,13 @@
         :value="search"
         type="text"
         placeholder="Search by name or email..."
-        class="rounded-full border border-slate-300/90 bg-white/95 px-4 py-2.5 text-sm text-slate-900 shadow-[0_6px_16px_rgba(15,23,42,0.06)] focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-100 dark:placeholder:text-slate-500"
+        class="rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-indigo-400/30"
         @input="$emit('update:search', ($event.target as HTMLInputElement).value)"
       />
       <div class="relative">
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/95 px-4 py-2.5 text-sm font-medium text-slate-900 shadow-[0_6px_16px_rgba(15,23,42,0.06)] focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-100"
+          class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm font-medium text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
           @click="roleFilterDropdownOpen = !roleFilterDropdownOpen"
         >
           {{ roleFilterLabel }}
@@ -19,19 +19,19 @@
         </button>
         <div
           v-if="roleFilterDropdownOpen"
-          class="absolute z-20 mt-1 min-w-44 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_30px_rgba(15,23,42,0.12)] dark:border-slate-700/70 dark:bg-slate-900/95"
+          class="absolute z-20 mt-1 min-w-44 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
         >
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('')">All roles</button>
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('student')">Student</button>
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('company')">Company</button>
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('admin')">Admin</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('')">All roles</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('student')">Student</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('company')">Company</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setRoleFilter('admin')">Admin</button>
         </div>
       </div>
 
       <div class="relative">
         <button
           type="button"
-          class="inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/95 px-4 py-2.5 text-sm font-medium text-slate-900 shadow-[0_6px_16px_rgba(15,23,42,0.06)] focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-100"
+          class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-4 py-2.5 text-sm font-medium text-[#2f2a47] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-indigo-400/30"
           @click="companyStatusDropdownOpen = !companyStatusDropdownOpen"
         >
           {{ companyStatusFilterLabel }}
@@ -39,27 +39,27 @@
         </button>
         <div
           v-if="companyStatusDropdownOpen"
-          class="absolute z-20 mt-1 min-w-52 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_30px_rgba(15,23,42,0.12)] dark:border-slate-700/70 dark:bg-slate-900/95"
+          class="absolute z-20 mt-1 min-w-52 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
         >
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('')">All company statuses</button>
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('pending')">Pending</button>
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('approved')">Approved</button>
-          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('rejected')">Rejected</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('')">All company statuses</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('pending')">Pending</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('approved')">Approved</button>
+          <button type="button" class="block w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="setCompanyStatusFilter('rejected')">Rejected</button>
         </div>
       </div>
     </div>
 
     <div v-if="loading" class="space-y-2">
-      <div v-for="n in 5" :key="n" class="h-12 rounded-3xl bg-gray-100 animate-pulse dark:bg-slate-800" />
+      <div v-for="n in 5" :key="n" class="h-12 animate-pulse rounded-3xl bg-[#f1edf8] dark:bg-slate-800" />
     </div>
 
     <div
       v-else
-      class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-slate-700/70 dark:bg-slate-900/90"
+      class="overflow-hidden rounded-3xl bg-white dark:bg-slate-900/90"
     >
       <div class="overflow-x-auto">
         <table class="min-w-190 w-full text-sm">
-        <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800/80 dark:text-slate-400">
+        <thead class="bg-[#f1edf8] text-xs font-semibold uppercase tracking-wide text-[#6b6682] dark:bg-slate-800/80 dark:text-slate-400">
           <tr>
             <th class="px-4 py-3 text-left">Name</th>
             <th class="px-4 py-3 text-left">Email</th>
@@ -69,11 +69,11 @@
             <th class="px-4 py-3 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100 dark:divide-slate-700/60">
+        <tbody class="divide-y divide-[#ece8f4] dark:divide-slate-700/60">
           <tr v-if="users.length === 0">
             <td colspan="6" class="px-4 py-10 text-center text-slate-400 dark:text-slate-500">No users found.</td>
           </tr>
-          <tr v-for="user in users" :key="user.id" class="hover:bg-slate-50/80 dark:hover:bg-slate-800/70">
+          <tr v-for="user in users" :key="user.id" class="hover:bg-[#f7f4fc] dark:hover:bg-slate-800/70">
             <td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
               <RouterLink
                 v-if="user.role === 'student'"
@@ -93,7 +93,7 @@
             </td>
             <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ user.email }}</td>
             <td class="px-4 py-3">
-              <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize dark:bg-slate-700 dark:text-slate-200">{{
+              <span class="rounded-full bg-[#ece8f4] px-2.5 py-0.5 text-xs font-medium capitalize text-[#5b5676] dark:bg-slate-700 dark:text-slate-200">{{
                 user.role
               }}</span>
             </td>
@@ -117,7 +117,7 @@
               <div class="relative flex gap-2">
                 <button
                   type="button"
-                  class="inline-flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-[0_4px_12px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-200"
+                  class="inline-flex items-center gap-2 rounded-full bg-[#e8e3f2] px-3 py-1.5 text-xs font-semibold text-[#4d466b] dark:bg-slate-800 dark:text-slate-200"
                   @click="roleDropdownUserId = roleDropdownUserId === user.id ? null : user.id"
                 >
                   {{ user.role }}
@@ -125,11 +125,11 @@
                 </button>
                 <div
                   v-if="roleDropdownUserId === user.id"
-                  class="absolute left-0 top-[calc(100%+4px)] z-20 min-w-28 rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-[0_12px_30px_rgba(15,23,42,0.12)] dark:border-slate-700/70 dark:bg-slate-900/95"
+                  class="absolute left-0 top-[calc(100%+4px)] z-20 min-w-28 rounded-2xl bg-white p-1.5 dark:bg-slate-900"
                 >
-                  <button type="button" class="block w-full rounded-xl px-2 py-1.5 text-left text-xs font-medium capitalize text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="changeRole(user.id, 'student')">student</button>
-                  <button type="button" class="block w-full rounded-xl px-2 py-1.5 text-left text-xs font-medium capitalize text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="changeRole(user.id, 'company')">company</button>
-                  <button type="button" class="block w-full rounded-xl px-2 py-1.5 text-left text-xs font-medium capitalize text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800" @click="changeRole(user.id, 'admin')">admin</button>
+                  <button type="button" class="block w-full rounded-xl px-2 py-1.5 text-left text-xs font-medium capitalize text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="changeRole(user.id, 'student')">student</button>
+                  <button type="button" class="block w-full rounded-xl px-2 py-1.5 text-left text-xs font-medium capitalize text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="changeRole(user.id, 'company')">company</button>
+                  <button type="button" class="block w-full rounded-xl px-2 py-1.5 text-left text-xs font-medium capitalize text-slate-700 hover:bg-[#f1edf8] dark:text-slate-200 dark:hover:bg-slate-800" @click="changeRole(user.id, 'admin')">admin</button>
                 </div>
                 <button
                   @click="$emit('delete-user', user.id)"

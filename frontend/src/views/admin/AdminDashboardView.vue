@@ -1,16 +1,16 @@
 <template>
   <AppLayout>
-    <div class="space-y-8">
-      <section class="rounded-3xl border border-slate-200/80 bg-linear-to-br from-[#f8f6ff] via-[#f4f0ff] to-[#eef5ff] p-6 shadow-[0_20px_45px_rgba(30,27,53,0.08)] dark:border-slate-700/70 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:shadow-[0_20px_45px_rgba(2,6,23,0.45)] sm:p-8">
+    <div class="space-y-6">
+      <section class="rounded-3xl bg-white p-6 dark:bg-slate-900/90 sm:p-8">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#4b35cb] dark:text-indigo-300">Administration</p>
-            <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">Admin Control Center</h1>
-            <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+            <p class="text-xs font-semibold uppercase tracking-[0.12em] text-[#66628b] dark:text-slate-400">Administration</p>
+            <h1 class="mt-2 text-3xl font-black tracking-tight text-[#1f1a38] dark:text-slate-100 sm:text-4xl">Admin Control Center</h1>
+            <p class="mt-2 max-w-2xl text-sm text-[#6c6786] dark:text-slate-300">
               Review users, company verifications and projects in one moderation workspace.
             </p>
           </div>
-          <span class="inline-flex rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#4b35cb] dark:bg-slate-800/90 dark:text-indigo-300">
+          <span class="inline-flex rounded-full bg-[#e8e3f2] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#4b35cb] dark:bg-slate-800 dark:text-indigo-300">
             Active: {{ activeTab === 'users' ? 'Users' : 'Projects' }}
           </span>
         </div>
