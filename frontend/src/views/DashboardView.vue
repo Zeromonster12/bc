@@ -240,20 +240,26 @@
                 {{ project.description || 'No description available.' }}
               </p>
 
-              <div class="mt-3 flex flex-wrap gap-1.5">
+              <div class="mt-3 flex h-6 items-center gap-1.5 overflow-hidden">
                 <span
-                  v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 3)"
+                  v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 2)"
                   :key="`${project.id}-${tech}`"
-                  class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  class="inline-flex max-w-24 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
                   :class="dashboardTechChipClass(index)"
                 >
-                  {{ tech }}
+                  <span class="truncate">{{ tech }}</span>
                 </span>
                 <span
-                  v-if="(project.tech_stack ?? []).length > 3"
+                  v-if="(project.tech_stack ?? []).length > 2"
                   class="inline-flex items-center rounded-full bg-[#ddd7f6] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
                 >
-                  +{{ (project.tech_stack ?? []).length - 3 }}
+                  +{{ (project.tech_stack ?? []).length - 2 }}
+                </span>
+                <span
+                  v-if="!(project.tech_stack ?? []).length"
+                  class="inline-flex items-center rounded-full bg-[#e8e3f2] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
+                >
+                  General
                 </span>
               </div>
 
