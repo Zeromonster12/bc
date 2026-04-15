@@ -1,6 +1,6 @@
 <template>
   <AppLayout>
-    <div class="space-y-8">
+    <div class="space-y-8 overflow-x-hidden">
       <!-- Student dashboard -->
       <template v-if="auth.isStudent">
         <section class="rounded-3xl bg-white p-6 dark:bg-slate-900 sm:p-8">
@@ -274,7 +274,7 @@
             <div
               v-for="n in 4"
               :key="n"
-              class="h-36 w-[min(16rem,calc(100vw-2.5rem))] shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
+              class="h-36 w-[min(16rem,85%)] shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
             />
           </div>
 
@@ -286,7 +286,7 @@
             <article
               v-for="project in recentProjects"
               :key="project.id"
-              class="group flex min-h-49 w-[min(16rem,calc(100vw-2.5rem))] shrink-0 cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72"
+              class="group flex min-h-49 w-[min(16rem,85%)] shrink-0 cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72"
               @click="$router.push('/projects/' + project.id)"
             >
               <div class="flex items-center justify-between gap-2">
