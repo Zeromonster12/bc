@@ -243,7 +243,7 @@
           </aside>
         </div>
 
-        <section>
+        <section class="min-w-0">
           <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent open projects</h2>
             <div class="flex items-center gap-2">
@@ -270,23 +270,23 @@
             </div>
           </div>
 
-          <div v-if="projectStore.loading" class="flex gap-3 overflow-hidden">
+          <div v-if="projectStore.loading" class="flex min-w-0 gap-3 overflow-x-auto pb-1">
             <div
               v-for="n in 4"
               :key="n"
-              class="h-36 w-64 shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
+              class="h-36 w-[calc(100%-0.75rem)] max-w-72 shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
             />
           </div>
 
           <div
             v-else-if="recentProjects.length"
             ref="recentProjectsRail"
-            class="flex gap-3 overflow-x-auto scroll-smooth pb-1"
+            class="flex min-w-0 gap-3 overflow-x-auto scroll-smooth pb-1 snap-x snap-mandatory"
           >
             <article
               v-for="project in recentProjects"
               :key="project.id"
-              class="group flex min-h-49 w-64 shrink-0 cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72"
+              class="group flex min-h-49 w-[calc(100%-0.75rem)] max-w-72 shrink-0 snap-start cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72"
               @click="$router.push('/projects/' + project.id)"
             >
               <div class="flex items-center justify-between gap-2">
