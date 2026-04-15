@@ -243,119 +243,6 @@
           </aside>
         </div>
 
-        <section class="min-w-0 w-full max-w-full">
-          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent open projects</h2>
-            <div class="hidden items-center gap-2 sm:flex">
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#e8e3f2] text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                aria-label="Scroll projects left"
-                @click="scrollRecentProjects('left')"
-              >
-                <svg viewBox="0 0 20 20" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M12.5 15.5 7 10l5.5-5.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#e8e3f2] text-[#4d466b] transition hover:bg-[#ddd7f6] dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                aria-label="Scroll projects right"
-                @click="scrollRecentProjects('right')"
-              >
-                <svg viewBox="0 0 20 20" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="m7.5 15.5 5.5-5.5-5.5-5.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div v-if="projectStore.loading" class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div
-              v-for="n in recentProjectsSkeletonCount"
-              :key="n"
-              class="h-36 w-[calc(100%-1rem)] shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
-            />
-          </div>
-
-          <div
-            v-else-if="recentProjectsCarousel.length"
-            ref="recentProjectsRail"
-            class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain scroll-smooth pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            <article
-              v-for="project in recentProjectsCarousel"
-              :key="project.id"
-              class="group flex min-h-49 w-[calc(100%-1rem)] shrink-0 cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 snap-start sm:w-72"
-              @click="$router.push('/projects/' + project.id)"
-            >
-              <div class="flex min-w-0 items-center justify-between gap-2">
-                <span class="inline-flex min-w-0 max-w-[70%] rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
-                  <span class="truncate">{{ normalizeLocationStrategy(project.location_strategy) }}</span>
-                </span>
-                <span class="shrink-0 text-[10px] text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
-              </div>
-
-              <h3 class="mt-2 line-clamp-2 text-sm font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
-                {{ project.title }}
-              </h3>
-
-              <p class="mt-1 line-clamp-2 text-xs text-slate-600 dark:text-slate-300">
-                {{ project.description || 'No description available.' }}
-              </p>
-
-              <div class="mt-3 flex h-6 items-center gap-1.5 overflow-hidden">
-                <span
-                  v-for="(tech, index) in (project.tech_stack ?? []).slice(0, 2)"
-                  :key="`${project.id}-${tech}`"
-                  class="inline-flex max-w-24 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                  :class="dashboardTechChipClass(index)"
-                >
-                  <span class="truncate">{{ tech }}</span>
-                </span>
-                <span
-                  v-if="(project.tech_stack ?? []).length > 2"
-                  class="inline-flex items-center rounded-full bg-[#ddd7f6] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
-                >
-                  +{{ (project.tech_stack ?? []).length - 2 }}
-                </span>
-                <span
-                  v-if="!(project.tech_stack ?? []).length"
-                  class="inline-flex items-center rounded-full bg-[#e8e3f2] px-2 py-0.5 text-[10px] font-semibold text-[#4d466b] dark:bg-slate-700 dark:text-slate-300"
-                >
-                  General
-                </span>
-              </div>
-
-              <div class="mt-auto flex items-center justify-between gap-2 pt-3 text-[11px] text-slate-500 dark:text-slate-400">
-                <div class="flex min-w-0 items-center gap-2">
-                  <img
-                    v-if="companyAvatarUrl(project)"
-                    :src="companyAvatarUrl(project)"
-                    :alt="`${companyName(project)} logo`"
-                    class="h-6 w-6 shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-                    loading="lazy"
-                  >
-                  <span
-                    v-else
-                    class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e3f2] text-[10px] font-bold text-[#4d466b] dark:bg-slate-700 dark:text-slate-200"
-                  >
-                    {{ companyInitials(project) }}
-                  </span>
-
-                  <span class="truncate pr-2 font-medium text-slate-600 dark:text-slate-300">
-                    {{ companyName(project) }}
-                  </span>
-                </div>
-                <span class="shrink-0 font-semibold text-indigo-600 dark:text-indigo-400">Open</span>
-              </div>
-            </article>
-          </div>
-
-          <div v-else class="rounded-2xl bg-white p-6 text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-            No open projects right now.
-          </div>
-        </section>
       </template>
 
       <!-- Company dashboard -->
@@ -578,7 +465,6 @@ export default defineComponent({
       stats: createDefaultDashboardStats(),
       adminUsers: [] as AdminUserLite[],
       adminProjects: [] as DashboardProject[],
-      viewportWidth: 1024,
     }
   },
   computed: {
@@ -588,23 +474,6 @@ export default defineComponent({
     },
     recentProjects(): DashboardProject[] {
       return (this.projectStore.projects as DashboardProject[]).slice(0, 6)
-    },
-    recentProjectsVisibleLimit(): number {
-      if (this.viewportWidth < 640) {
-        return 1
-      }
-
-      if (this.viewportWidth < 1024) {
-        return 3
-      }
-
-      return 6
-    },
-    recentProjectsCarousel(): DashboardProject[] {
-      return this.recentProjects.slice(0, this.recentProjectsVisibleLimit)
-    },
-    recentProjectsSkeletonCount(): number {
-      return Math.max(1, Math.min(4, this.recentProjectsVisibleLimit))
     },
     recommendedProjects(): DashboardProject[] {
       return this.recentProjects.slice(0, 3)
@@ -729,9 +598,6 @@ export default defineComponent({
     },
   },
   async mounted() {
-    this.updateViewportWidth()
-    window.addEventListener('resize', this.updateViewportWidth)
-
     if (this.auth.isStudent) {
       await Promise.all([
         this.projectStore.fetchProjects({ status: 'open', per_page: 8 }),
@@ -776,13 +642,7 @@ export default defineComponent({
       this.stats.openProjects = Number(this.projectStore.pagination?.total ?? 0)
     }
   },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.updateViewportWidth)
-  },
   methods: {
-    updateViewportWidth(): void {
-      this.viewportWidth = window.innerWidth
-    },
     normalizeLocationStrategy(value: unknown): string {
       const strategy = String(value ?? '').trim().toLowerCase()
       if (!strategy) return 'Unknown'
@@ -896,22 +756,6 @@ export default defineComponent({
       ].find((value) => typeof value === 'string' && value.trim().length > 0)
 
       return resolveAssetUrl(typeof possibleUrl === 'string' ? possibleUrl : '')
-    },
-    scrollRecentProjects(direction: 'left' | 'right'): void {
-      if (this.recentProjectsCarousel.length <= 1) {
-        return
-      }
-
-      const rail = this.$refs.recentProjectsRail
-      if (!(rail instanceof HTMLElement)) {
-        return
-      }
-
-      const step = Math.max(220, Math.floor(rail.clientWidth * 0.8))
-      rail.scrollBy({
-        left: direction === 'left' ? -step : step,
-        behavior: 'smooth',
-      })
     },
   },
 })
