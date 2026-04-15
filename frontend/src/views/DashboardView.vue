@@ -243,7 +243,7 @@
           </aside>
         </div>
 
-        <section class="min-w-0">
+        <section class="min-w-0 w-full max-w-full overflow-x-hidden">
           <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent open projects</h2>
             <div class="hidden items-center gap-2 sm:flex">
@@ -270,7 +270,7 @@
             </div>
           </div>
 
-          <div v-if="projectStore.loading" class="flex min-w-0 gap-3 overflow-hidden pb-1 sm:overflow-x-auto">
+          <div v-if="projectStore.loading" class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-1">
             <div
               v-for="n in recentProjectsSkeletonCount"
               :key="n"
@@ -281,19 +281,19 @@
           <div
             v-else-if="recentProjectsCarousel.length"
             ref="recentProjectsRail"
-            class="flex min-w-0 gap-3 overflow-hidden scroll-smooth pb-1 sm:overflow-x-auto sm:snap-x sm:snap-mandatory"
+            class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain scroll-smooth pb-1 sm:snap-x sm:snap-mandatory"
           >
             <article
               v-for="project in recentProjectsCarousel"
               :key="project.id"
-              class="group flex min-h-49 w-full cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72 sm:shrink-0 sm:snap-start"
+              class="group flex min-h-49 min-w-0 w-full cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72 sm:shrink-0 sm:snap-start"
               @click="$router.push('/projects/' + project.id)"
             >
-              <div class="flex items-center justify-between gap-2">
-                <span class="inline-flex rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
-                  {{ normalizeLocationStrategy(project.location_strategy) }}
+              <div class="flex min-w-0 items-center justify-between gap-2">
+                <span class="inline-flex min-w-0 max-w-[70%] rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">
+                  <span class="truncate">{{ normalizeLocationStrategy(project.location_strategy) }}</span>
                 </span>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
+                <span class="shrink-0 text-[10px] text-slate-500 dark:text-slate-400">{{ formatPostedAt(project.posted_at) }}</span>
               </div>
 
               <h3 class="mt-2 line-clamp-2 text-sm font-bold text-slate-900 group-hover:text-indigo-700 dark:text-slate-100 dark:group-hover:text-indigo-300">
