@@ -243,7 +243,7 @@
           </aside>
         </div>
 
-        <section class="min-w-0 w-full max-w-full overflow-x-hidden">
+        <section class="min-w-0 w-full max-w-full">
           <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-slate-100">Recent open projects</h2>
             <div class="hidden items-center gap-2 sm:flex">
@@ -270,23 +270,23 @@
             </div>
           </div>
 
-          <div v-if="projectStore.loading" class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-1">
+          <div v-if="projectStore.loading" class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div
               v-for="n in recentProjectsSkeletonCount"
               :key="n"
-              class="h-36 w-full animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72 sm:shrink-0"
+              class="h-36 w-[calc(100%-1rem)] shrink-0 animate-pulse rounded-2xl bg-[#f1edf8] dark:bg-slate-800 sm:w-72"
             />
           </div>
 
           <div
             v-else-if="recentProjectsCarousel.length"
             ref="recentProjectsRail"
-            class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain scroll-smooth pb-1 sm:snap-x sm:snap-mandatory"
+            class="flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overscroll-x-contain scroll-smooth pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <article
               v-for="project in recentProjectsCarousel"
               :key="project.id"
-              class="group flex min-h-49 min-w-0 w-full cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 sm:w-72 sm:shrink-0 sm:snap-start"
+              class="group flex min-h-49 w-[calc(100%-1rem)] shrink-0 cursor-pointer flex-col rounded-2xl bg-white p-4 transition hover:bg-[#fcfbff] dark:bg-slate-900 dark:hover:bg-slate-800 snap-start sm:w-72"
               @click="$router.push('/projects/' + project.id)"
             >
               <div class="flex min-w-0 items-center justify-between gap-2">
