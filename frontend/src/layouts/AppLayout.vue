@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen overflow-x-hidden bg-transparent">
+  <div class="min-h-screen bg-transparent">
     <header class="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur lg:hidden dark:border-slate-700/80 dark:bg-slate-900/95">
       <div class="flex h-14 items-center justify-between px-4">
         <RouterLink
