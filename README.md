@@ -1,3 +1,10 @@
+# Deployment a demo ucty
+
+- Deployment: https://projectlinker.lznet.work
+- Demo ucet student: student@example.com
+- Demo ucet company: company@example.com
+- Heslo pre oba ucty: password
+
 # Postup lokalneho overenia funkcnosti
 
 ## 1. Rozsah riesenia
